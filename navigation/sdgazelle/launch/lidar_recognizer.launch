@@ -1,0 +1,8 @@
+<launch>
+    <node name="playbag" pkg="rosbag" type="play"
+      args="--clock /media/nvidia/data/bags/frwd.bag" />
+
+    <node name="rviz_map" pkg="rviz" type="rviz" args="-d $(find ouster_ros)/viz.rviz" />
+    <node pkg="sdgazelle" name="lidar_recognizer" type="lidar_image_detect.py" output="log" />
+
+</launch>

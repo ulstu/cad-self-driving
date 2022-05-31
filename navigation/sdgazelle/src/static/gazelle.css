@@ -1,0 +1,50 @@
+#velocitycontainer {
+    z-index: 1000;
+    position: absolute;
+    top: 20px;
+    left: 100px;
+    font-size: 35px;
+    color: red;
+    font-weight: bold;
+    font-family: Arial, Helvetica;
+}
+
+#controlcontainer {
+    z-index: 1000;
+    position: absolute;
+    bottom: 20px;
+    right: 200px;
+}
+
+#distcontainer {
+    z-index: 1000;
+    position: absolute;
+    top: 120px;
+    left: 100px;
+    font-size: 18px;
+    color: red;
+    font-weight: bold;
+    font-family: Arial, Helvetica;
+}
+#statuscontainer {
+    z-index: 1000;
+    position: absolute;
+    top: 60px;
+    left: 100px;
+    font-size: 40px;
+    color: red;
+    font-weight: bold;
+    font-family: Arial, Helvetica;
+}
+
+#carstatecontainer {
+    z-index: 1000;
+    position: absolute;
+    top: 160px;
+    left: 100px;
+    font-size: 20px;
+    color: blue;
+    font-weight: bold;
+    font-family: Arial, Helvetica;
+
+}

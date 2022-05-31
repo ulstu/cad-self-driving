@@ -1,0 +1,66 @@
+<launch>
+
+  <arg name="os1_hostname" default="192.168.1.54" doc="hostname or IP in dotted decimal form of the sensor"/>
+  <arg name="os1_udp_dest" default="192.168.1.38" doc="hostname or IP where the sensor will send data packets"/>
+  <arg name="os1_lidar_port" default="7502" doc="port to which the sensor should send lidar data"/>
+  <arg name="os1_imu_port" default="7503" doc="port to which the sensor should send imu data"/>
+  <arg name="replay" default="false" doc="do not connect to a sensor; expect /os1_node/{lidar,imu}_packets from replay"/>
+  <arg name="lidar_mode" default="1024x10" doc="resolution and rate: either 512x10, 512x20, 1024x10, 1024x20, or 2048x10"/>
+  <arg name="metadata" default="/home/nvidia/.ros/10.3.23.82.json" doc="override default metadata file for replays"/>
+  <arg name="viz" default="false" doc="whether to run a simple visualizer"/>
+  <arg name="image" default="false" doc="publish range/intensity/noise image topic"/>
+
+  <arg name="rviz" default="true" />
+   <arg name="map" default="true" />
+
+  <node pkg="ouster_ros" name="os_node" type="os_node" output="screen" required="true">
+    <param name="~/lidar_mode" type="string" value="$(arg lidar_mode)"/>
+    <param name="~/replay" value="$(arg replay)"/>
+    <param name="~/os1_hostname" value="$(arg os1_hostname)"/>
+    <param name="~/os1_udp_dest" value="$(arg os1_udp_dest)"/>
+    <param name="~/os1_lidar_port" value="$(arg os1_lidar_port)"/>
+    <param name="~/os1_imu_port" value="$(arg os1_imu_port)"/>
+    <param name="~/metadata" value="$(arg metadata)"/>
+  </node>
+
+  <node pkg="ouster_ros" type="os_cloud_node" name="os_cloud_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/lidar_packets" to="/os1_node/lidar_packets"/>
+    <remap from="~/imu_packets" to="/os1_node/imu_packets"/>
+  </node>
+
+  <node if="$(arg viz)" pkg="ouster_ros" name="viz_node" type="viz_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/points" to="/os1_cloud_node/points"/>
+  </node>
+
+<!--
+  <node pkg="obstacle_detection" name="obstacle_detection_node" type="obstacle_detection" output="screen">
+    <param name="input" value="/os1_cloud_node/points"/>
+    <param name="ground_min" value="-0.34"/>
+    <param name="ground_max" value="0.4"/>
+    <param name="ground_min" value="-0.34"/>
+    <param name="ground_max" value="3"/>
+  </node>
+-->
+  <node if="$(arg image)" pkg="ouster_ros" name="img_node" type="img_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/points" to="/os1_cloud_node/points"/>
+  </node>
+
+
+<!--
+  <param name="robot_description"
+    textfile="$(find ouster_ros)/urdf/os1_sensor.urdf" />
+-->
+  <node if="$(arg rviz)" name="rviz_map" pkg="rviz" type="rviz" args="-d $(find ouster_ros)/viz.rviz" />
+
+
+<node name="playbag" pkg="rosbag" type="play"
+      args="--clock /media/nvidia/data/bags/back.bag" />
+
+<!--  <node pkg="rosbag" type="record" name="rosbag_record_all"
+    args="-a -o $(find rover_gazebo)/data/racer"
+    if="$(arg record)" /> 
+-->
+</launch>

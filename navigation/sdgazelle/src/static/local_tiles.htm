@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ulstu GAZelle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <link rel="stylesheet" href="jquery-ui.min.css" type="text/css"/>
+    <link rel="stylesheet" href="gazelle.css" type="text/css"/>
+    <script type="text/javascript" src="OpenLayers.js"></script>
+    <script type="text/javascript" src="OpenStreetMap.js"></script>
+    <script type="text/javascript" src="jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="jquery-ui.min.js"></script>
+    <script type="text/javascript" src="gazelle_map.js"></script>
+</head>
+
+<body>
+
+<div style="width:98%; height:98%; position: absolute" id="map"></div>
+<div id="velocitycontainer"><span id="velocityspan"></span>&nbsp;км/ч</div>
+<div id="statuscontainer"></div>
+<div id="distcontainer"></div>
+<div id="carstatecontainer"></div>
+<div id="controlcontainer">
+    <input type="checkbox" name="drawroad" id="drawroad"/>
+    <label for="drawroad">Draw road</label>
+</div>
+<div id="pointTypeDialog" title="Basic dialog">
+  <p>Select point type</p>
+</div>
+</body>
+</html>
