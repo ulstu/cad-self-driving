@@ -17,29 +17,30 @@ public:
         analogWrite(speed_pin, 0);
     }
 
-    void run(int speed, Direction direction){
-        if (direction != Direction::neutral){
-            this->speed = constrain(speed, 0, 100);
-        }else{
+    void run(int speed, Direction direction) {
+        if (direction != Direction::neutral) {
+            this->speed = speed;
+        }
+        else {
             this->speed = 0;
         }
         this->direction = direction;
     }
 
-    Direction get_direction(){
+    Direction get_direction() {
         return direction;
     }
 
-    void Update(){
-        if (direction == Direction::forward){
+    void update(){
+        if (direction == Direction::forward) {
             digitalWrite(dir_pin, inversed ? HIGH : LOW);
             analogWrite(speed_pin, speed);
         }
-        if (direction == Direction::backward){
+        if (direction == Direction::backward) {
             digitalWrite(dir_pin, inversed ? LOW : HIGH);
             analogWrite(speed_pin, speed);
         }
-        if (direction == Direction::neutral){
+        if (direction == Direction::neutral) {
             analogWrite(speed_pin, 0);
         }
     }

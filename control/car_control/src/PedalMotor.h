@@ -2,21 +2,85 @@
 
 class PedalMotor {
 
+private:
+    int pwmPin, dirPin, analogPin, limitSwitch;
+    int min, max;
+    int targetPosition;
+    bool inversed;
+    bool fast = false;
+
 public:
 
-    PedalMotor(int pin, int pin_dir, int l_up, int l_down, int up_state, int down_state, bool inverse_direction):
-        pin(pin), 
-        pin_dir(pin_dir), 
-        lim_up(l_up), 
-        lim_down(l_down), 
-        up_state(up_state), 
-        down_state(down_state),
-        inverse_direction(inverse_direction)
-    {
-        pinMode(l_up, INPUT_PULLUP);
-        pinMode(l_down, INPUT_PULLUP);
+    PedalMotor(int pwmPin, int min, int max, int dirPin, int analogPin, int limitSwitch, bool inversed) {
+        this->pwmPin      = pwmPin;
+        this->dirPin      = dirPin;
+        this->analogPin   = analogPin;
+        this->min         = min;
+        this->max         = max;
+        this->limitSwitch = limitSwitch;
+        this->inversed    = inversed;
+        targetPosition    = 0;
+        pinMode(pwmPin, OUTPUT);
+        pinMode(dirPin, OUTPUT);
+        if (limitSwitch != NULL) {
+        	pinMode(limitSwitch, INPUT_PULLUP);
+        }
     }
 
+    void set(int position) {
+    	if (position == -1) {
+    		fast = true;
+    	} else {
+    		fast = false;
+    	}
+    	targetPosition = abs(position) * (max / 255.0);
+    	if (targetPosition > max) {
+    		targetPosition = max;
+    	}
+    	else if (targetPosition < min) {
+    		targetPosition = min;
+    	}
+    }
+
+    void update() {
+        int currentPosition = analogRead(analogPin);
+        int speed = 4 * abs(currentPosition - targetPosition);
+        if (speed > 255) {
+        	speed = 255;
+        }
+        //else if (speed < 50) {
+        //    speed = 0;
+        //}
+        if(currentPosition > targetPosition) {
+    		digitalWrite(dirPin, inversed? 0 : 1);
+        }
+        else if (currentPosition < targetPosition) {
+        	digitalWrite(dirPin, inversed? 1 : 0);
+        }
+
+        if (limitSwitch != NULL) {
+        	if (!digitalRead(limitSwitch) && currentPosition < targetPosition) {
+        		speed = 0;
+        	}
+        }
+        else if ((currentPosition > targetPosition) && (currentPosition < (0.92 * max)) && (currentPosition > (0.01 * max)) && fast == false) {
+        	speed *= 0.06;
+        }
+        analogWrite(pwmPin, speed);
+    }
+
+    int getPosition() {
+        int result = analogRead(analogPin) * (255.0 / max);
+        if (result > max) {
+            result = max;
+        }
+        else if (result < min) {
+            result = min;
+        }
+    	return result;
+    }
+
+    /*
     void push(int speed = 100) {
         speed *= 2.5;
         this->speed = speed;
@@ -32,43 +96,5 @@ public:
     void stop() {
         this->speed = 0;
     }
-
-    int update() {
-        GearboxMotor::Position current_position = get_position();
-        //остановка движка в крайних положениях
-        if (get_position() == GearboxMotor::Position::up && direction == (inverse_direction? 0 : 1)) {
-            analogWrite(pin, 0);
-        }
-        else if (get_position() == GearboxMotor::Position::down && direction == (inverse_direction? 1 : 0)) {
-            analogWrite(pin, 0);
-        }
-        else {
-            analogWrite(pin, speed);
-            digitalWrite(pin_dir, direction);
-        }
-
-        return current_confirmed_position;
-    }
-
-    GearboxMotor::Position get_position() {
-        if (digitalRead(lim_up) == up_state) {
-            return GearboxMotor::Position::up;
-        }
-        else if (digitalRead(lim_down) == down_state) {
-            return GearboxMotor::Position::down;
-        }
-        else {
-            return GearboxMotor::Position::middle;
-        }
-    }
-
-private:
-    int pin, pin_dir;
-    int speed;
-    int direction;
-    int change_count;
-    GearboxMotor::Position current_confirmed_position;
-    int lim_up, lim_down;
-    int up_state, down_state;
-    bool inverse_direction;
+*/
 };

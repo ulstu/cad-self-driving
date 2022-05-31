@@ -15,57 +15,37 @@ namespace RC_receiver {
 	volatile unsigned long times[6];
 	
 	void pin_1_change() {
-		int state = digitalRead(2);
-		if (state == HIGH) {
-			times[0] = micros();
-		}
-		if (state == LOW) {
+		if (digitalRead(2) == LOW) {
 			gear_value = micros() - times[0];
 		}
 	}
 	void pin_2_change() {
-		int state = digitalRead(3);
-		if (state == HIGH) {
-			times[1] = micros();
-		}
-		if (state == LOW) {
-			egn_value = micros() - times[1];
+		if (digitalRead(3) == LOW) {
+			egn_value = micros() - times[0];
 		}
 	}
 	void pin_3_change() {
-		int state = digitalRead(18);
-		if (state == HIGH) {
-			times[2] = micros();
-		}
-		if (state == LOW) {
-			unused_value = micros() - times[2];
+		if (digitalRead(18) == LOW) {
+			unused_value = micros() - times[0];
 		}
 	}
 	void pin_4_change() {
 		int state = digitalRead(19);
 		if (state == HIGH) {
-			times[3] = micros();
+			times[0] = micros();
 		}
 		if (state == LOW) {
-			brake_value = micros() - times[3];
+			brake_value = micros() - times[0];
 		}
 	}
 	void pin_5_change() {
-		int state = digitalRead(20);
-		if (state == HIGH) {
-			times[4] = micros();
-		}
-		if (state == LOW) {
-			clutch_value = micros() - times[4];
+		if (digitalRead(20) == LOW) {
+			clutch_value = micros() - times[0];
 		}
 	}
 	void pin_6_change() {
-		int state = digitalRead(21);
-		if (state == HIGH) {
-			times[5] = micros();
-		}
-		if (state == LOW) {
-			eur_value = micros() - times[5];
+		if (digitalRead(21) == LOW) {
+			eur_value = micros() - times[0];
 		}
 	}
 
@@ -85,10 +65,8 @@ namespace RC_receiver {
 	}
 
 	bool Available() {
-		for (int i = 0; i < 6; i++) {
-			if (micros() - times[i] > 100000) {
-				return false;
-			}
+		if (micros() - times[0] > 300000) {
+			return false;
 		}
 		return true;
 	}
