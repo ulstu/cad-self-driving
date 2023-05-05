@@ -3,6 +3,7 @@ import math
 import numpy as np
 import cv2
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus, PointCloud2, Imu
+from std_msgs.msg import Float32
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg  import PointStamped, TransformStamped, Quaternion
 from tf2_ros import TransformBroadcaster
@@ -10,8 +11,15 @@ from ackermann_msgs.msg import AckermannDrive
 from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from scipy.spatial.transform import Rotation
+from  .log_server import set_location
+from  .log_server import set_state
+from  .log_server import set_lidar_hz
+from  .log_server import set_gnss_hz
+from  .log_server import set_camera_hz
+from .log_server import LogServerStatus
+from prometheus_client import start_http_server
 
-class NodeGPS(Node):
+class NodeSensorsWebots(Node):
     def __init__(self):
         try:
             super().__init__('node_gps')
@@ -22,15 +30,36 @@ class NodeGPS(Node):
             self.__pc_publisher = self.create_publisher(PointCloud2, '/lidar', qos)
             self.create_subscription(PointStamped, '/vehicle/gps', self.__on_gps_message, qos)
             self.create_subscription(Image, '/vehicle/range_finder', self.__on_range_message, qos)
+            self.create_subscription(Float32, '/vehicle/gps/speed', self.__on_speed, qos)
             self.create_subscription(PointCloud2, '/vehicle/Velodyne_VLP_16/point_cloud', self.__on_point_cloud, qos)
             self.create_subscription(Imu, '/imu', self.__on_imu, qos)
             self.__cur_imu_data = None
             self.__tf_broadcaster = TransformBroadcaster(self)
             self._logger.info('GPS Node initialized')
+            self.__cur_speed = 0.0
+            self.__lidar_last_time = self.get_clock().now()
+            self.__gnss_last_time = self.get_clock().now()
+            self.__camera_last_time = self.get_clock().now()
         except  Exception as err:
             print(f'{str(err)}')
 
+
+    def set_last_time(self, last_time, set_func):
+        cur_time = self.get_clock().now()
+
+        time_diff = (cur_time - last_time).nanoseconds / 1e9
+        if time_diff == 0.0:
+            time_diff = 0.0
+        else:
+            time_diff = 1 / time_diff
+        set_func(time_diff)
+        return cur_time
+
+    def __on_speed(self, data):
+        self.__cur_speed = float(data.data)
+
     def __on_range_message(self, data):
+
         try:
             pass
             # img = data.data
@@ -47,6 +76,8 @@ class NodeGPS(Node):
     
     def __on_point_cloud(self, data):
         try:
+            self.__lidar_last_time = self.set_last_time(self.__lidar_last_time, set_lidar_hz)
+
             p = data
             p.header.stamp = self.get_clock().now().to_msg()
             p.header.frame_id = 'base_link'
@@ -103,6 +134,7 @@ class NodeGPS(Node):
         try:
             if not self.__cur_imu_data:
                 return 
+            self.__gnss_last_time = self.set_last_time(self.__gnss_last_time, set_gnss_hz)
 
             (roll, pitch, yaw) = self.euler_from_quaternion(self.__cur_imu_data.orientation.x, self.__cur_imu_data.orientation.y, self.__cur_imu_data.orientation.z, self.__cur_imu_data.orientation.w)
             #self._logger.info(f'direction: {yaw}')
@@ -138,15 +170,29 @@ class NodeGPS(Node):
             odom.pose.pose.position.z = data.point.z
             odom.pose.pose.orientation = self.__cur_imu_data.orientation
             self.__odom_publisher.publish(odom)
+            set_location(self.__cur_speed * 10, data.point.x, data.point.y, data.point.z, yaw)
         except  Exception as err:
             print(f'{str(err)}')
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    detector = NodeGPS()
-    rclpy.spin(detector)
-    rclpy.shutdown()
+    try:
+        start_http_server(8009)
+        set_state(LogServerStatus.STARTED)
+        rclpy.init(args=args)
+        set_state(LogServerStatus.RUNNING)
+        detector = NodeSensorsWebots()
+        rclpy.spin(detector)
+        set_state(LogServerStatus.STOPPED)
+        rclpy.shutdown()
+    except KeyboardInterrupt:
+        set_state(LogServerStatus.STOPPED)
+        print('server stopped cleanly')
+    except  Exception as err:
+        set_state(LogServerStatus.STOPPED)
+        print(f'node_gps stopped')
+    finally:
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':

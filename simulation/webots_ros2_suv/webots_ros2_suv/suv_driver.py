@@ -2,7 +2,6 @@ import rclpy
 from ackermann_msgs.msg import AckermannDrive
 from nav_msgs.msg import Odometry
 
-
 class SUVDriver:
     def init(self, webots_node, properties):
         try:

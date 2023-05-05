@@ -6,6 +6,9 @@ from sensor_msgs.msg import Image
 from ackermann_msgs.msg import AckermannDrive
 from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
+from  .log_server import set_transmission
+from  .log_server import set_steering
+
 
 
 CONTROL_COEFFICIENT = 0.0007
@@ -58,16 +61,25 @@ class LaneFollower(Node):
                     error = 190 - center_x
                     command_message.steering_angle = error * CONTROL_COEFFICIENT
 
+            set_transmission(command_message.speed / 25 + 1)
+            set_steering(command_message.steering_angle)
+
             self.__ackermann_publisher.publish(command_message)
         except  Exception as err:
             self._logger.info(f'{str(err)}')
 
 def main(args=None):
-    
-    rclpy.init(args=args)
-    follower = LaneFollower()
-    rclpy.spin(follower)
-    rclpy.shutdown()
+    try:
+        rclpy.init(args=args)
+        follower = LaneFollower()
+        rclpy.spin(follower)
+        rclpy.shutdown()
+    except KeyboardInterrupt:
+        pass
+    except  Exception as err:
+        print(f'node_gps stopped')
+    finally:
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':

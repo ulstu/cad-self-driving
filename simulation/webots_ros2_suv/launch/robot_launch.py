@@ -14,8 +14,10 @@ from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLau
 from webots_ros2_driver.utils import controller_url_prefix
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from nav2_common.launch import RewrittenYaml
+#from .log_server import LogServer
 
 def get_ros2_nodes(*args):
+#    LogServer.set_state('starting')
     package_dir = get_package_share_directory('webots_ros2_suv')
     urdf_filename = pathlib.Path(os.path.join(package_dir, 'resource', 'suv.urdf'))
     robot_description = urdf_filename.read_text()
@@ -57,13 +59,14 @@ def get_ros2_nodes(*args):
         output='screen',
         parameters=[os.path.join(pkg_share, 'config/ekf.yaml'), {'use_sim_time': use_sim_time}])
 
-    node_gps = Node(
+    node_sensors_webots = Node(
         package='webots_ros2_suv',
-        executable='node_gps',
-        name='node_gps',
+        executable='node_sensors_webots',
+        name='node_sensors_webots',
         output='screen' ,
         parameters=[{'use_sim_time': use_sim_time}]
     )
+
 
     static_imu_transform = Node(
         package="tf2_ros",
@@ -137,8 +140,9 @@ def get_ros2_nodes(*args):
     return [
         lane_follower,
         suv_driver,
+
         robot_state_publisher,
-        node_gps,
+        node_sensors_webots,
         #ekf_robot_localization_cmd,
         static_imu_transform,
         static_lidar_transform,
@@ -151,15 +155,15 @@ def get_ros2_nodes(*args):
         #         FindPackageShare("nav2_bringup"), '/launch', '/navigation_launch.py']),
         #     launch_arguments=configParams.items(),
         # ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                FindPackageShare("nav2_bringup"), '/launch', '/navigation_launch.py']),
-            launch_arguments={
-                               'use_sim_time' : use_sim_time,
-                               'map' : map_file_name,
-                               'autostart' : 'true',
-                               'params_file' : [configured_params]}.items(),
-        ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([
+        #         FindPackageShare("nav2_bringup"), '/launch', '/navigation_launch.py']),
+        #     launch_arguments={
+        #                        'use_sim_time' : use_sim_time,
+        #                        'map' : map_file_name,
+        #                        'autostart' : 'true',
+        #                        'params_file' : [configured_params]}.items(),
+        # ),
     ]
 
 

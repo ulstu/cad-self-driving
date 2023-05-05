@@ -48,7 +48,7 @@ setup(
     entry_points={
         'console_scripts': [
             'lane_follower = webots_ros2_suv.lane_follower:main',
-            'node_gps = webots_ros2_suv.node_gps:main',
+            'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main'
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }
