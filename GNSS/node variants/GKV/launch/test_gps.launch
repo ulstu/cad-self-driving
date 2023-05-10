@@ -1,0 +1,21 @@
+<launch>
+    <arg name="osm.tiles.dir" default="/media/nvidia/data/repositories/tiles" />
+    <arg name="osm.gpspath" default="/home/nvidia/catkin_ws/src/sdgazelle/src/data/gpspath_sim.csv" />
+    <!--    <arg name="osm.gpspath" default="/home/nvidia/catkin_ws/src/sdgazelle/src/data/gpspath_sim.csv" />-->
+    <arg name="osm.gpssimulation" default="/home/nvidia/catkin_ws/src/sdgazelle/src/data/gps_dummy_pos.csv" />
+    <arg name="osm.gpsvals" default="/home/nvidia/catkin_ws/src/sdgazelle/src/data/gpsvals.csv" />
+    <arg name="simulation" default="False" />
+    <arg name="usekalman" default="False" />
+
+    <node pkg="sdgazelle" name="gpsnode" type="gpsnode.py" output="screen">
+        <param name="gpsport" value="/dev/ttyUSB0" />
+        <param name="baudrate" value="921600" />
+        <param name="gpsvals" value="$(arg osm.gpsvals)" />
+        <param name="need_display" value="False" />
+        <param name="osm.gpssimulation" value="$(arg osm.gpssimulation)" />
+        <param name="simulation" value="$(arg simulation)" />
+        <param name="simulationdelay" value="0.5" />
+        <param name="usekalman" value="$(arg usekalman)" />
+    </node>
+
+</launch>
