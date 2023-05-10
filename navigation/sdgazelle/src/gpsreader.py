@@ -7,7 +7,28 @@ import math
 import time
 import csv
 import rospy
+import sys
+import struct
+import binascii
 from utils import *
+
+
+def bytes_to_int(offset, paket):
+    r = 0
+    for i in range(4):
+        d = i * 8
+        r += int.from_bytes(paket[offset + i], 'little') << d
+    return r
+
+
+dict = { 'gps_state_status' : 0,
+         'gps_int_longitude' : 8,
+         'gps_int_latitude' : 4,
+         'gps_altitude' : 12,
+         'gps_velocity' : 16,
+         'gps_yaw' : 20
+         }
+
 
 class GPSReader:
     @property
@@ -22,6 +43,11 @@ class GPSReader:
     def velocity(self):
         return self.__velocity
 
+    @property
+    def yaw(self):
+        return self.__yaw
+
+
     def to_decimal(self, lat, lon):
         lat_dd = int(float(lat) / 100)
         lat_mm = float(lat) - lat_dd * 100
@@ -31,16 +57,16 @@ class GPSReader:
         lon_dec = lon_dd + lon_mm / 60
         return lat_dec, lon_dec
 
-    def read_all_data(self):
-        try:
-            while True:
-                self.read_data()
-                rospy.loginfo(
-                    "time: {}; is_confidential: {}; lat: {}; lat_g:{}; lon: {}; lon_g:{}; velocity: {}; direction: {}; date: {}".format(
-                        self.__time, self.__is_confidential, self.__lat, self.__lat_g, self.__lon, self.__lon_g, self.__velocity, self.__direction, self.__date))
-                rospy.loginfo("lat:{}; lon:{}".format(self.__lat_dec, self.__lon_dec))
-        except KeyboardInterrupt:
-            pass
+    """def read_all_data(self):
+                    try:
+                        while True:
+                            self.read_data()
+                            rospy.loginfo(
+                                "time: {}; is_confidential: {}; lat: {}; lat_g:{}; lon: {}; lon_g:{}; velocity: {}; direction: {}; date: {}".format(
+                                    self.__time, self.__is_confidential, self.__lat, self.__lat_g, self.__lon, self.__lon_g, self.__velocity, self.__direction, self.__date))
+                            rospy.loginfo("lat:{}; lon:{}".format(self.__lat_dec, self.__lon_dec))
+                    except KeyboardInterrupt:
+                        pass"""
 
     def save_vals(self, count, filename):
         try:
@@ -66,38 +92,41 @@ class GPSReader:
             rospy.loginfo("GPS device not found")
             time.sleep(2)
         
-        line = str(self.__ser.readline().decode())
-        while not (line.startswith("$GNRMC") or line.startswith("$GPRMC")):
-            line = str(self.__ser.readline().decode())
+        self.__paket = [b'\x00']
+        self.__paket[0] = self.__ser.read()
 
-        if line.startswith("$GNRMC") or line.startswith("$GPRMC"):
-            messages = line.split(',')
-            self.__time = messages[1]
-            self.__is_confidential = messages[2]
-            if self.__is_confidential == 'A':
-                self.__lat = messages[3]
-                self.__lat_g = messages[4]
-                self.__lon = messages[5]
-                self.__lon_g = messages[6]
-                self.__velocity = messages[7]
-                self.__direction = messages[8]
-                self.__date = messages[9]
-                self.__lat_dec, self.__lon_dec = self.to_decimal(self.__lat, self.__lon)
-                if self.__init_lat_dec == 0 or self.__init_lon_dec == 0:
-                    self.__init_lat_dec, self.__init_lon_dec = self.__lat_dec, self.__lon_dec
-            else:
-                rospy.loginfo('GPS NMEA data received but not confidential')
+        while self.__paket[0] != b'\xff':
+            self.__paket[0] = self.__ser.read()
 
+        for byte in range(3):
+            self.__paket.append(self.__ser.read())
 
+        for byte in range(int.from_bytes(self.__paket[3], byteorder=sys.byteorder) + 4):
+            self.__paket.append(self.__ser.read())
+
+        self.__status = bool(bytes_to_int(dict['gps_state_status'] + 4, self.__paket) & (2 ** 16)) - 1
+
+        if self.__status == -1:
+            rospy.loginfo('GPS NMEA data received but not confidential')
+        else:
+
+            self.__lon_dec = bytes_to_int(dict['gps_int_longitude'] + 4, self.__paket) * 360 / 4294967296
+            self.__lat_dec = bytes_to_int(dict['gps_int_latitude'] + 4, self.__paket) * 360 / 4294967296
+            self.__altitude = self.__paket[dict['gps_altitude'] + 4] + self.__paket[dict['gps_altitude'] + 5] + self.__paket[dict['gps_altitude'] + 6] + self.__paket[dict['gps_altitude'] + 7]
+            self.__altitude = struct.unpack('f', self.__altitude)[0]
+            self.__velocity = self.__paket[dict['gps_velocity'] + 4] + self.__paket[dict['gps_velocity'] + 5] + self.__paket[dict['gps_velocity'] + 6] + self.__paket[dict['gps_velocity'] + 7]
+            self.__velocity = struct.unpack('f', self.__velocity)[0]
+            self.__yaw = self.__paket[dict['gps_yaw'] + 4] + self.__paket[dict['gps_yaw'] + 5] + self.__paket[dict['gps_yaw'] + 6] + self.__paket[dict['gps_yaw'] + 7]
+            self.__yaw = struct.unpack('f', self.__yaw)[0]
+            # print(self.__status, self.__lat_dec, self.__lon_dec, self.__altitude, self.__velocity, self.__yaw)
 
     def __init__(self, port, baudrate):
         self.__ser = serial.Serial(port, baudrate)
         rospy.loginfo(self.__ser.name)  # check which port was really used
         self.__init_lat_dec, self.__init_lon_dec = 0, 0
         self.__lat_dec, self.__lon_dec = 0, 0
-        self.__is_confidential = "V"
+        self.__velocity = 0
+        self.__yaw = 0
+        self.__paket = [b'\x00']
         self.read_data()
-        while (self.__is_confidential == "V"):
-            self.read_data()
-            time.sleep(1)
-
+        self.read_data()

@@ -89,9 +89,9 @@ def filter(measurements):
                                            )
         # check not
         if not bool(rospy.get_param("~usekalman")):
-            pub.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}".format(gps.lat_dec, gps.lon_dec, gps.lat_dec, gps.lon_dec, gps.velocity))
+            pub.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}; yaw: {}".format(gps.lat_dec, gps.lon_dec, gps.lat_dec, gps.lon_dec, gps.velocity, gps.yaw))
         else:
-            pub.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}".format(gps.lat_dec, gps.lon_dec, x_now[0], x_now[2], gps.velocity))
+            pub.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}; yaw: {}".format(gps.lat_dec, gps.lon_dec, x_now[0], x_now[2], gps.velocity, gps.yaw))
             
         x_new.append(x_now)
         measurements.append([float(gps.lat_dec), float(gps.lon_dec)])
@@ -133,8 +133,9 @@ if __name__ == '__main__':
                     lat = points[i][0]
                     lon = points[i][1]
                     velocity = 0.006
+                    yaw = 100
                     rospy.loginfo("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}".format(lat, lon, lat, lon, velocity))
-                    gps_pos_publisher.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}".format(lat, lon, lat, lon, velocity))
+                    gps_pos_publisher.publish("lat: {}; lon: {}; klat: {}; klon: {}; velocity: {}; yaw: {}".format(lat, lon, lat, lon, velocity))
                     rospy.sleep(float(rospy.get_param("~simulationdelay")))
                 i += 1
 

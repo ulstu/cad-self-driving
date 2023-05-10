@@ -43,6 +43,7 @@ class Car(object):
             Serial.write(get_code(int(data.data.split()[0]), int(float(data.data.split()[1]))))
         elif int(data.data.split()[0]) != 6:
             Serial.write(get_code(int(data.data.split()[0]), int(float(data.data.split()[1]))))
+            rospy.logerr('Angle: {}'.format(int(float(data.data.split()[1]))))
 
     def read_obd(self):
         '''
@@ -249,8 +250,8 @@ class Car(object):
 
 if __name__ == '__main__':
     try:
-        Serial = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
         rospy.init_node('car', anonymous=True)
+        Serial = serial.Serial(port=rospy.get_param('~mainblockport'), baudrate=115200)
         ctrl = Car()
         ctrl.control()
     except rospy.ROSInterruptException:

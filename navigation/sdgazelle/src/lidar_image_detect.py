@@ -73,7 +73,7 @@ class PathDetector:
         minw = (255 * img_height * window_size)
         np_img[np_img < minval] = 0
         for i in range(0, np_img.shape[1] - window_size, stride):
-            window = np_img[:1, i : i + window_size,:]
+            window = np_img[:, i : i + window_size,:]
             s = np.sum(window)
             if (is_near and s < minw) or (not is_near and s <= minw):# or  (abs(imin - i) < 10 and abs(s - minw) < 1000):
                 minw = s
@@ -83,7 +83,7 @@ class PathDetector:
     def search_nearest(self, np_img, minval = 0):
         np_img[np_img < minval] = 0
         ilongest_empty = int(np_img.shape[1] / 2)
-        sum_rows_img = np_img.sum(axis=0)
+        sum_rows_img = np_img[:1,:,:].sum(axis=0)
         boundary_array = []
         left_boundary = 0
         right_boundary = 0
@@ -166,6 +166,7 @@ class PathDetector:
 
             np_img = cv2.cvtColor(np_img.astype(np.uint8),cv2.COLOR_GRAY2RGB)
             (rows, cols, channels) = np_img.shape
+            imin_buf = imin
             if abs(near_imin - cols / 2) > 50:
                 if (imin  - cols / 2) < 0: # left
                     if (near_imin - cols / 2) > 0:
@@ -181,7 +182,7 @@ class PathDetector:
                 near_imin = int(np_img.shape[1] / 2 - window_size_near / 2)
             
 
-            #print(imin, near_imin)
+            #print(imin, imin_buf, near_imin)
             cv2.rectangle(np_img, (imin, 0), (imin + window_size, rows), (0, 255, 0), 2)
             cv2.line(np_img, (imin + int(window_size / 2), 0), (int(cols / 2), img_height), (255, 0, 0), 3)
             cv2.line(np_img, (near_imin, 0), (int(cols / 2), img_height), (0, 0, 255), 3)
