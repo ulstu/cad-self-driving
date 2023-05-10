@@ -35,12 +35,10 @@
     <node pkg="sdgazelle" name="car" type="car.py" output="screen">
         <param name="histfilename" value="/home/nvidia/catkin_ws/src/sdgazelle/src/data/histcar.csv" />
         <param name="simulation" value="$(arg simulation)" />
-        <param name="obdport" value="/dev/ttyACM1" />        
-        <param name="mainblockport" value="/dev/ttyACM0" />
+        <param name="obdport" value="/dev/ttyUSB0" />
         <param name="loadobd" value="False" />
     </node>
-    <node pkg="sdgazelle" name="stereorecognizer" type="stereorecognizer.py" output="screen">
-    </node>
-    <include file="$(find sdgazelle)/launch/os1_obst.launch" />
+    
+
     <!-- <include file="$(find obstacle_detection)/launch/obstacle_detection.launch" /> -->
 </launch>
