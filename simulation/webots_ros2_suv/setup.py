@@ -7,15 +7,14 @@ package_name = 'webots_ros2_suv'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
 data_files.append(('share/' + package_name + '/launch', ['launch/robot_launch.py']))
+data_files.append(('share/' + package_name + '/launch', ['launch/ulstu_field_launch.py']))
 data_files.append(('share/' + package_name + '/worlds', [
     'worlds/suv_world.wbt', 'worlds/.suv_world.wbproj',
 ]))
-data_files.append(('share/' + package_name + '/worlds', [
-    'worlds/robocross.wbt'
-]))
-data_files.append(('share/' + package_name + '/resource', [
-    'resource/suv.urdf'
-]))
+data_files.append(('share/' + package_name + '/worlds', ['worlds/ulstu_field.wbt']))
+data_files.append(('share/' + package_name + '/worlds', ['worlds/ulstu_field_points.txt']))
+data_files.append(('share/' + package_name + '/worlds', ['worlds/robocross.wbt']))
+data_files.append(('share/' + package_name + '/resource', ['resource/suv.urdf']))
 data_files.append(('share/' + package_name, ['package.xml']))
 data_files.append(('share/' + package_name + '/config', ['config/ekf.yaml']))
 data_files.append(('share/' + package_name + '/config', ['config/slam_toolbox_mapping.yaml']))
@@ -48,6 +47,7 @@ setup(
     entry_points={
         'console_scripts': [
             'lane_follower = webots_ros2_suv.lane_follower:main',
+            'field_follower = webots_ros2_suv.field_follower:main',
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main'
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
