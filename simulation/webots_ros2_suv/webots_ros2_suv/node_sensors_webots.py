@@ -18,6 +18,8 @@ from  .log_server import set_gnss_hz
 from  .log_server import set_camera_hz
 from .log_server import LogServerStatus
 from prometheus_client import start_http_server
+import traceback
+
 
 class NodeSensorsWebots(Node):
     def __init__(self):
@@ -178,6 +180,9 @@ class NodeSensorsWebots(Node):
 def main(args=None):
     try:
         start_http_server(8009)
+    except  Exception as err:
+        print(''.join(traceback.TracebackException.from_exception(err).format()))
+    try:
         set_state(LogServerStatus.STARTED)
         rclpy.init(args=args)
         set_state(LogServerStatus.RUNNING)
@@ -190,7 +195,7 @@ def main(args=None):
         print('server stopped cleanly')
     except  Exception as err:
         set_state(LogServerStatus.STOPPED)
-        print(f'node_gps stopped')
+        print(''.join(traceback.TracebackException.from_exception(err).format()))
     finally:
         rclpy.shutdown()
 
