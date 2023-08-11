@@ -3,7 +3,8 @@ import os
 import pathlib
 import launch
 import yaml
-from launch.substitutions import LaunchConfiguration
+import xacro
+from launch.substitutions import Command, LaunchConfiguration
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions.path_join_substitution import PathJoinSubstitution
 from launch import LaunchDescription
@@ -12,84 +13,75 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLauncher
 from webots_ros2_driver.utils import controller_url_prefix
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from webots_ros2_driver.webots_controller import WebotsController
 from nav2_common.launch import RewrittenYaml
-#from .log_server import LogServer
+
+PACKAGE_NAME = 'webots_ros2_suv'
+USE_SIM_TIME = True
 
 def get_ros2_nodes(*args):
-#    LogServer.set_state('starting')
-    package_dir = get_package_share_directory('webots_ros2_suv')
-    urdf_filename = pathlib.Path(os.path.join(package_dir, 'resource', 'suv.urdf'))
-    robot_description = urdf_filename.read_text()
-
-    use_sim_time = True#LaunchConfiguration('use_sim_time', default='true') 
-    with open(urdf_filename, 'r') as infp:
-        robot_desc = infp.read()
-
-    suv_driver = Node(
-        package='webots_ros2_driver',
-        executable='driver',
-        output='screen',
-        additional_env={'WEBOTS_CONTROLLER_URL': controller_url_prefix() + 'vehicle'},
-        parameters=[
-            {'robot_description': robot_description, 'use_sim_time': use_sim_time,},
-        ]
-    )
+    pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
 
     lane_follower = Node(
-        package='webots_ros2_suv',
+        package=PACKAGE_NAME,
         executable='lane_follower',
-        parameters=[{'use_sim_time': use_sim_time}]
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
-    robot_state_publisher =  Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_desc}],
-        arguments=[robot_description])
-    
-    pkg_share = FindPackageShare(package='webots_ros2_suv').find('webots_ros2_suv')
-
-    ekf_robot_localization_cmd = Node(
-        package='robot_localization',
-        executable='ekf_node',
-        name='ekf_filter_node',
-        output='screen',
-        parameters=[os.path.join(pkg_share, 'config/ekf.yaml'), {'use_sim_time': use_sim_time}])
-
     node_sensors_webots = Node(
-        package='webots_ros2_suv',
+        package=PACKAGE_NAME,
         executable='node_sensors_webots',
         name='node_sensors_webots',
         output='screen' ,
-        parameters=[{'use_sim_time': use_sim_time}]
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
+    node_segmentation = Node(
+        package=PACKAGE_NAME,
+        executable='node_segmentation',
+        name='node_segmentation',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
 
-    static_imu_transform = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        output="screen" ,
-        arguments=["0", "0", "0", "0", "0", "0", "base_link", "imu_link"],
-        parameters=[{'use_sim_time': use_sim_time}]
+    pcl_map_node = Node(
+        package="pcl_maps",
+        executable='pcl_map_node',
+        name='pcl_map_node',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
 
-    )
-    static_lidar_transform = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        output="screen" ,
-        arguments=["0", "0", "0", "0", "0", "0", "base_link", "lidar"],
-        parameters=[{'use_sim_time': use_sim_time}]
-    )
-    static_map_transform = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        output="screen" ,
-        arguments=["0", "0", "0", "0", "0", "0", "map", "odom"],
-        parameters=[{'use_sim_time': use_sim_time}]
-    )
+    package_dir = get_package_share_directory(PACKAGE_NAME)
+    urdf = os.path.join(
+        package_dir,
+        os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'suv.urdf'))))
+    with open(urdf, 'r') as infp:
+        robot_desc = infp.read()
+
+    state_publisher_node = Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='screen',
+            parameters=[{'use_sim_time': USE_SIM_TIME, 'robot_description': robot_desc}],
+            arguments=[urdf])
+
+    static_transforms = [
+        ["base_link", "imu_link"],
+        ["base_link", "lidar"],
+        ["map", "odom"],
+        ["base_link", "range_finder"]
+    ]
+    static_transform_nodes = []
+    for s in static_transforms:
+        static_transform_nodes.append(Node(
+            package="tf2_ros",
+            executable="static_transform_publisher",
+            output="screen" ,
+            arguments=["0", "0", "0", "0", "0", "0"] + s,
+            parameters=[{'use_sim_time': USE_SIM_TIME}]
+        ))
 
     rviz2_node = Node(
             package='rviz2',
@@ -117,93 +109,43 @@ def get_ros2_nodes(*args):
             }]
     )
 
-    slam_node = Node(
-        parameters=[
-            os.path.join(pkg_share, 'config/slam_toolbox_mapping.yaml'),
-            {"use_sim_time": False}
-        ],
-        package="slam_toolbox",
-        executable="async_slam_toolbox_node",
-        name="slam_toolbox_localization",
-        output="screen"
-    )
-
-    with open(os.path.join(pkg_share, 'config/nav2_mapping.yaml'), 'r') as file:
-        configParams = yaml.safe_load(file)#['my_node_name']['ros__parameters']
-        print(configParams)
-    configured_params = RewrittenYaml(
-        source_file=os.path.join(pkg_share, 'config/nav2_mapping.yaml'),
-        root_key='',
-        param_rewrites={},
-        convert_types=True)
-    map_file_name = os.path.join(pkg_share, 'maps/suv_world.yaml')
     return [
-        lane_follower,
-        suv_driver,
-
-        robot_state_publisher,
-        node_sensors_webots,
-        #ekf_robot_localization_cmd,
-        static_imu_transform,
-        static_lidar_transform,
-        static_map_transform,
+        state_publisher_node,
         rviz2_node,
+        lane_follower,
+        node_sensors_webots,
+        node_segmentation,
+        pcl_map_node,
         depth_to_laserscan,
-        #slam_node
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([
-        #         FindPackageShare("nav2_bringup"), '/launch', '/navigation_launch.py']),
-        #     launch_arguments=configParams.items(),
-        # ),
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([
-        #         FindPackageShare("nav2_bringup"), '/launch', '/navigation_launch.py']),
-        #     launch_arguments={
-        #                        'use_sim_time' : use_sim_time,
-        #                        'map' : map_file_name,
-        #                        'autostart' : 'true',
-        #                        'params_file' : [configured_params]}.items(),
-        # ),
-    ]
+    ] + static_transform_nodes
 
 
 def generate_launch_description():
-    package_dir = get_package_share_directory('webots_ros2_suv')
+    package_dir = get_package_share_directory(PACKAGE_NAME)
     world = LaunchConfiguration('world')
-    webots = WebotsLauncher(
-        world=PathJoinSubstitution([package_dir, 'worlds', world])
-    )
-    ros2_supervisor = Ros2SupervisorLauncher()
-    # The following line is important!
-    # This event handler respawns the ROS 2 nodes on simulation reset (supervisor process ends).
-    reset_handler = launch.actions.RegisterEventHandler(
-        event_handler=launch.event_handlers.OnProcessExit(
-            target_action=ros2_supervisor,
-            on_exit=get_ros2_nodes,
-        )
-    )
 
+    webots = WebotsLauncher(world=PathJoinSubstitution([package_dir, 'worlds', world]), ros2_supervisor=True)
+    robot_description_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'suv.urdf')))
+    vehicle_driver = WebotsController(
+        robot_name='vehicle',
+        parameters=[
+            {'robot_description': robot_description_path}
+        ],
+        respawn=True
+    )
     return LaunchDescription([
         DeclareLaunchArgument(
             'world',
-            #default_value='suv_world.wbt',
             default_value='robocross.wbt',
-            description='Choose one of the world files from `/webots_ros2_tesla/worlds` directory'
+            description='Robocross simulation world'
         ),
         webots,
-        ros2_supervisor,
-
+        webots._supervisor,
+        vehicle_driver,
         launch.actions.RegisterEventHandler(
-            event_handler=launch.event_handlers.OnProcessExit(
-                target_action=webots,
-                on_exit=[
-                    launch.actions.UnregisterEventHandler(
-                        event_handler=reset_handler.event_handler
-                    ),
-                    launch.actions.EmitEvent(event=launch.events.Shutdown())
-                ],
+        event_handler=launch.event_handlers.OnProcessExit(
+             target_action=webots,
+             on_exit=[launch.actions.EmitEvent(event=launch.events.Shutdown())],
             )
         ),
-
-        reset_handler
     ] + get_ros2_nodes())

@@ -21,6 +21,7 @@ from prometheus_client import start_http_server
 import traceback
 
 
+
 class NodeSensorsWebots(Node):
     def __init__(self):
         try:
@@ -33,7 +34,8 @@ class NodeSensorsWebots(Node):
             self.create_subscription(PointStamped, '/vehicle/gps', self.__on_gps_message, qos)
             self.create_subscription(Image, '/vehicle/range_finder', self.__on_range_message, qos)
             self.create_subscription(Float32, '/vehicle/gps/speed', self.__on_speed, qos)
-            self.create_subscription(PointCloud2, '/vehicle/Velodyne_VLP_16/point_cloud', self.__on_point_cloud, qos)
+            #self.create_subscription(PointCloud2, '/vehicle/Velodyne_VLP_16/point_cloud', self.__on_point_cloud, qos)
+            self.create_subscription(PointCloud2, '/vehicle/range_finder/point_cloud', self.__on_point_cloud, qos)
             self.create_subscription(Imu, '/imu', self.__on_imu, qos)
             self.__cur_imu_data = None
             self.__tf_broadcaster = TransformBroadcaster(self)

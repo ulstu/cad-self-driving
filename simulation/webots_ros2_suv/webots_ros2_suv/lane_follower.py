@@ -8,11 +8,9 @@ from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from  .log_server import set_transmission
 from  .log_server import set_steering
-
-
+import traceback
 
 CONTROL_COEFFICIENT = 0.0007
-
 
 class LaneFollower(Node):
     def __init__(self):
@@ -25,14 +23,15 @@ class LaneFollower(Node):
         # In case ROS_DISTRO is not foxy the QoSReliabilityPolicy is strict.
         if 'ROS_DISTRO' in os.environ and os.environ['ROS_DISTRO'] != 'foxy':
             qos_camera_data.reliability = QoSReliabilityPolicy.RELIABLE
-        self.create_subscription(Image, 'vehicle/camera', self.__on_camera_image, qos_camera_data)
+        self.create_subscription(Image, '/vehicle/camera/image_color', self.__on_camera_image, qos_camera_data)
         self._logger.info('Lane Follower initialized')
 
     def __on_camera_image(self, message):
         try:
+            print('camera image received')
             img = message.data
             img = np.frombuffer(img, dtype=np.uint8).reshape((message.height, message.width, 4))
-            img = img[120:240, :]
+            img = img[int(message.height / 2):message.height, :]
 
             # Segment the image by color in HSV color space
             img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB)
@@ -66,7 +65,7 @@ class LaneFollower(Node):
 
             self.__ackermann_publisher.publish(command_message)
         except  Exception as err:
-            self._logger.info(f'{str(err)}')
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
 def main(args=None):
     try:

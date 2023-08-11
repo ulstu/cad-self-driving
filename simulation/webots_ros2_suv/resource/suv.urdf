@@ -270,6 +270,13 @@
     <child link="camera"/>
     <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
   </joint>
+  <link name="range_finder">
+  </link>
+  <joint name="base_link_range_finder_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="range_finder"/>
+    <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
+  </joint>
   <link name="engine_speaker">
   </link>
   <joint name="base_link_engine_speaker_joint" type="fixed">

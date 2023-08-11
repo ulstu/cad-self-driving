@@ -1,0 +1,32 @@
+version: '3.0'
+services:
+  tensorflow:
+    build: ./
+    env_file:
+      - ./.env.dev
+    environment:
+      DISPLAY: $DISPLAY
+    container_name: tensorflow-gpu
+    restart: unless-stopped
+    command: ls -l /usr/local | grep cuda
+    #python3 /src/image_analyze.py
+    network_mode: "host"
+    volumes:
+      - ./notebooks:/notebooks
+      - ./data:/data
+      - ./src:/src
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ~/.Xauthority:/root/.Xauthority
+      #- ./:/webcam
+      - /dev/video0:/dev/video0
+      - ./weights:/weights
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+#    ports:
+#      - '8888:8888'
