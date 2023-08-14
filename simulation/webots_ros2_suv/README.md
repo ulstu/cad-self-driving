@@ -14,4 +14,7 @@ https://arxiv.org/abs/2108.03227
 Cam2BEV
 https://github.com/ika-rwth-aachen/Cam2BEV
 
+RANSAC
+Martin A. Fischler and Robert C. Bolles (June 1981). "Random Sample Consensus: A Paradigm for Model Fitting with Applications to Image Analysis and Automated Cartography". Comm. of the ACM 24: 381–395.
+
 
