@@ -19,13 +19,15 @@ from  .log_server import set_camera_hz
 from .log_server import LogServerStatus
 from prometheus_client import start_http_server
 import traceback
-
+from webots_ros2_driver.utils import controller_url_prefix
 
 
 class NodeSensorsWebots(Node):
     def __init__(self):
         try:
             super().__init__('node_gps')
+            self._logger.info(controller_url_prefix())
+
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__gps_publisher = self.create_publisher(NavSatFix, "/vehicle/gps_nav", qos)

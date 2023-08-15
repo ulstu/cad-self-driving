@@ -2,6 +2,9 @@ import rclpy
 import math
 import numpy as np
 import cv2
+import traceback
+import os
+import pathlib
 import sensor_msgs.msg
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus, PointCloud2, Imu
 from std_msgs.msg import Float32
@@ -9,14 +12,12 @@ from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from scipy.spatial.transform import Rotation
 from  .log_server import *
-import traceback
 from fastseg import MobileV3Large
 from fastseg.image import colorize, blend
 from PIL import Image
-import os
-import pathlib
 from ament_index_python.packages import get_package_share_directory
 import cameratransform as ct
+import torch
 
 PACKAGE_NAME = 'webots_ros2_suv'
 SENSOR_DEPTH = 40
@@ -33,7 +34,10 @@ class SegmentationNode(Node):
             self._logger.info('Segmentation Node initialized')
             package_dir = get_package_share_directory(PACKAGE_NAME)
             weights_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'mobilev3large-lraspp.pt')))
-            self.seg_model = MobileV3Large.from_pretrained(weights_path).cuda().eval()
+            if torch.cuda.is_available():
+                self.seg_model = MobileV3Large.from_pretrained(weights_path).cuda().eval()
+            else:
+                self.seg_model = MobileV3Large.from_pretrained(weights_path).eval()
             self._logger.info('Segmentation Node initialized')
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))

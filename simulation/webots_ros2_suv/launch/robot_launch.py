@@ -12,7 +12,6 @@ from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLauncher
-from webots_ros2_driver.utils import controller_url_prefix
 from webots_ros2_driver.webots_controller import WebotsController
 from nav2_common.launch import RewrittenYaml
 
