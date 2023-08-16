@@ -16,7 +16,6 @@ from fastseg import MobileV3Large
 from fastseg.image import colorize, blend
 from PIL import Image
 from ament_index_python.packages import get_package_share_directory
-import cameratransform as ct
 import torch
 
 PACKAGE_NAME = 'webots_ros2_suv'
