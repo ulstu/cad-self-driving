@@ -28,6 +28,7 @@ export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 * Компиляция командой 'colcon build' из папки ~/ros_ws 
 * Запуск командой 'ros2 launch webots_ros2_suv robot_launch.py'
+* Если стоит conda/miniconda, необходимо ее деактивировать 'conda deactivate'
 
 Image segmentation: fastseg
 
