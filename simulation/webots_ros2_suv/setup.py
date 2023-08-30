@@ -2,6 +2,8 @@
 
 from setuptools import setup
 import os
+
+
 def generate_data_files(share_path, dir):
     data_files = []
     for path, _, files in os.walk(dir):
@@ -10,13 +12,12 @@ def generate_data_files(share_path, dir):
 
     return data_files
 
-
-
 package_name = 'webots_ros2_suv'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
 data_files.append(('share/' + package_name + '/launch', ['launch/robot_launch.py']))
 data_files.append(('share/' + package_name + '/launch', ['launch/ulstu_field_launch.py']))
+data_files.append(('share/' + package_name + '/launch', ['launch/web_launch.py']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/suv_world.wbt', 'worlds/.suv_world.wbproj']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/ulstu_field.wbt']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/ulstu_field_points.txt']))

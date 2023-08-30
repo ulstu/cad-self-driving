@@ -15,6 +15,7 @@ pip install opencv-python
 pip install prometheus-client
 pip install fastseg
 pip install cherrypy
+pip install pyyaml
 ```
 
 ## Установка решения
@@ -66,3 +67,5 @@ https://github.com/ika-rwth-aachen/Cam2BEV
 RANSAC
 Martin A. Fischler and Robert C. Bolles (June 1981). "Random Sample Consensus: A Paradigm for Model Fitting with Applications to Image Analysis and Automated Cartography". Comm. of the ACM 24: 381–395.
 
+Visualization of Obstacles on Bird’s-eye View Using Depth Sensor for Remote Controlled Robot
+http://www.robot.t.u-tokyo.ac.jp/~yamashita/paper/B/B172Final.pdf

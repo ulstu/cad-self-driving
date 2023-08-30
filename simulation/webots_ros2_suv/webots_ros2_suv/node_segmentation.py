@@ -17,6 +17,8 @@ from fastseg.image import colorize, blend
 from PIL import Image
 from ament_index_python.packages import get_package_share_directory
 import torch
+from datetime import datetime
+
 
 PACKAGE_NAME = 'webots_ros2_suv'
 SENSOR_DEPTH = 40
@@ -47,6 +49,10 @@ class SegmentationNode(Node):
         cv2.imshow("range", range_image)
         if cv2.waitKey(25) & 0xFF == ord('q'):
            return
+        img_filename = datetime.now().strftime("%Y%m%d-%H%M%S")
+        
+        np.save(f"/home/hiber/{img_filename}_seg.npy", labels)
+        np.save(f"/home/hiber/{img_filename}_range.npy", range_image)
         # seg_image = labels.copy()
         # result_image = np.zeros((MAP_DEPTH + 1, range_image.shape[1]))
         # result_image[result_image == 0] = -1

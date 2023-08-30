@@ -1,3 +1,5 @@
 fastseg
 prometheus_client
 cameratransform
+cherrypy
+pyyaml
