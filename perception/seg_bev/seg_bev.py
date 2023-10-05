@@ -23,17 +23,17 @@ class BEVCreator(object):
         cv2.imshow("map image", np.asarray(colorized))
         if cv2.waitKey(25) & 0xFF == ord('q'):
            return
-        #seg_image = labels.copy()
+        seg_image = labels.copy()
         # result_image = np.zeros((MAP_DEPTH + 1, range_image.shape[1]))
         # result_image[result_image == 0] = -1
 
-        # width, height = seg_image.shape[1], seg_image[0]
-        # source = np.float32([[0, 0], [100, 0], [100, 100], [0, 100]])
-        # dest = np.float32([[0, 0], [-1000, 0], [-1000, -1000], [0, -1000]])
+        width, height = seg_image.shape[1], seg_image[0]
+        source = np.float32([[0, 0], [100, 0], [100, 100], [0, 100]]).reshape(-1,1,2)
+        dest = np.float32([[0, 0], [-1000, 0], [-1000, -1000], [0, -1000]])
         # # source = np.float32([[0, int(width / 2)], [height, int(width / 2)], [0, int(width / 2) - 100], [height, 0, int(width / 2) - 100]])
         # # dest = np.float32([[0, int(width / 2)], [height, int(width / 2)], [0, int(width / 2) - 200], [height, 0, int(width / 2) - 80]])
-        # homography, _ = cv2.findHomography(source, dest)
-        # result_image = cv2.perspectiveTransform(seg_image, homography)
+        homography, _ = cv2.findHomography(source, dest, cv2.RANSAC, 5.0)
+        result_image = cv2.perspectiveTransform(seg_image, homography)
 
 #         for i in range(range_image.shape[1]):
 #             for j in range(range_image.shape[0]):
@@ -61,6 +61,7 @@ def main():
             run.append(img_prefix)
             bv.make_bev(np.load(f'{prefix_path}{img_prefix}_seg.npy'), 
                           np.load(f'{prefix_path}{img_prefix}_range.npy'))
+            break
             time.sleep(0.5)
 
 if __name__ == '__main__':
