@@ -124,7 +124,7 @@ def get_ros2_nodes(*args):
         node_segmentation,
         # pcl_map_node,
         node_map,
-        depth_to_laserscan,
+        #depth_to_laserscan,
     ] + static_transform_nodes
 
 

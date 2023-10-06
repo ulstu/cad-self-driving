@@ -155,9 +155,7 @@ class CalibrationTool(object):
 
     def transform_depth(self):
         depth_map = np.load(self.__img_filename.replace('_seg.npy', '_range.npy'))
-        cv2.imshow('source depth', depth_map)
         depth_map = depth_map[self.__horizont_line_height:,:]
-        cv2.imshow('h depth', depth_map)
         output_size = (depth_map.shape[0], depth_map.shape[1])
 
         # Создаем пустое изображение для коррекции глубины
@@ -175,7 +173,11 @@ class CalibrationTool(object):
 
                 if 0 <= x_corrected < output_size[1] and 0 <= y_corrected < output_size[0]:
                     corrected_depth[y_corrected, x_corrected] = depth_map[y, x]
+        cv2.imshow('h depth', depth_map)
+        cv2.imshow('source depth', depth_map)
         cv2.imshow('corrected depth', corrected_depth)
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+           return
         return corrected_depth
 
     def fill_pts_from_canvas(self):

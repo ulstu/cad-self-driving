@@ -44,40 +44,19 @@ class SegmentationNode(Node):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
 
-    def __make_bev(self, labels):
+    def __make_bev(self, labels, composited, source):
         range_image = self.__cur_range_image.copy()
         cv2.imshow("range", range_image)
+        cv2.imshow("composited image", composited)
         if cv2.waitKey(25) & 0xFF == ord('q'):
            return
         img_filename = datetime.now().strftime("%Y%m%d-%H%M%S")
-        
+
         np.save(f"/home/hiber/{img_filename}_seg.npy", labels)
         np.save(f"/home/hiber/{img_filename}_range.npy", range_image)
-        # seg_image = labels.copy()
-        # result_image = np.zeros((MAP_DEPTH + 1, range_image.shape[1]))
-        # result_image[result_image == 0] = -1
+        np.save(f"/home/hiber/{img_filename}_composited.npy", composited)
+        np.save(f"/home/hiber/{img_filename}_source.npy", source)
 
-        # width, height = seg_image.shape[1], seg_image[0]
-        # source = np.float32([[0, 0], [100, 0], [100, 100], [0, 100]])
-        # dest = np.float32([[0, 0], [-1000, 0], [-1000, -1000], [0, -1000]])
-        # # source = np.float32([[0, int(width / 2)], [height, int(width / 2)], [0, int(width / 2) - 100], [height, 0, int(width / 2) - 100]])
-        # # dest = np.float32([[0, int(width / 2)], [height, int(width / 2)], [0, int(width / 2) - 200], [height, 0, int(width / 2) - 80]])
-        # homography, _ = cv2.findHomography(source, dest)
-        # result_image = cv2.perspectiveTransform(seg_image, homography)
-
-#         for i in range(range_image.shape[1]):
-#             for j in range(range_image.shape[0]):
-#                 #x_coef = (MAP_DEPTH / (0.5 * MAP_DEPTH + j)) / 3
-#                 #new_i = int(i * x_coef)
-#                 #new_i = new_i if new_i < 840 else 839
-#                 new_i = int(i - (i - range_image.shape[1] / 2) * 1.4)
-# #                self._logger.info(f'{new_i}')
-#                 result_image[MAP_DEPTH - int(range_image[j, i] * MAP_DEPTH), new_i] = seg_image[j, i]
-
-        # colorized = colorize(result_image)
-        # cv2.imshow("map image", np.asarray(colorized))
-        # if cv2.waitKey(25) & 0xFF == ord('q'):
-        #    return
     def __on_range_image_message(self, data):
         image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
         image[image == np.inf] = SENSOR_DEPTH
@@ -96,10 +75,9 @@ class SegmentationNode(Node):
             composited = blend(analyze_image, colorized)
             # cv2.imshow("seg image", np.asarray(analyze_image))
             cv2.imshow("colorized image", np.asarray(colorized))
-            cv2.imshow("composited image", np.asarray(composited))
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 return
-            self.__make_bev(np.asarray(labels))
+            self.__make_bev(np.asarray(labels), np.asarray(composited), analyze_image)
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
