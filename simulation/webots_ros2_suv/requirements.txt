@@ -3,3 +3,4 @@ prometheus_client
 cameratransform
 cherrypy
 pyyaml
+ultralytics

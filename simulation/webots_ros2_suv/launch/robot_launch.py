@@ -35,10 +35,10 @@ def get_ros2_nodes(*args):
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
-    node_segmentation = Node(
+    node_localmap = Node(
         package=PACKAGE_NAME,
-        executable='node_segmentation',
-        name='node_segmentation',
+        executable='node_localmap',
+        name='node_localmap',
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
@@ -51,10 +51,10 @@ def get_ros2_nodes(*args):
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
-    node_map = Node(
+    node_globalmap = Node(
         package=PACKAGE_NAME,
-        executable='node_map',
-        name='node_map',
+        executable='node_globalmap',
+        name='node_globalmap',
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
@@ -121,9 +121,9 @@ def get_ros2_nodes(*args):
         rviz2_node,
         lane_follower,
         node_sensors_webots,
-        node_segmentation,
+        node_localmap,
         # pcl_map_node,
-        node_map,
+        node_globalmap,
         #depth_to_laserscan,
     ] + static_transform_nodes
 

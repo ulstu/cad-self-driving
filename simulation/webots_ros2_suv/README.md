@@ -16,6 +16,7 @@ pip install prometheus-client
 pip install fastseg
 pip install cherrypy
 pip install pyyaml
+pip install ultralytics
 ```
 
 ## Установка решения
