@@ -101,7 +101,7 @@ class LocalMapNode(Node):
             cv2.imshow("result", self.__map_builder.plot_bboxes(image, results[0].boxes.data, score=False))
 
             cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))
-            #cv2.waitKey(0)
+            cv2.waitKey(100)
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
