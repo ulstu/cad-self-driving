@@ -1,4 +1,5 @@
-!simulation/webots_ros2_suv/webots_ros2_suv/lib/**
+!simulation/webots_ros2_suv/webots_ros2_suv/lib/*
+!simulation/webots_ros2_suv/webots_ros2_suv/lib
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
