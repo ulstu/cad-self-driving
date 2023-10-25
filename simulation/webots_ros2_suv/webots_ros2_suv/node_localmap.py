@@ -46,6 +46,12 @@ class LocalMapNode(Node):
             base_path = get_package_share_directory('webots_ros2_suv')
             self.__map_builder = MapBuilder(model_path=f'{base_path}/resource/yolov8l.pt',
                                             ipm_config=f'{base_path}/config/ipm_config.yaml')
+            cv2.namedWindow('range', 1)
+            cv2.namedWindow('composited image', 1)
+            cv2.namedWindow('colorized seg', 1)
+            cv2.namedWindow('result', 1)
+            cv2.namedWindow('depth', 1)
+            cv2.namedWindow('original', 1)
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
@@ -101,7 +107,8 @@ class LocalMapNode(Node):
             cv2.imshow("result", self.__map_builder.plot_bboxes(image, results[0].boxes.data, score=False))
 
             cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))
-            cv2.waitKey(100)
+            if cv2.waitKey(2000) & 0xFF == ord('q'):
+               return
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))

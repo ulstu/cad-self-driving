@@ -6,9 +6,17 @@ import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
 import * as ol_color from 'ol/color';
 import {useGeographic} from 'ol/proj.js';
 
-useGeographic();
+let init_point = [48.387626, 54.351436]
 
-const init_point = [48.387626, 54.351436];
+$.ajax({
+    url: '/get_init_point',
+    success: function(data){
+        init_point = [data['lat'], data['lon']]
+    },
+    async: false
+});
+
+useGeographic();
 
 const raster = new TileLayer({
   source: new OSM(),
@@ -45,7 +53,7 @@ function addInteraction() {
       source: source,
       type: typeSelect.value,
     });
-    
+
     let style_stroke = new Stroke({
       color: '#' + typeSelect.options[typeSelect.selectedIndex].dataset.color,
       width: 2
@@ -60,7 +68,7 @@ function addInteraction() {
     })
 
     var s = new Style({
-      stroke: style_stroke, 
+      stroke: style_stroke,
       fill: style_fill,
       image: style_circle,
     });

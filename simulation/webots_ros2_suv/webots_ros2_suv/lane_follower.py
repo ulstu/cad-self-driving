@@ -52,6 +52,7 @@ class LaneFollower(Node):
 
                 cv2.drawContours(img, largest_contour, -1, (0,255,0), 3)
                 cv2.imshow("img", img)
+
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     return
                 
