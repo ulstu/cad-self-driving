@@ -16,7 +16,7 @@ class MapBuilder(object):
         self.__corr_depth_pos = (0, 10)
 
     def detect_objects(self, image):
-        results = self.__model.predict(source=image, save=True, save_txt=True)
+        results = self.__model.predict(source=image, save=False, save_txt=False)
         return results
 
     def load_ipm_config(self, config_path):

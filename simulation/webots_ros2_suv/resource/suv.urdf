@@ -9,6 +9,17 @@
             <gyroName>gyro</gyroName>
             <accelerometerName>accelerometer</accelerometerName>
     </plugin>
+    <device reference="camera" type="Camera">
+      <ros>
+          <topicName>/vehicle/camera</topicName>
+      </ros>
+    </device>
+    <device reference="left_wing_camera" type="Camera">
+      <ros>
+          <topicName>/vehicle/left_wing_camera</topicName>
+      </ros>
+    </device>
+
   </webots>
   <link name="base_link">
     <visual>
@@ -263,6 +274,7 @@
     <child link="Sms UMRR 0a30"/>
     <origin xyz="3.85 0 0.45" rpy="0 0 0"/>
   </joint>
+  
   <link name="camera">
   </link>
   <joint name="base_link_camera_joint" type="fixed">
@@ -270,6 +282,15 @@
     <child link="camera"/>
     <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
   </joint>
+  
+  <link name="left_wing_camera">
+  </link>
+  <joint name="base_link_camera_left_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_wing_camera"/>
+    <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
+  </joint>
+  
   <link name="range_finder">
   </link>
   <joint name="base_link_range_finder_joint" type="fixed">

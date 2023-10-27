@@ -121,12 +121,12 @@ $.get('/get_point_types', function(data){
   addInteraction();
 });
 
-setTimeout(
-  () => $.get('/get_position', function(data){
-    ego_feature.geometry = new Point([data['lat'], data['lon']])
-  }),
-  500,
-);
+// setTimeout(
+//   () => $.get('/get_position', function(data){
+//     ego_feature.geometry = new Point([data['lat'], data['lon']])
+//   }),
+//   500,
+// );
 
 
 

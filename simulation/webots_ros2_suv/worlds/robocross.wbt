@@ -28,8 +28,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.10074334691922812 0.5875715333361932 0.8028763735871588 0.4535775426990799
-  position -36.367602422152224 -19.942024154629266 23.504760479531473
+  orientation 0.029638430811262884 -0.8533375439089986 -0.5205157054060945 6.073550925237012
+  position -15.335724749168175 -9.569579909014823 6.429644278009744
   follow "vehicle"
 }
 TexturedBackground {
@@ -40,6 +40,33 @@ BmwX5 {
   controller "<extern>"
   supervisor TRUE
   sensorsSlotFront [
+    Camera {
+      translation -2.85 0.734 0.85
+      rotation -0.09965347132281188 0.12987596262571324 0.986509716113003 1.84569
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      name "left_wing_camera"
+      fieldOfView 1
+      width 840
+      height 480
+    }
     RangeFinder {
       translation 0 0 0.2
       name "range_finder"
@@ -1030,15 +1057,15 @@ Solid {
   name "solid(1)"
 }
 Pedestrian {
-  translation 35.6786 -9.37331 1.27
+  translation 35.7255 -10.0783 1.27
 }
 CitroenCZero {
-  translation 20.2655 -2.53229 0.83
+  translation 37.7845 -0.178133 1.1
   rotation 1 0 0 4.692820414042842e-06
   name "vehicle(1)"
 }
 LincolnMKZ {
-  translation 35.673 -2.94138 0.83
+  translation 56.5687 0.752313 1.1
   name "vehicle(2)"
 }
 Solid {

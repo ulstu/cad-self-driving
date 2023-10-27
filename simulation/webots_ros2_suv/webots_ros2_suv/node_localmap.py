@@ -23,7 +23,7 @@ from .lib.map_builder import MapBuilder
 PACKAGE_NAME = 'webots_ros2_suv'
 SENSOR_DEPTH = 40
 MAP_DEPTH = 480
-FPS = 0.3
+FPS = 15 #0.3
 
 class LocalMapNode(Node):
     def __init__(self):
@@ -32,6 +32,7 @@ class LocalMapNode(Node):
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos)
+            self.create_subscription(sensor_msgs.msg.Image, '/vehicle/left_wing_camera/image_color', self.__on_left_image_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/range_finder/image', self.__on_range_image_message, qos)
             self._logger.info('Segmentation Node initialized')
             package_dir = get_package_share_directory(PACKAGE_NAME)
@@ -43,9 +44,8 @@ class LocalMapNode(Node):
                 self.seg_model = MobileV3Large.from_pretrained(weights_path).eval()
             self._logger.info('Segmentation Node initialized')
 
-            base_path = get_package_share_directory('webots_ros2_suv')
-            self.__map_builder = MapBuilder(model_path=f'{base_path}/resource/yolov8l.pt',
-                                            ipm_config=f'{base_path}/config/ipm_config.yaml')
+            self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l.pt',
+                                            ipm_config=f'{package_dir}/config/ipm_config.yaml')
             cv2.namedWindow('range', 1)
             cv2.namedWindow('composited image', 1)
             cv2.namedWindow('colorized seg', 1)
@@ -56,6 +56,8 @@ class LocalMapNode(Node):
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
+    def __on_left_image_message(self, data):
+        pass
 
     def __save_image_files(self, labels, composited, source):
         range_image = self.__cur_range_image.copy()
@@ -83,7 +85,7 @@ class LocalMapNode(Node):
             image_depth = self.__map_builder.resize_img(image_depth.astype('float32'))
 
             results = self.__map_builder.detect_objects(image)
-            tbs, widths = self.__map_builder.transform_boxes(results[0].boxes.data)
+            tbs, widths = self.__map_builder.transform_boxes(results[0].boxes.data.cpu())
             depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
             ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
