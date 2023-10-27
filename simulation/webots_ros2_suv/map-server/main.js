@@ -1,10 +1,11 @@
 import Draw from 'ol/interaction/Draw.js';
 import {Feature, Map, Overlay, View} from 'ol/index.js';
-import {Circle, Fill, Stroke, Style} from 'ol/style.js';
+import {Point} from 'ol/geom.js';
+import {Circle, Fill, Stroke, Style, Icon} from 'ol/style.js';
 import {OSM, Vector as VectorSource} from 'ol/source.js';
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
 import * as ol_color from 'ol/color';
-import {useGeographic} from 'ol/proj.js';
+import {useGeographic, fromLonLat} from 'ol/proj.js';
 
 let init_point = [48.387626, 54.351436]
 
@@ -28,12 +29,32 @@ const vector = new VectorLayer({
   source: source,
 });
 
+let ego_feature = new Feature({
+  geometry: new Point(init_point),//(fromLonLat(init_point)),
+  name: 'Ego vehicle',
+}); 
+
+const ego_vehicle_layer = new VectorLayer({
+  source: new VectorSource({
+    wrapX: false,
+    features: [ego_feature]
+  }),
+  style: new Style({
+    image: new Icon({
+      anchor: [0.5, 46],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+    })
+  })
+});
+
 const map = new Map({
-  layers: [raster, vector],
+  layers: [raster, vector, ego_vehicle_layer],
   target: 'map',
   view: new View({
     center: init_point,
-    zoom: 9,
+    zoom: 17,
   }),
 });
 
@@ -65,7 +86,8 @@ function addInteraction() {
       radius: 8,
       fill: style_fill,
       stroke: style_stroke
-    })
+    });
+
 
     var s = new Style({
       stroke: style_stroke,
@@ -98,6 +120,13 @@ $.get('/get_point_types', function(data){
   );
   addInteraction();
 });
+
+setTimeout(
+  () => $.get('/get_position', function(data){
+    ego_feature.geometry = new Point([data['lat'], data['lon']])
+  }),
+  500,
+);
 
 
 
