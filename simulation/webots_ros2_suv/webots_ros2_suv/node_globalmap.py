@@ -5,6 +5,8 @@ import yaml
 import os
 import pathlib
 from ament_index_python.packages import get_package_share_directory
+from sensor_msgs.msg import Image, NavSatFix, NavSatStatus
+from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from .lib.world_model import WorldModel
 
@@ -22,14 +24,27 @@ class MapServer(Node):
         try:
             super().__init__('node_globalmap')
             self.get_logger().info('map server started')
+            qos = qos_profile_sensor_data
+            qos.reliability = QoSReliabilityPolicy.RELIABLE
+            self.create_subscription(NavSatFix, '/vehicle/gps_nav', self.__on_gps_message, qos)
             self.__world_model = WorldModel()
         except  Exception as err:
             print(''.join(traceback.TracebackException.from_exception(err).format()))
 
+    def __on_gps_message(self, data):
+        lat, lon = self.__world_model.get_global_coords(data.latitude, data.longitude)
+        self.get_logger().info(f'lat: {lat}; lon: {lon}')
+
     @cherrypy.expose
     def index(self):
         raise cherrypy.HTTPRedirect("static/index.html")
-    
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_position(self):
+        lat, lon = self.__world_model.get_current_position()
+        return {'lat': lat, 'lon': lon}
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_point_types(self):

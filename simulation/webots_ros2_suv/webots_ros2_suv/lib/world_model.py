@@ -15,9 +15,20 @@ class WorldModel(object):
         # корректировка координат, необходима для установления соотвествия между координатами симулятора и OSM карты
         # кортеж значений (x, y, direction)
         self.__coord_corrections = (0, 0, 0)
-        self.load_config()
+        self.__load_config()
 
-    def load_config(self):
+        self.__EARTH_RADIUS_KM = 6378.137
+
+    def __get_latitude(self, latitude: float, meters: float) -> float:
+        m: float = (1 / ((2 * math.pi / 360) * self.__EARTH_RADIUS_KM)) / 1000
+        return latitude + (meters * m)
+
+    def __get_longitude(self, longitude: float, meters: float) -> float:
+        latitude: float = 0.0
+        m: float = (1 / ((2 * math.pi / 360) * self.__EARTH_RADIUS_KM)) / 1000
+        return longitude + (meters * m) / math.cos(latitude * (math.pi / 180))
+
+    def __load_config(self):
         package_dir = get_package_share_directory('webots_ros2_suv')
         config_path = os.path.join(package_dir,
                                     pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
@@ -29,5 +40,11 @@ class WorldModel(object):
         self.__coord_corrections = (config['x'], config['y'], config['orientation'])
         print('Translation coordinates: ', self.__coord_corrections)
 
-    def __get_global_coords(self):
-        pass
+    def get_global_coords(self, lat, lon):
+        latitude = self.__get_latitude(self.__coord_corrections[0], lat)
+        longitude = self.__get_longitude(self.__coord_corrections[1], lon)
+        self.__car_model.update(lat=latitude, lon=longitude)
+        return latitude, longitude
+
+    def get_current_position(self):
+        return self.__car_model.get_position()

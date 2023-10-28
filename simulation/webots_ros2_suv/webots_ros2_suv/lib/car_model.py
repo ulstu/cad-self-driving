@@ -8,17 +8,20 @@ class CarModel(object):
     '''
     def __init__(self):
         self.__speed = 0
-        self.__x = 0
-        self.__y = 0
-        self.__direction = 0
+        self.__lat = 0
+        self.__lon = 0
+        self.__orientation = 0
 
-    def __update(self, speed=None, x=None, y=None, direction=None):
+    def update(self, speed=None, lat=None, lon=None, orientation=None):
         if speed:
             self.__speed = speed
         if x:
-            self.__x = x
+            self.__lat = lat
         if y:
-            self.__y = y
-        if direction:
-            self.__direction = direction
+            self.__lon = lon
+        if orientation:
+            self.__orientation = orientation
+
+    def get_position(self):
+        return self.__lat, self.__lon
 
