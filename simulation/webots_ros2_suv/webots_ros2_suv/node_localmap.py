@@ -106,6 +106,7 @@ class LocalMapNode(Node):
 
             cv2.imshow('original', image)
             cv2.imshow("colorized seg", colorized)
+            cv2.imshow("composited image", np.asarray(colorize(image_seg)))
             cv2.imshow("result", self.__map_builder.plot_bboxes(image, results[0].boxes.data, score=False))
 
             cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))

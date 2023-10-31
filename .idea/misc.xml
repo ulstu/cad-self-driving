@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="map-server" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="map-server" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10.12 WSL (Ubuntu-22.04): (/usr/bin/python3)" project-jdk-type="Python SDK" />
 </project>
