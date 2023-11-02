@@ -8,7 +8,7 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: LidarPointClouds::RangeFinderFrustums
 consoles: Console:All:All
-renderingDevicePerspectives: vehicle:camera;1;0.520833;0;0
+renderingDevicePerspectives: vehicle:camera;1;0.316667;0;0
 renderingDevicePerspectives: vehicle:camera_left;1;0.215476;0.616695;0
 renderingDevicePerspectives: vehicle:display;1;1.4;0.352894;0.00118483
 renderingDevicePerspectives: vehicle:left_wing_camera;1;0.215476;0.616695;0

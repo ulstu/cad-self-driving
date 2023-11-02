@@ -28,8 +28,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.029638430811262884 -0.8533375439089986 -0.5205157054060945 6.073550925237012
-  position -15.335724749168175 -9.569579909014823 6.429644278009744
+  orientation 0.011737799514716813 -0.7999989844222182 -0.5998865300921263 6.134494702449401
+  position -12.890898101361566 -11.813261940073932 6.777350294218745
   follow "vehicle"
 }
 TexturedBackground {
@@ -1057,10 +1057,10 @@ Solid {
   name "solid(1)"
 }
 Pedestrian {
-  translation 35.7255 -10.0783 1.27
+  translation 26.1314 -8.18481 1.27
 }
 CitroenCZero {
-  translation 37.7845 -0.178133 1.1
+  translation 24.8197 -5.52315 1.1
   rotation 1 0 0 4.692820414042842e-06
   name "vehicle(1)"
 }
@@ -1105,6 +1105,6 @@ RectangleArena {
   }
 }
 MercedesBenzSprinter {
-  translation 32.2955 4.98737 1.4
+  translation 88.0277 -7.30469 1.4
   rotation 0 0 1 3.14159
 }

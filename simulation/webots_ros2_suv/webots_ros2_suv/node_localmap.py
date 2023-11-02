@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import traceback
 import os
+import math
 import pathlib
 import sensor_msgs.msg
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus, PointCloud2, Imu
@@ -17,8 +18,10 @@ from ament_index_python.packages import get_package_share_directory
 import torch
 from datetime import datetime
 from ament_index_python.packages import get_package_share_directory
+from ackermann_msgs.msg import AckermannDrive
 from .lib.map_builder import MapBuilder
-from .lib.rrt import rrt, plot_rrt, generate_path, PathNode
+from .lib.timeit import timeit
+from .lib.rrt import rrt, plot_rrt, generate_path, PathNode, Vehicle
 
 
 PACKAGE_NAME = 'webots_ros2_suv'
@@ -35,7 +38,9 @@ class LocalMapNode(Node):
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/left_wing_camera/image_color', self.__on_left_image_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/range_finder/image', self.__on_range_image_message, qos)
-            self._logger.info('Segmentation Node initialized')
+
+            self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
+
             package_dir = get_package_share_directory(PACKAGE_NAME)
             weights_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'mobilev3large-lraspp.pt')))
             self.__last_image_time = datetime.now()
@@ -47,12 +52,6 @@ class LocalMapNode(Node):
 
             self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l.pt',
                                             ipm_config=f'{package_dir}/config/ipm_config.yaml')
-            # cv2.namedWindow('range', 1)
-            # cv2.namedWindow('composited image', 1)
-            # cv2.namedWindow('colorized seg', 1)
-            # cv2.namedWindow('result', 1)
-            # cv2.namedWindow('depth', 1)
-            # cv2.namedWindow('original', 1)
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
@@ -79,6 +78,44 @@ class LocalMapNode(Node):
         image[image == -np.inf] = 0
         self.__cur_range_image = image / SENSOR_DEPTH
 
+    def find_goal_point_x(self, arr, val=100):
+        max_length = 0
+        max_start = 0
+        current_length = 0
+        current_start = 0
+
+        for i, element in enumerate(arr):
+            if element == val:
+                current_length += 1
+                if current_length > max_length:
+                    max_length = current_length
+                    max_start = current_start
+            else:
+                current_length = 0
+                current_start = i + 1
+
+        if max_length > 0:
+            max_end = max_start + max_length - 1
+            return max_start + int((max_end - max_start) / 3 * 2)
+        else:
+            return 0
+
+    def drive(self, path, pov_point):
+        if (len(path) < 2):
+            return
+        p1, p2 = path[0], path[1]
+        angle = math.acos((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
+        error = math.pi - angle + 1   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
+        p_coef = 1.2
+        command_message = AckermannDrive()
+        command_message.speed = 5.0
+        command_message.steering_angle = error * p_coef
+        self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
+        self.__ackermann_publisher.publish(command_message)
+
+
+
+    @timeit
     def __process_frame(self, image, image_seg, image_depth):
         try:
             image = self.__map_builder.resize_img(image)
@@ -86,51 +123,67 @@ class LocalMapNode(Node):
             image_depth = self.__map_builder.resize_img(image_depth.astype('float32'))
 
             results = self.__map_builder.detect_objects(image)
-            tbs, widths = self.__map_builder.transform_boxes(results[0].boxes.data.cpu())
+            cboxes = results[0].boxes.data.cpu()
+            tbs, widths = self.__map_builder.transform_boxes(cboxes)
             depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
             image_seg[image_seg == 0] = 100
+
+            for b in cboxes:
+                corr = 5
+                image_seg[int(b[1])-corr:int(b[3]) + corr, int(b[0]) - corr:int(b[2]) + corr] = 100
+
+
             ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
-            colorized = colorize(ipm_image)
-            colorized = np.asarray(colorized)
 
             pov_point = (image.shape[0], int(image.shape[1] / 2))
             pov_point = self.__map_builder.calc_bev_point(pov_point)
-            colorized = colorized[:pov_point[1], :]
+            pov_point = (pov_point[0], pov_point[1] - 15)
+            goal_point = (self.find_goal_point_x(ipm_image[10,:]), 10)
+
+
+            colorized = colorize(ipm_image)
+            colorized = np.asarray(colorized)
 
             for i in range(len(tbs)):
-                cv2.rectangle(colorized, (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2)),
-                              (int(tbs[i][0] + widths[i] / 2), int(tbs[i][1] + widths[i] / 2)), (255, 0, 0), 2)
+                p1 = (int(tbs[i][0] - widths[i] / 3 * 2), int(tbs[i][1] - widths[i] / 3 * 2))
+                p2 = (int(tbs[i][0] + widths[i] / 3 * 2), int(tbs[i][1] + widths[i] / 3 * 2))
+                cv2.rectangle(colorized, p1, p2, (255, 0, 0), 2)
                 cv2.putText(colorized, f"{i}", (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2)),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-            cv2.circle(colorized, pov_point, 7, (0, 255, 0, 5))
-            goal_point = (0, int(image.shape[1] / 2))
-            cv2.circle(colorized, goal_point, 7, (255, 0, 0, 5))
+
+            colorized = colorized[:pov_point[1], :]
+            ipm_image = ipm_image[:pov_point[1], :]
+
+            cv2.circle(colorized, pov_point, 7, (0, 255, 0), 5)
+            cv2.circle(colorized, goal_point, 7, (255, 0, 0), 5)
 
             max_iterations = 1000
-            step_size = 5
-            result = rrt(PathNode(pov_point[0], pov_point[1]), PathNode(goal_point[0] - 30,goal_point[1]), ipm_image, max_iterations, step_size)
+            step_size = 40
+            vehicle = Vehicle(length=5, width=5)
+            result = rrt(PathNode(pov_point[1], pov_point[0]), PathNode(goal_point[1],goal_point[0]), ipm_image, max_iterations, step_size, vehicle, logger=self._logger)
             if result:
-                path = generate_path(goal_point)
-                self._logger.info("Путь найден:", path)
-                plot_rrt(result, goal_point, ipm_image)
+                self._logger.info(f"Путь найден. Точек пути:  {len(result)} ")
+                colorized = plot_rrt(result, PathNode(pov_point[1], pov_point[0]), PathNode(goal_point[1],goal_point[0]), colorized)
             else:
                 self._logger.info("Путь не найден.")
 
+            path = generate_path(result, PathNode(goal_point[1],goal_point[0]))
+            self.drive(path, pov_point)
             colorized_resized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
 
-            # cv2.imshow('original', image)
-            cv2.imshow("colorized seg", colorized)
+            cv2.imshow("colorized seg", colorized_resized)
             cv2.imshow("composited image", np.asarray(colorize(image_seg)))
             cv2.imshow("result", self.__map_builder.plot_bboxes(image, results[0].boxes.data, score=False))
 
             # cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))
-            if cv2.waitKey(2000) & 0xFF == ord('q'):
+            if cv2.waitKey(10) & 0xFF == ord('q'):
                return
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
+    @timeit
     def __on_image_message(self, data):
         try:
             if (datetime.now() - self.__last_image_time).total_seconds() < 1 / FPS:
