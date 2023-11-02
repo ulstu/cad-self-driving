@@ -18,6 +18,7 @@ import torch
 from datetime import datetime
 from ament_index_python.packages import get_package_share_directory
 from .lib.map_builder import MapBuilder
+from .lib.rrt import rrt, plot_rrt, generate_path, PathNode
 
 
 PACKAGE_NAME = 'webots_ros2_suv'
@@ -46,12 +47,12 @@ class LocalMapNode(Node):
 
             self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l.pt',
                                             ipm_config=f'{package_dir}/config/ipm_config.yaml')
-            cv2.namedWindow('range', 1)
-            cv2.namedWindow('composited image', 1)
-            cv2.namedWindow('colorized seg', 1)
-            cv2.namedWindow('result', 1)
-            cv2.namedWindow('depth', 1)
-            cv2.namedWindow('original', 1)
+            # cv2.namedWindow('range', 1)
+            # cv2.namedWindow('composited image', 1)
+            # cv2.namedWindow('colorized seg', 1)
+            # cv2.namedWindow('result', 1)
+            # cv2.namedWindow('depth', 1)
+            # cv2.namedWindow('original', 1)
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
@@ -88,28 +89,42 @@ class LocalMapNode(Node):
             tbs, widths = self.__map_builder.transform_boxes(results[0].boxes.data.cpu())
             depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
+            image_seg[image_seg == 0] = 100
             ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
             colorized = colorize(ipm_image)
             colorized = np.asarray(colorized)
 
-            pov = (image.shape[0], int(image.shape[1] / 2))
-            pov = self.__map_builder.calc_bev_point(pov)
-            colorized = colorized[:pov[1], :]
+            pov_point = (image.shape[0], int(image.shape[1] / 2))
+            pov_point = self.__map_builder.calc_bev_point(pov_point)
+            colorized = colorized[:pov_point[1], :]
 
             for i in range(len(tbs)):
                 cv2.rectangle(colorized, (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2)),
                               (int(tbs[i][0] + widths[i] / 2), int(tbs[i][1] + widths[i] / 2)), (255, 0, 0), 2)
                 cv2.putText(colorized, f"{i}", (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2)),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-            cv2.circle(colorized, pov, 5, (0, 255, 0, 3))
-            colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
+            cv2.circle(colorized, pov_point, 7, (0, 255, 0, 5))
+            goal_point = (0, int(image.shape[1] / 2))
+            cv2.circle(colorized, goal_point, 7, (255, 0, 0, 5))
 
-            cv2.imshow('original', image)
+            max_iterations = 1000
+            step_size = 5
+            result = rrt(PathNode(pov_point[0], pov_point[1]), PathNode(goal_point[0] - 30,goal_point[1]), ipm_image, max_iterations, step_size)
+            if result:
+                path = generate_path(goal_point)
+                self._logger.info("Путь найден:", path)
+                plot_rrt(result, goal_point, ipm_image)
+            else:
+                self._logger.info("Путь не найден.")
+
+            colorized_resized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
+
+            # cv2.imshow('original', image)
             cv2.imshow("colorized seg", colorized)
             cv2.imshow("composited image", np.asarray(colorize(image_seg)))
             cv2.imshow("result", self.__map_builder.plot_bboxes(image, results[0].boxes.data, score=False))
 
-            cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))
+            # cv2.imshow("depth", self.__map_builder.plot_bboxes(image_depth, results[0].boxes.data, score=False))
             if cv2.waitKey(2000) & 0xFF == ord('q'):
                return
 
