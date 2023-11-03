@@ -130,7 +130,8 @@ class MapBuilder(object):
         box_points = []
         widths = []
         for box in boxes:
-            p = np.asarray([box[0] + (box[2] - box[0]) / 2, box[1] + (box[3] - box[1]) / 2 - self.__horizont_line_height], dtype='float32')
+            # p = np.asarray([box[0] + (box[2] - box[0]) / 2, box[1] + (box[3] - box[1]) / 2 - self.__horizont_line_height], dtype='float32')
+            p = np.asarray([box[0] + (box[2] - box[0]) / 2, box[3] - self.__horizont_line_height], dtype='float32')
             widths.append(box[2] - box[0])
             box_points.append(self.calc_bev_point(p))
         return box_points, widths

@@ -104,11 +104,12 @@ class LocalMapNode(Node):
         if (len(path) < 2):
             return
         p1, p2 = path[0], path[1]
-        angle = math.acos((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
-        error = math.pi - angle + 1   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
+        angle = math.asin((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
+        self._logger.info(f'angle: {angle}')
+        error = angle - 0.7   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
         p_coef = 1.2
         command_message = AckermannDrive()
-        command_message.speed = 5.0
+        command_message.speed = 1.5
         command_message.steering_angle = error * p_coef
         self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
         self.__ackermann_publisher.publish(command_message)
@@ -132,15 +133,12 @@ class LocalMapNode(Node):
             for b in cboxes:
                 corr = 5
                 image_seg[int(b[1])-corr:int(b[3]) + corr, int(b[0]) - corr:int(b[2]) + corr] = 100
-
-
             ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
 
             pov_point = (image.shape[0], int(image.shape[1] / 2))
             pov_point = self.__map_builder.calc_bev_point(pov_point)
             pov_point = (pov_point[0], pov_point[1] - 15)
             goal_point = (self.find_goal_point_x(ipm_image[10,:]), 10)
-
 
             colorized = colorize(ipm_image)
             colorized = np.asarray(colorized)
