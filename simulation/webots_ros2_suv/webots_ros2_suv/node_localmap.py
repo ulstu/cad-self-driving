@@ -22,6 +22,7 @@ from ackermann_msgs.msg import AckermannDrive
 from .lib.map_builder import MapBuilder
 from .lib.timeit import timeit
 from .lib.rrt import rrt, plot_rrt, generate_path, PathNode, Vehicle
+from .lib.rrt_star import rrt_star, RRTTreeNode, visualize_path
 
 
 PACKAGE_NAME = 'webots_ros2_suv'
@@ -101,16 +102,20 @@ class LocalMapNode(Node):
             return 0
 
     def drive(self, path, pov_point):
-        if (len(path) < 2):
+        if (len(path) < 3):
+            command_message = AckermannDrive()
+            command_message.speed = 0.0
+            command_message.steering_angle = 0.0
+            self.__ackermann_publisher.publish(command_message)
             return
-        p1, p2 = path[0], path[1]
+        p1, p2 = path[0], path[3]
         angle = math.asin((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
         self._logger.info(f'angle: {angle}')
         error = angle - 0.7   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
-        p_coef = 1.2
+        p_coef = 0.8
         command_message = AckermannDrive()
-        command_message.speed = 1.5
-        command_message.steering_angle = error * p_coef
+        command_message.speed = 8.0
+        command_message.steering_angle = error / math.pi * p_coef
         self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
         self.__ackermann_publisher.publish(command_message)
 
@@ -140,15 +145,20 @@ class LocalMapNode(Node):
             pov_point = (pov_point[0], pov_point[1] - 15)
             goal_point = (self.find_goal_point_x(ipm_image[10,:]), 10)
 
-            colorized = colorize(ipm_image)
-            colorized = np.asarray(colorized)
 
             for i in range(len(tbs)):
-                p1 = (int(tbs[i][0] - widths[i] / 3 * 2), int(tbs[i][1] - widths[i] / 3 * 2))
-                p2 = (int(tbs[i][0] + widths[i] / 3 * 2), int(tbs[i][1] + widths[i] / 3 * 2))
-                cv2.rectangle(colorized, p1, p2, (255, 0, 0), 2)
-                cv2.putText(colorized, f"{i}", (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                label_num = int(results[0].boxes.data[i][-1]) + 1
+                if label_num in [7]:    # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
+                    continue
+                l = self.__map_builder.get_labels()[label_num]
+                p1 = (int(tbs[i][0] - widths[i] / 2), int(tbs[i][1] - widths[i] / 2))
+                p2 = (int(tbs[i][0] + widths[i] / 2), int(tbs[i][1]))
+                # cv2.rectangle(colorized, p1, p2, (255, 0, 0), 2)
+                # cv2.putText(colorized, f"{i} : {l}", p1, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
+
+            colorized = colorize(ipm_image)
+            colorized = np.asarray(colorized)
 
             colorized = colorized[:pov_point[1], :]
             ipm_image = ipm_image[:pov_point[1], :]
@@ -156,18 +166,28 @@ class LocalMapNode(Node):
             cv2.circle(colorized, pov_point, 7, (0, 255, 0), 5)
             cv2.circle(colorized, goal_point, 7, (255, 0, 0), 5)
 
+            start_node = RRTTreeNode(pov_point[0], pov_point[1])
+            goal_node = RRTTreeNode(goal_point[0],goal_point[1])
+            
             max_iterations = 1000
-            step_size = 40
-            vehicle = Vehicle(length=5, width=5)
-            result = rrt(PathNode(pov_point[1], pov_point[0]), PathNode(goal_point[1],goal_point[0]), ipm_image, max_iterations, step_size, vehicle, logger=self._logger)
-            if result:
-                self._logger.info(f"Путь найден. Точек пути:  {len(result)} ")
-                colorized = plot_rrt(result, PathNode(pov_point[1], pov_point[0]), PathNode(goal_point[1],goal_point[0]), colorized)
+            step_size = 10
+            car_length = 10  # Длина автомобиля
+            car_width = 10   # Ширина автомобиля
+            
+            path, nodes = rrt_star(start_node, goal_node, ipm_image, max_iterations, step_size, car_length, car_width, self._logger)
+            
+            if path:
+                self._logger.info(f"Путь найден: {path}")
+                prev_point = None
+                for n in path:
+                    if prev_point:
+                        cv2.line(colorized, prev_point, n, (0, 255, 255), 2)
+                    prev_point = n
+                self.drive(path, pov_point)
             else:
                 self._logger.info("Путь не найден.")
 
-            path = generate_path(result, PathNode(goal_point[1],goal_point[0]))
-            self.drive(path, pov_point)
+
             colorized_resized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
 
             cv2.imshow("colorized seg", colorized_resized)

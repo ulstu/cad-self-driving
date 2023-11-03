@@ -56,10 +56,6 @@ def is_collision(node, obstacles, vehicle):
                 return True
     return False
 
-    # if 0 <= x < len(obstacles) and 0 <= y < len(obstacles[0]):
-    #     return obstacles[x][y] != 100
-    # return True
-
 def generate_path(nodes, goal_node):
     if not nodes:
         return []
