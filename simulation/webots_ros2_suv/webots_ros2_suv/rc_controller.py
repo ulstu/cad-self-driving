@@ -58,10 +58,11 @@ def get_key(settings):
 
 pub = None
 
+
 def tx_timer_callback():
-    rcMsg = Int32MultiArray()
-    rcMsg.data = channels
-    pub.publish(rcMsg)
+    rc_msg = Int32MultiArray()
+    rc_msg.data = channels
+    pub.publish(rc_msg)
 
 
 def constrain(input_vel, low_bound, high_bound):
@@ -80,19 +81,18 @@ def print_channels():
         print("\033[%d;%dH  %2d [" % (i + 5, 50, i + 1), end="")
         axisStr = ""
         for j in range(10, 0, -1):
-            if (1500 - j * 50 >= channels[i]):
+            if 1500 - j * 50 >= channels[i]:
                 axisStr += "#"
             else:
                 axisStr += "-"
         axisStr += "|"
         for j in range(10):
-            if (1500 + j * 50 >= channels[i]):
+            if 1500 + j * 50 >= channels[i]:
                 axisStr += "-"
             else:
                 axisStr += "#"
         axisStr += "]"
         print(axisStr)
-
 
 
 def main():
@@ -182,12 +182,8 @@ def main():
                     channels[8] = 1000
                 status = 1
             else:
-                if (key == '\x03'):
+                if key == '\x03':
                     break
-
-
-
-
 
     except Exception as e:
         print(e)

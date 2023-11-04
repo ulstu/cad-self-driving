@@ -300,8 +300,6 @@ class GazeleController:
                     self.__node._logger.info('Auto mode')
 
 
-
-        # self.__robot.setCruisingSpeed((self.__channels[0] - 1500) * 0.05)
         else:
             self.__node._logger.info('E-stop')
             self.__ser.flushInput()
