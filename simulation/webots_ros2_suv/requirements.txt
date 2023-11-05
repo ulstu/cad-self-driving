@@ -4,3 +4,5 @@ cameratransform
 cherrypy
 pyyaml
 ultralytics
+pyserial
+json-rpc
