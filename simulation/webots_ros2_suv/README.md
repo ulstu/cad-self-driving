@@ -70,3 +70,10 @@ Martin A. Fischler and Robert C. Bolles (June 1981). "Random Sample Consensus: A
 
 Visualization of Obstacles on Bird’s-eye View Using Depth Sensor for Remote Controlled Robot
 http://www.robot.t.u-tokyo.ac.jp/~yamashita/paper/B/B172Final.pdf
+
+
+# Неявные ошибки
+1. Если при импорте torch возникает ошибка "name 'sympy' is not defined", то выполнить команду 
+```bash
+pip install mpmath --upgrade
+```

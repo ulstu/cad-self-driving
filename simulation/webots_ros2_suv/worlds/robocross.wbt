@@ -1063,10 +1063,12 @@ CitroenCZero {
   translation 24.6976 -1.30106 1.1
   rotation 1 0 0 4.692820414042842e-06
   name "vehicle(1)"
+  controller "autonomous_vehicle"
 }
 LincolnMKZ {
   translation 60.3212 -9.38723 1.1
   name "vehicle(2)"
+  controller "autonomous_vehicle"
 }
 Solid {
   translation 107.72 -84.49 -1.29
@@ -1107,4 +1109,5 @@ RectangleArena {
 MercedesBenzSprinter {
   translation 85.174 -2.21543 1.4
   rotation 0 0 1 3.14159
+  controller "autonomous_vehicle"
 }
