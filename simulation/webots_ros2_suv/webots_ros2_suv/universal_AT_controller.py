@@ -11,6 +11,8 @@ UDP_PORT = 5005
 
 COMMAND_TIMEOUT = 5000
 
+INJECTORS_COUNT = 10
+
 
 class ATController:
     robot = None
@@ -20,6 +22,8 @@ class ATController:
 
     __sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     __sock.settimeout(0.001)
+
+    injectors_state = []
 
     __rpc_dispatcher = Dispatcher()
 
@@ -64,6 +68,38 @@ class ATController:
             errors.append("commandTimeout")
         return errors
 
+    @staticmethod
+    @__rpc_dispatcher.add_method
+    def setInjectors(byMask=True, num=None, state=None, mask=None):
+        if byMask == True:
+            if mask == None:
+                return '"status":"failed,"reason":"invalidMask"'
+            for i in range(INJECTORS_COUNT):
+                ATController.injectors_state[i] = mask & 1
+                mask = mask >> 1
+            return '"status":"ok"'
+        elif num == None:
+            return '"status":"failed,"reason":"invalidNum"'
+        elif state == None:
+            return '"status":"failed,"reason":"invalidState"'
+        else:
+            ATController.injectors_state[num] = state
+
+    @staticmethod
+    @__rpc_dispatcher.add_method
+    def getInjectors(byMask=True, num=None):
+        if byMask:
+            mask = 0
+            for i in range(INJECTORS_COUNT):
+                mask = mask << 1
+                if ATController.injectors_state[INJECTORS_COUNT - i - 1]:
+                    mask |= 1
+            return '"mask":"' + mask + '"'
+        elif num == None:
+            return '"status":"failed,"reason":"invalidNum"'
+        else:
+            return '"state":"' + ATController.injectors_state[num] + '"'
+
     def __check_rpc_msgs(self):
         try:
             data, addr = self.__sock.recvfrom(1024)
@@ -92,6 +128,9 @@ class ATController:
 
             self.__sock.bind((UDP_SERVER_IP, UDP_PORT))
 
+            for i in range(INJECTORS_COUNT):
+                ATController.injectors_state.append(False)
+
             self.__timer = self.__node.create_timer(0.1, self.__timer_callback)
             self.__node.create_timer(0.05, self.__check_rpc_msgs)
 
@@ -103,7 +142,8 @@ class ATController:
             print(f'{str(err)}')
 
     def __timer_callback(self):
-        if int(round(time.time() * 1000)) > ATController.last_cmd_frame + COMMAND_TIMEOUT and not ATController.commandTimeout:
+        if int(round(
+                time.time() * 1000)) > ATController.last_cmd_frame + COMMAND_TIMEOUT and not ATController.commandTimeout:
             ATController.commandTimeout = True
             self.__node._logger.info('AT controller command timeout')
 
