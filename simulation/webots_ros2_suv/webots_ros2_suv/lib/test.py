@@ -1,91 +1,42 @@
+import cv2
 import torch
-import random
-import torch.nn as nn
-import torch.optim as optim
+from datetime import datetime
+from map_builder import MapBuilder
+from fastseg import MobileV3Large
+from fastseg.image import colorize, blend
 
-class TrajectoryPredictionModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(TrajectoryPredictionModel, self).__init__()
-        self.rnn = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=2, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
 
-    def forward(self, x):
-        output, _ = self.rnn(x)
-        predictions = self.fc(output)
-        return predictions
+cap = cv2.VideoCapture("https://restreamer.vms.evo73.ru/909026beec0c23c6/stream.m3u8")
+map_builder = MapBuilder(model_path=f'/Users/hiber/Downloads/yolov8l.pt',
+                                            ipm_config=f'/Users/hiber/Downloads/config.yaml')
+weights_path = "/Users/hiber/Downloads/mobilev3large-lraspp.pt"
+if torch.cuda.is_available():
+    seg_model = MobileV3Large.from_pretrained(weights_path).cuda().eval()
+else:
+    seg_model = MobileV3Large.from_pretrained(weights_path).eval()
 
-class DataLoader:
-    def __init__(self, batch_size):
-        self.batch_size = batch_size
+while(True):
+    ret, frame = cap.read()
+    cv2.imshow('frame', frame)
 
-    def generate_sample_data(self, num_classes, num_points_per_class):
-        data = []
-        for class_id in range(num_classes):
-            for _ in range(num_points_per_class):
-                x = random.uniform(0, 100)
-                y = random.uniform(0, 100)
-                data.append((class_id, x, y))
-        return data
 
-    def get_batch(self, data):
-        random.shuffle(data)
-        num_batches = len(data) // self.batch_size
-        for i in range(num_batches):
-            batch_data = data[i * self.batch_size: (i + 1) * self.batch_size]
-            input_sequence = []
-            output_sequence = []
-            for item in batch_data:
-                class_id, x, y = item
-                input_sequence.append([class_id, x, y])
-                output_sequence.append([x, y])
-            yield input_sequence, output_sequence
+    # labels = seg_model.predict_one(frame)
+    # colorized = colorize(labels)
+    #composited = blend(frame, colorized)
 
-class TrajectoryPredictor:
-    def __init__(self, input_size, hidden_size, output_size, batch_size):
-        self.model = TrajectoryPredictionModel(input_size, hidden_size, output_size)
-        self.criterion = nn.MSELoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
-        self.data_loader = DataLoader(batch_size)
+    # image = map_builder.resize_img(frame)
+    # results = map_builder.detect_objects(image)
+    ipm_image = map_builder.generate_ipm(frame, is_mono=False, need_cut=False)
 
-    def train(self, input_sequence, target_sequence, num_epochs):
-        for epoch in range(num_epochs):
-            self.optimizer.zero_grad()
-            inputs = torch.tensor(input_sequence, dtype=torch.float32)
-            targets = torch.tensor(target_sequence, dtype=torch.float32)
-            outputs = self.model(inputs)
-            loss = self.criterion(outputs, targets)
-            loss.backward()
-            self.optimizer.step()
+    cv2.imshow("IPM", ipm_image)
+    # cv2.imshow("objects", results[0].plot())
 
-    def predict(self, input_sequence):
-        with torch.no_grad():
-            inputs = torch.tensor(input_sequence, dtype=torch.float32)
-            predictions = self.model(inputs)
-        return predictions.tolist()
 
-if __name__ == "__main__":
-    input_size = 3  # Размер входных данных (класс объекта, x, y координаты)
-    hidden_size = 64  # Размер скрытого состояния RNN
-    output_size = 2  # Размер выходных данных (x, y координаты)
-    num_classes = 7  # Количество классов объектов
-    batch_size = 32  # Размер батча для обучения
-    num_points_per_class = 40  # Количество точек данных для каждого класса
 
-    predictor = TrajectoryPredictor(input_size, hidden_size, output_size, batch_size)
-    data_loader = DataLoader(batch_size)
-    data = data_loader.generate_sample_data(num_classes, num_points_per_class)
-
-    num_epochs = 10
-    for epoch in range(num_epochs):
-        for inputs, targets in data_loader.get_batch(data):
-            predictor.train(inputs, targets, num_epochs=1)
-
-        # Пример использования модели для предсказания траектории
-        class_id = random.randint(0, num_classes - 1)
-        x_coord = random.uniform(0, 100)
-        y_coord = random.uniform(0, 100)
-        input_sequence = [[class_id, x_coord, y_coord]]
-        predicted_trajectory = predictor.predict(input_sequence)
-        print(f"Epoch {epoch + 1}: Predicted Trajectory: {predicted_trajectory}")
-
-    print("Training completed.")
+    # img_filename = datetime.now().strftime("%Y%m%d-%H%M%S")
+    # base_path = "/Users/hiber/Downloads/"
+    # cv2.imwrite(f"{base_path}{img_filename}.png", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cap.release()
+        cv2.destroyAllWindows()
+        break
