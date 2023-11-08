@@ -203,41 +203,21 @@ class LocalMapNode(Node):
             image_depth = self.__map_builder.resize_img(image_depth.astype('float32'))
 
             results = self.__map_builder.detect_objects(image)
-            track_ids = self.track_objects(results)
             cboxes = results[0].boxes.data.cpu()
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
             depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
-            image_seg[image_seg == 0] = 100
-
-            excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
-            for b in cboxes:
-                if (int(b[-1]) + 1) in excluded_classes:
-                    continue
-                corr = 5
-                image_seg[int(b[1])-corr:int(b[3]) + corr, int(b[0]) - corr:int(b[2]) + corr] = 100
+            image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes)
             ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
 
             pov_point = (image.shape[0], int(image.shape[1] / 2))
             pov_point = self.__map_builder.calc_bev_point(pov_point)
             pov_point = (pov_point[0], pov_point[1] - 15)
             goal_point = (self.find_goal_point_x(ipm_image[10,:]), 10)
-
-
-            for i in range(len(tbs)):
-                label_num = int(results[0].boxes.data[i][-1]) + 1
-                if label_num in excluded_classes:
-                    continue
-                l = self.__map_builder.get_labels()[label_num]
-                p1 = (int(tbs[i][0] - widths[i] / 4), int(tbs[i][1] - widths[i] / 4))
-                p2 = (int(tbs[i][0] + widths[i] / 4), int(tbs[i][1]))
-                ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
-
-            colorized = colorize(ipm_image)
-            colorized = np.asarray(colorized)
-
-            colorized = colorized[:pov_point[1], :]
+            ipm_image = self.__map_builder.put_objects(ipm_image, tbs, widths, results)
+            colorized = np.asarray(colorize(ipm_image))[:pov_point[1], :]
             ipm_image = ipm_image[:pov_point[1], :]
+            ipm_image, track_ids = self.__map_builder.track_objects(results, ipm_image, self.__pos)
 
 
             path = self.plan_path(pov_point, goal_point, ipm_image, colorized)
@@ -249,8 +229,8 @@ class LocalMapNode(Node):
             cv2.imshow("colorized seg", colorized_resized)
             cv2.imshow("composited image", np.asarray(colorize(image_seg)))
             cv2.imshow("yolo drawing", results[0].plot())
-            img_tracks = draw_absolute_tracks(self.__track_history_bev, 500, 500, self._logger)
-            cv2.imshow("yolo drawing", img_tracks)
+            #img_tracks = draw_absolute_tracks(self.__track_history_bev, 500, 500, self._logger)
+            #cv2.imshow("yolo drawing", img_tracks)
 
 
             if cv2.waitKey(10) & 0xFF == ord('q'):

@@ -6,71 +6,11 @@ import os
 import yaml
 from fastseg.image import colorize
 import time
+from collections import defaultdict
+from orientation import local_to_global
+from behavioral_analysis import BehaviourAnalyser
+from ipm_transformer import IPMTransformer
 
-class IPMTransformer(object):
-    def __init__(self, homography_matrix=None):
-        """
-        Конструктор класса IPMTransformer.
-
-        Args:
-            homography_matrix (numpy.ndarray, optional): Матрица гомографии, инициализируется пустой матрицей, если не предоставлена.
-        """
-        self.__h = homography_matrix
-
-    def calc_homography(self, pts_src, pts_dst):
-        """
-        Метод для вычисления матрицы гомографии на основе набора исходных точек (pts_src) и соответствующих точек назначения (pts_dst).
-        Использует функцию cv2.findHomography для выполнения вычислений.
-
-        Args:
-            pts_src (numpy.ndarray): Массив исходных точек.
-            pts_dst (numpy.ndarray): Массив точек назначения.
-
-        Returns:
-            numpy.ndarray: Матрица гомографии.
-        """
-        self.__h, status = cv2.findHomography(pts_src, pts_dst, cv2.RANSAC)
-        return self.__h
-
-    def get_homography_matrix(self):
-        """
-        Метод для получения матрицы гомографии, которая была вычислена или установлена ранее.
-
-        Returns:
-            numpy.ndarray: Матрица гомографии.
-        """
-        return self.__h
-
-    def get_ipm(self, im_src, dst_size=(1200, 800), horizont=0, is_mono=False, need_cut=True):
-        """
-        Метод для выполнения обратного преобразования перспективы (Inverse Perspective Mapping) на исходном изображении im_src.
-
-        Args:
-            im_src (numpy.ndarray): Исходное изображение, на которое будет применено обратное преобразование перспективы.
-            dst_size (tuple, optional): Размер целевого изображения после преобразования (по умолчанию (1200, 800)).
-            horizont (int, optional): Высота горизонтальной линии, используемой для обрезки изображения (по умолчанию 0).
-            is_mono (bool, optional): Флаг, указывающий, является ли исходное изображение монохромным (по умолчанию False).
-            need_cut (bool, optional): Флаг, указывающий, нужно ли обрезать изображение для удаления нулевых строк и столбцов в результате (по умолчанию True).
-
-        Returns:
-            numpy.ndarray: Преобразованное изображение после применения обратного преобразования перспективы.
-        """
-        im_src = im_src[horizont:, :]  # Обрезаем изображение по горизонтали, если задана высота горизонтали
-        im_dst = cv2.warpPerspective(im_src, self.__h, dst_size)  # Применяем матрицу гомографии
-        if not need_cut:
-            return im_dst
-        if not is_mono:
-            rows = np.sum(im_dst, axis=(1, 2))
-            cols = np.sum(im_dst, axis=(0, 2))
-        else:
-            rows = np.sum(im_dst, axis=(1))
-            cols = np.sum(im_dst, axis=(0))
-
-        nonzero_rows = len(rows[np.nonzero(rows)])  # Находим ненулевые строки
-        nonzero_cols = len(cols[np.nonzero(cols)])  # Находим ненулевые столбцы
-        im_dst = im_dst[:nonzero_rows, :nonzero_cols]  # Обрезаем изображение до ненулевых строк и столбцов
-        im_dst = cv2.resize(im_dst, (im_dst.shape[1], im_dst.shape[1]), interpolation=cv2.INTER_AREA)  # Изменяем размер
-        return im_dst
 
 
 class MapBuilder(object):
@@ -78,7 +18,10 @@ class MapBuilder(object):
         self.__model = YOLO(model_path)
         self.load_ipm_config(ipm_config)
         self.__corr_depth_pos = (0, 10)
-
+        self.__track_history = defaultdict(lambda: [])
+        self.__track_history_bev = defaultdict(lambda: [])
+        self.__behaviour_analyser = BehaviourAnalyser()
+        self.__behaviour_analyser_bev = BehaviourAnalyser()
 
     def detect_objects(self, image):
         #results = self.__model.predict(source=image, save=False, save_txt=False)
@@ -96,6 +39,8 @@ class MapBuilder(object):
         self.__img_height = config['height']
         self.__img_width = config['width']
 
+    def get_horizont_line(self):
+        return self.__horizont_line_height
 
     def generate_ipm(self, image, is_mono = False, need_cut=True):
         ipm_transformer = IPMTransformer(homography_matrix=self.__homograpthy_matrix)
@@ -133,21 +78,91 @@ class MapBuilder(object):
 
     def calc_bev_point(self, p):
         m = self.__homograpthy_matrix
-        px = ((m[0][0] * p[0] + m[0][1] * p[1] + m[0][2])
-              / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
-        py = ((m[1][0] * p[0] + m[1][1] * p[1] + m[1][2])
-              / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
+        px = ((m[0][0] * p[0] + m[0][1] * p[1] + m[0][2]) / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
+        py = ((m[1][0] * p[0] + m[1][1] * p[1] + m[1][2]) / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
         return (int(px), int(py))
 
-    def transform_boxes(self, boxes):
+    def transform_boxes(self, cboxes):
         box_points = []
         widths = []
-        for box in boxes:
-            # p = np.asarray([box[0] + (box[2] - box[0]) / 2, box[1] + (box[3] - box[1]) / 2 - self.__horizont_line_height], dtype='float32')
-            p = np.asarray([box[0] + (box[2] - box[0]) / 2, box[3] - self.__horizont_line_height], dtype='float32')
-            widths.append(box[2] - box[0])
-            box_points.append(self.calc_bev_point(p))
+        for b in cboxes:
+            p = np.asarray([
+                b[0] + (b[2] - b[0]) / 2,
+                b[3] - self.__horizont_line_height
+                ], 
+                dtype='float32')
+            b0 = self.calc_bev_point(np.array([b[0], b[3]]))
+            b1 = self.calc_bev_point(np.array([b[2], b[3]]))
+            widths.append(b1[0] - b0[0])
+            bev_point = self.calc_bev_point(p)
+            box_points.append(bev_point)
         return box_points, widths
+
+    def remove_detected_objects(self, image_seg, cboxes):
+        image_seg[image_seg == 0] = 100
+        excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
+        for b in cboxes:
+            if (int(b[-1]) + 1) in excluded_classes:
+                continue
+            corr = 5
+            image_seg[int(b[1])-corr:int(b[3]) + corr, int(b[0]) - corr:int(b[2]) + corr] = 100
+        return image_seg
+
+
+    def put_objects(self, ipm_image, tbs, widths, results):
+        excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
+        for i in range(len(tbs)):
+            label_num = int(results[0].boxes.data[i][-1]) + 1
+            if label_num in excluded_classes:
+                continue
+            l = self.get_labels()[label_num]
+            p1 = (int(tbs[i][0] - widths[i] / 1.5), int(tbs[i][1] - widths[i] / 1.5))
+            p2 = (int(tbs[i][0] + widths[i] / 1.5), int(tbs[i][1]))
+            ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
+        return ipm_image
+
+    def track_objects(self, results, ipm_image, pos=(0, 0, 0)):
+        boxes = results[0].boxes.xywh.cpu()
+        if len(results[0].boxes) < 1:
+            return ipm_image, []
+        track_ids = results[0].boxes.id.int().cpu().tolist()
+        classes = [int(results[0].boxes.data[i][-1]) + 1 for i in range(len(results[0].boxes.data))]
+
+        annotated_frame = results[0].plot()
+        for box, track_id, obj_class in zip(boxes, track_ids, classes):
+            x, y, w, h = box
+            track = self.__track_history[track_id]
+            track.append((float(x), float(y)))  # x, y center point
+            bev_track = self.__track_history_bev[track_id]
+            bev_point = self.calc_bev_point((int(x), (int(y + h / 2 - self.__horizont_line_height))))
+            if not (0 < bev_point[1] < ipm_image.shape[0] and 0 < bev_point[0] < ipm_image.shape[1]): # Нужно проверить!!!!
+                continue
+            if pos and bev_point:
+                x, y = local_to_global(bev_point[0], bev_point[1], pos[0], pos[1], pos[2])
+                bev_track.append((x, y))
+
+            if len(track) > 40:  # retain 90 tracks for 90 frames
+                track.pop(0)
+                bev_track.pop(0)
+
+            points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
+            cv2.polylines(annotated_frame, [points], isClosed=False, color=(0, 255, 0), thickness=3)
+            pred_traj = self.__behaviour_analyser.run_spline(track, obj_class)
+            if pred_traj:
+                pred_points = np.hstack(pred_traj).astype(np.int32).reshape((-1, 1, 2))
+                cv2.polylines(annotated_frame, [pred_points], isClosed=False, color=(255, 0, 0), thickness=3)
+
+            if len(bev_track) > 0:
+                points_bev = np.hstack(bev_track).astype(np.int32).reshape((-1, 1, 2))
+                cv2.polylines(ipm_image, [points_bev], isClosed=False, color=(0, 255, 0), thickness=3)
+                pred_traj_bev = self.__behaviour_analyser_bev.run_spline(bev_track, obj_class)
+                if pred_traj_bev:
+                    pred_points_bev = np.hstack(pred_traj_bev).astype(np.int32).reshape((-1, 1, 2))
+                    cv2.polylines(ipm_image, [pred_points_bev], isClosed=False, color=(255, 0, 0), thickness=3)
+
+        cv2.imshow("YOLOv8 Tracking", annotated_frame)
+        return ipm_image, track_ids
+
 
     def resize_img(self, image):
         return cv2.resize(image, (self.__img_width, self.__img_height))
