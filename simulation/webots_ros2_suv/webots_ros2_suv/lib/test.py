@@ -43,7 +43,8 @@ while(True):
     colorized = np.array(colorize(labels))
 
     image_seg = map_builder.remove_detected_objects(labels, cboxes)
-    ipm_image_seg = map_builder.generate_ipm(labels, is_mono=True, need_cut=False)
+    ipm_image_seg = map_builder.generate_ipm(image_seg, is_mono=True, need_cut=False)
+    full_ipm_image_seg = map_builder.generate_ipm(colorized, is_mono=True, need_cut=False)
     ipm_image_seg = map_builder.put_objects(ipm_image_seg, tbs, widths, results)
     ipm_image_seg_colorized = np.array(colorize(ipm_image_seg))
     ipm_image = map_builder.generate_ipm(image, is_mono=False, need_cut=True)
@@ -52,17 +53,20 @@ while(True):
     pov_point = map_builder.calc_bev_point(pov_point)
     ipm_image_seg_colorized = ipm_image_seg_colorized[:pov_point[1], :]
     colorized = colorized[:pov_point[1], :]
+    full_ipm_image_seg = full_ipm_image_seg[:pov_point[1], :]
 
 
-    ipm_image_seg_colorized, track_ids = map_builder.track_objects(results, ipm_image_seg_colorized, (0, 0, 0))
+    ipm_image_seg_colorized, track_ids = map_builder.track_objects(results, ipm_image_seg_colorized, (0, 0, 0), only_train=True)
 
     ipm_image_seg_colorized = cv2.resize(ipm_image_seg_colorized, (500, 500), cv2.INTER_AREA)
     ipm_image = cv2.resize(ipm_image, (500, 500), cv2.INTER_AREA)
     frame = cv2.resize(frame, (500, 500), cv2.INTER_AREA)
+    full_ipm_image_seg = cv2.resize(full_ipm_image_seg, (500, 500), cv2.INTER_AREA)
 
     cv2.imshow('frame', frame)
     cv2.imshow("IPM seg", ipm_image_seg_colorized)
     cv2.imshow("IPM original", ipm_image)
+    cv2.imshow("IPM seg full ", full_ipm_image_seg)
     cv2.imshow("segmented", np.array(colorized))
 
 

@@ -4,13 +4,17 @@ import cv2
 import numpy as np
 import os
 import yaml
-from fastseg.image import colorize
 import time
+import traceback
+from fastseg.image import colorize
 from collections import defaultdict
+
 from orientation import local_to_global
 from behavioral_analysis import BehaviourAnalyser
 from ipm_transformer import IPMTransformer
-
+# from .orientation import local_to_global
+# from .behavioral_analysis import BehaviourAnalyser
+# from .ipm_transformer import IPMTransformer
 
 
 class MapBuilder(object):
@@ -121,48 +125,63 @@ class MapBuilder(object):
             ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
         return ipm_image
 
-    def track_objects(self, results, ipm_image, pos=(0, 0, 0)):
-        boxes = results[0].boxes.xywh.cpu()
-        if len(results[0].boxes) < 1:
+    def track_objects(self, results, ipm_image, pos=(0, 0, 0), only_train=False):
+        try:
+            boxes = results[0].boxes.xywh.cpu()
+            if len(results[0].boxes) < 1:
+                return ipm_image, []
+            track_ids = results[0].boxes.id.int().cpu().tolist()
+            classes = [int(results[0].boxes.data[i][-1]) + 1 for i in range(len(results[0].boxes.data))]
+
+            annotated_frame = results[0].plot()
+            for box, track_id, obj_class in zip(boxes, track_ids, classes):
+                x, y, w, h = box
+                track = self.__track_history[track_id]
+                track.append((float(x), float(y)))  # x, y center point
+                bev_track = self.__track_history_bev[track_id]
+                bev_point = self.calc_bev_point((int(x), (int(y + h / 2 - self.__horizont_line_height))))
+                if not (0 < bev_point[1] < ipm_image.shape[0] and 0 < bev_point[0] < ipm_image.shape[1]): # Нужно проверить!!!!
+                    continue
+                if pos and bev_point:
+                    x, y = local_to_global(bev_point[0], bev_point[1], pos[0], pos[1], pos[2])
+                    bev_track.append((x, y))
+
+                if len(track) > 60:  # retain 90 tracks for 90 frames
+                    track.pop(0)
+                    bev_track.pop(0)
+
+                points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
+                cv2.polylines(annotated_frame, [points], isClosed=False, color=(0, 255, 0), thickness=3)
+                if only_train:
+                    self.__behaviour_analyser.train(obj_class, track)
+
+                # pred_traj = self.__behaviour_analyser.run_spline(track, obj_class)
+                else:
+                    pred_traj = self.__behaviour_analyser.run(track, obj_class, need_train=False)
+                    if pred_traj:
+                        pred_points = np.hstack(pred_traj).astype(np.int32).reshape((-1, 1, 2))
+                        cv2.polylines(annotated_frame, [pred_points], isClosed=False, color=(255, 0, 0), thickness=3)
+                        pred_points_bev = []
+                        for p in pred_traj:
+                            p_bev = self.calc_bev_point((int(p[0]), (int(p[1] + h / 2 - self.__horizont_line_height))))
+                            pred_points_bev.append(p_bev)
+
+                        pred_points_bev = np.hstack(pred_points_bev).astype(np.int32).reshape((-1, 1, 2))
+                        cv2.polylines(ipm_image, [pred_points_bev], isClosed=False, color=(255, 0, 0), thickness=3)
+
+                if len(bev_track) > 0:
+                    points_bev = np.hstack(bev_track).astype(np.int32).reshape((-1, 1, 2))
+                    cv2.polylines(ipm_image, [points_bev], isClosed=False, color=(0, 255, 0), thickness=3)
+                    # pred_traj_bev = self.__behaviour_analyser_bev.run_spline(bev_track, obj_class)
+                    # if pred_traj_bev:
+                    #     pred_points_bev = np.hstack(pred_traj_bev).astype(np.int32).reshape((-1, 1, 2))
+                    #     cv2.polylines(ipm_image, [pred_points_bev], isClosed=False, color=(255, 0, 0), thickness=3)
+
+            cv2.imshow("YOLOv8 Tracking", annotated_frame)
+            return ipm_image, track_ids
+        except  Exception as err:
+            print(''.join(traceback.TracebackException.from_exception(err).format()))
             return ipm_image, []
-        track_ids = results[0].boxes.id.int().cpu().tolist()
-        classes = [int(results[0].boxes.data[i][-1]) + 1 for i in range(len(results[0].boxes.data))]
-
-        annotated_frame = results[0].plot()
-        for box, track_id, obj_class in zip(boxes, track_ids, classes):
-            x, y, w, h = box
-            track = self.__track_history[track_id]
-            track.append((float(x), float(y)))  # x, y center point
-            bev_track = self.__track_history_bev[track_id]
-            bev_point = self.calc_bev_point((int(x), (int(y + h / 2 - self.__horizont_line_height))))
-            if not (0 < bev_point[1] < ipm_image.shape[0] and 0 < bev_point[0] < ipm_image.shape[1]): # Нужно проверить!!!!
-                continue
-            if pos and bev_point:
-                x, y = local_to_global(bev_point[0], bev_point[1], pos[0], pos[1], pos[2])
-                bev_track.append((x, y))
-
-            if len(track) > 40:  # retain 90 tracks for 90 frames
-                track.pop(0)
-                bev_track.pop(0)
-
-            points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
-            cv2.polylines(annotated_frame, [points], isClosed=False, color=(0, 255, 0), thickness=3)
-            pred_traj = self.__behaviour_analyser.run_spline(track, obj_class)
-            if pred_traj:
-                pred_points = np.hstack(pred_traj).astype(np.int32).reshape((-1, 1, 2))
-                cv2.polylines(annotated_frame, [pred_points], isClosed=False, color=(255, 0, 0), thickness=3)
-
-            if len(bev_track) > 0:
-                points_bev = np.hstack(bev_track).astype(np.int32).reshape((-1, 1, 2))
-                cv2.polylines(ipm_image, [points_bev], isClosed=False, color=(0, 255, 0), thickness=3)
-                pred_traj_bev = self.__behaviour_analyser_bev.run_spline(bev_track, obj_class)
-                if pred_traj_bev:
-                    pred_points_bev = np.hstack(pred_traj_bev).astype(np.int32).reshape((-1, 1, 2))
-                    cv2.polylines(ipm_image, [pred_points_bev], isClosed=False, color=(255, 0, 0), thickness=3)
-
-        cv2.imshow("YOLOv8 Tracking", annotated_frame)
-        return ipm_image, track_ids
-
 
     def resize_img(self, image):
         return cv2.resize(image, (self.__img_width, self.__img_height))

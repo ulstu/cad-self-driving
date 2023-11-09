@@ -134,43 +134,11 @@ class LocalMapNode(Node):
         command_message = AckermannDrive()
         command_message.speed = 3.0
         command_message.steering_angle = error / math.pi * p_coef
+        #command_message.steering_angle = 0.0
         #self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
         self.__ackermann_publisher.publish(command_message)
 
     
-    def track_objects(self, results):
-        # Get the boxes and track IDs
-        boxes = results[0].boxes.xywh.cpu()
-        # if not results[0].boxes.id:
-        #     return None
-        track_ids = results[0].boxes.id.int().cpu().tolist()
-
-        # Visualize the results on the frame
-        annotated_frame = results[0].plot()
-        # Plot the tracks
-        for box, track_id in zip(boxes, track_ids):
-            x, y, w, h = box
-            track = self.__track_history[track_id]
-            track.append((float(x), float(y)))  # x, y center point
-            bev_track = self.__track_history_bev[track_id]
-            bev_point = self.__map_builder.calc_bev_point((int(y), int(x)))
-            if self.__pos and bev_point:
-                x, y = local_to_global(bev_point[1], bev_point[0], self.__pos[0], self.__pos[1], self.__pos[2])
-                bev_track.append((x, y))
-
-            if len(track) > 30:  # retain 90 tracks for 90 frames
-                track.pop(0)
-                bev_track.pop(0)
-
-            # Draw the tracking lines
-            points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
-            cv2.polylines(annotated_frame, [points], isClosed=False, color=(230, 230, 230), thickness=5)
-
-        # Display the annotated frame
-        cv2.imshow("YOLOv8 Tracking", annotated_frame)
-        return track_ids
-
-
     def plan_path(self, pov_point, goal_point, ipm_image, colorized):
         start_node = RRTTreeNode(pov_point[0], pov_point[1])
         goal_node = RRTTreeNode(goal_point[0],goal_point[1])
@@ -217,7 +185,7 @@ class LocalMapNode(Node):
             ipm_image = self.__map_builder.put_objects(ipm_image, tbs, widths, results)
             colorized = np.asarray(colorize(ipm_image))[:pov_point[1], :]
             ipm_image = ipm_image[:pov_point[1], :]
-            ipm_image, track_ids = self.__map_builder.track_objects(results, ipm_image, self.__pos)
+            colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
 
 
             path = self.plan_path(pov_point, goal_point, ipm_image, colorized)
