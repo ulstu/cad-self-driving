@@ -1,0 +1,26 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+# template language: javascript
+
+EXTERNPROTO "webots://projects/appearances/protos/Leather.proto"
+
+PROTO UazPatriotInterior []
+{
+  Group {
+    children [
+      DEF UazInterior Pose {
+        translation 0 0.65 1.41
+        rotation 0 0 0 0
+        children [
+          CadShape {
+            url [
+              "models/uaz_interior.dae"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
