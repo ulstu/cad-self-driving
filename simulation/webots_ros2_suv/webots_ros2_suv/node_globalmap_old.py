@@ -4,13 +4,10 @@ import traceback
 import yaml
 import os
 import pathlib
-import json
 from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus
 from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
-from os import listdir
-from os.path import isfile, join
 from .lib.world_model import WorldModel
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
@@ -20,7 +17,6 @@ BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
 YAML_PATH = BASE_PATH + 'resource/map-config/robocross.yaml'
-MAPS_PATH = BASE_PATH + 'resource/global_maps/'
 ASSETS_PATH = STATIC_PATH + 'assets/'
 
 class MapServer(Node):
@@ -59,38 +55,6 @@ class MapServer(Node):
                 return {'status': 'ok', 'pointtypes': point_types}
         except Exception as err:
             return {'status': ''.join(traceback.TracebackException.from_exception(err).format())}
-        
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def get_maps(self):
-        try:
-            map_files = [f for f in listdir(MAPS_PATH) if isfile(join(MAPS_PATH, f))]
-            return {'status': 'ok', 'maps': map_files}
-        except Exception as err:
-            return {'status': ''.join(traceback.TracebackException.from_exception(err).format())}
-
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def save_map(self, filename, map_data):
-        try:
-            with open(f'{MAPS_PATH}/{filename}.geojson', 'w') as f:
-                json.dump(json.loads(map_data), f)
-            return {'status': 'ok'} 
-        except Exception as err:        
-            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
-            return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
-
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def load_map(self, filename):
-        try:
-            with open(f'{MAPS_PATH}/{filename}') as f:
-                j = json.load(f)
-                return {'status': 'ok', 'features' : j} 
-        except Exception as err:        
-            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
-            return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
-
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

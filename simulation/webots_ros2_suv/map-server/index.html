@@ -5,6 +5,7 @@
     <title>Редактор карт</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="node_modules/ol/ol.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" integrity="sha512-ELV+xyi8IhEApPS/pSj66+Jiw+sOT1Mqkzlh8ExXihe4zfqbWkxPRi8wptXIO9g73FSlhmquFlUOuMSoXz5IRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />    
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
@@ -26,9 +27,20 @@
           </select>
           <input class="form-control" type="button" value="Отменить ввод" id="undo">
         </span>
+        <span class="input-group">
+          <input class="form-control" type="button" value="Сохранить" id="save">
+          <input class="form-control" type="button" value="Сохранить как..." id="saveas">
+        </span>
+        <span class="input-group">
+          <label class="input-group-text" for="type">Сохраненные карты</label>
+          <select class="form-select" id="maps">
+          </select>
+          <input class="form-control" type="button" value="Загрузить" id="loadmap">
+        </span>
       </div>
     </div>
 
     <script type="module" src="main.js"></script>
+    <script type="module" src="map_cmd.js"></script>
   </body>
 </html>
