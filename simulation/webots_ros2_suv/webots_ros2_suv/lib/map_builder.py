@@ -9,12 +9,12 @@ import traceback
 from fastseg.image import colorize
 from collections import defaultdict
 
-from orientation import local_to_global
-from behavioral_analysis import BehaviourAnalyser
-from ipm_transformer import IPMTransformer
-# from .orientation import local_to_global
-# from .behavioral_analysis import BehaviourAnalyser
-# from .ipm_transformer import IPMTransformer
+# from orientation import local_to_global
+# from behavioral_analysis import BehaviourAnalyser
+# from ipm_transformer import IPMTransformer
+from .orientation import local_to_global
+from .behavioral_analysis import BehaviourAnalyser
+from .ipm_transformer import IPMTransformer
 
 
 class MapBuilder(object):
@@ -120,8 +120,8 @@ class MapBuilder(object):
             if label_num in excluded_classes:
                 continue
             l = self.get_labels()[label_num]
-            p1 = (int(tbs[i][0] - widths[i] / 1.5), int(tbs[i][1] - widths[i] / 1.5))
-            p2 = (int(tbs[i][0] + widths[i] / 1.5), int(tbs[i][1]))
+            p1 = (int(tbs[i][0] - widths[i] / 0.45), int(tbs[i][1] - widths[i] / 0.8))
+            p2 = (int(tbs[i][0] + widths[i] / 0.45), int(tbs[i][1]))
             ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
         return ipm_image
 

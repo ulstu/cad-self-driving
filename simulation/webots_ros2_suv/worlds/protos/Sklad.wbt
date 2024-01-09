@@ -1,0 +1,707 @@
+#VRML_SIM R2023a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/ThreadMetalPlate.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/Roughcast.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/conveyors/protos/ConveyorBelt.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/pallet/protos/WoodenPalletStack.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/pallet/protos/WoodenPallet.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/stairs/protos/StraightStairs.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/stairs/protos/StraightStairsRail.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/Rubber.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/obstacles/protos/OilBarrel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/traffic/protos/TrafficCone.proto"
+EXTERNPROTO "../protos/BmwX5.proto"
+
+WorldInfo {
+  info [
+    "Simulation of the Festo's Robotino 3 robot."
+    "This model includes an accurate and fast simulation of the mecanum wheels."
+    "The robot can be equiped with various lidar sensors and cameras"
+    "The simulation shows a Robotino 3 moving in an industrial environment using a Braitenberg algorithm using the information received by its nine infrared sensors."
+  ]
+  title "Festo's Robotino 3 robot"
+  contactProperties [
+    ContactProperties {
+      material1 "WheelMat"
+      coulombFriction [
+        0, 2, 0
+      ]
+      bounce 0
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.3462089764800317 0.33991996936843677 -0.8744105208820454 1.8261788589166281
+  position 8.385233987313603 42.31658339895678 41.94974238642885
+  followSmoothness 0
+}
+TexturedBackground {
+  texture "factory"
+  skybox FALSE
+}
+TexturedBackgroundLight {
+  texture "factory"
+}
+RectangleArena {
+  floorSize 43 40
+  floorTileSize 1 1
+  floorAppearance ThreadMetalPlate {
+  }
+  wallHeight 6.9
+  wallAppearance Roughcast {
+    colorOverride 0.533333 0.541176 0.521569
+    textureTransform TextureTransform {
+      scale 5 1.75
+    }
+  }
+}
+DEF ROOF RectangleArena {
+  translation 0 0.000165885 7.58
+  rotation 1 0 0 3.14156
+  name "rectangle arena(1)"
+  floorSize 43 40
+  floorTileSize 1 1
+  floorAppearance Roughcast {
+    colorOverride 0.533333 0.541176 0.521569
+    textureTransform TextureTransform {
+      scale 5 1.75
+    }
+  }
+  wallHeight 6.9
+  wallAppearance Roughcast {
+    colorOverride 0.533333 0.541176 0.521569
+    textureTransform TextureTransform {
+      scale 5 1.75
+    }
+  }
+}
+DEF BARREL Solid {
+  translation -13.61 12.48 0
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    OilBarrel {
+      translation -7.18 1.203 0.44
+    }
+    OilBarrel {
+      translation -7.18 1.9 0.45
+      name "oil barrel(1)"
+    }
+    OilBarrel {
+      translation -7.18 2.57 0.44
+      name "oil barrel(2)"
+    }
+    OilBarrel {
+      translation -7.18 3.25 0.44
+      name "oil barrel(3)"
+    }
+    OilBarrel {
+      translation -7.18 3.95 0.44
+      name "oil barrel(4)"
+    }
+    OilBarrel {
+      translation -6.55 3.64 0.44
+      name "oil barrel(5)"
+    }
+    OilBarrel {
+      translation -6.55 2.95 0.44
+      name "oil barrel(6)"
+    }
+    OilBarrel {
+      translation -6.55 2.26 0.44
+      name "oil barrel(7)"
+    }
+    OilBarrel {
+      translation -6.55 1.58 0.44
+      name "oil barrel(8)"
+    }
+  ]
+  name "solid(1)"
+}
+DEF BARREL Solid {
+  translation -10.11 12.48 0
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    OilBarrel {
+      translation -7.18 1.203 0.44
+    }
+    OilBarrel {
+      translation -7.18 1.9 0.45
+      name "oil barrel(1)"
+    }
+    OilBarrel {
+      translation -7.18 2.57 0.44
+      name "oil barrel(2)"
+    }
+    OilBarrel {
+      translation -7.18 3.25 0.44
+      name "oil barrel(3)"
+    }
+    OilBarrel {
+      translation -7.18 3.95 0.44
+      name "oil barrel(4)"
+    }
+    OilBarrel {
+      translation -6.55 3.64 0.44
+      name "oil barrel(5)"
+    }
+    OilBarrel {
+      translation -6.55 2.95 0.44
+      name "oil barrel(6)"
+    }
+    OilBarrel {
+      translation -6.55 2.26 0.44
+      name "oil barrel(7)"
+    }
+    OilBarrel {
+      translation -6.55 1.58 0.44
+      name "oil barrel(8)"
+    }
+  ]
+  name "solid(8)"
+}
+DEF BARREL Solid {
+  translation -6.56 12.48 0
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    OilBarrel {
+      translation -7.18 1.203 0.44
+    }
+    OilBarrel {
+      translation -7.18 1.9 0.45
+      name "oil barrel(1)"
+    }
+    OilBarrel {
+      translation -7.18 2.57 0.44
+      name "oil barrel(2)"
+    }
+    OilBarrel {
+      translation -7.18 3.25 0.44
+      name "oil barrel(3)"
+    }
+    OilBarrel {
+      translation -7.18 3.95 0.44
+      name "oil barrel(4)"
+    }
+    OilBarrel {
+      translation -6.55 3.64 0.44
+      name "oil barrel(5)"
+    }
+    OilBarrel {
+      translation -6.55 2.95 0.44
+      name "oil barrel(6)"
+    }
+    OilBarrel {
+      translation -6.55 2.26 0.44
+      name "oil barrel(7)"
+    }
+    OilBarrel {
+      translation -6.55 1.58 0.44
+      name "oil barrel(8)"
+    }
+  ]
+  name "solid(9)"
+}
+DEF BARREL Solid {
+  translation -3.08 12.48 0
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    OilBarrel {
+      translation -7.18 1.203 0.44
+    }
+    OilBarrel {
+      translation -7.18 1.9 0.45
+      name "oil barrel(1)"
+    }
+    OilBarrel {
+      translation -7.18 2.57 0.44
+      name "oil barrel(2)"
+    }
+    OilBarrel {
+      translation -7.18 3.25 0.44
+      name "oil barrel(3)"
+    }
+    OilBarrel {
+      translation -7.18 3.95 0.44
+      name "oil barrel(4)"
+    }
+    OilBarrel {
+      translation -6.55 3.64 0.44
+      name "oil barrel(5)"
+    }
+    OilBarrel {
+      translation -6.55 2.95 0.44
+      name "oil barrel(6)"
+    }
+    OilBarrel {
+      translation -6.55 2.26 0.44
+      name "oil barrel(7)"
+    }
+    OilBarrel {
+      translation -6.55 1.58 0.44
+      name "oil barrel(8)"
+    }
+  ]
+  name "solid(10)"
+}
+DEF BARREL Solid {
+  translation 0.37 12.48 0
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    OilBarrel {
+      translation -7.18 1.203 0.44
+    }
+    OilBarrel {
+      translation -7.18 1.9 0.45
+      name "oil barrel(1)"
+    }
+    OilBarrel {
+      translation -7.18 2.57 0.44
+      name "oil barrel(2)"
+    }
+    OilBarrel {
+      translation -7.18 3.25 0.44
+      name "oil barrel(3)"
+    }
+    OilBarrel {
+      translation -7.18 3.95 0.44
+      name "oil barrel(4)"
+    }
+    OilBarrel {
+      translation -6.55 3.64 0.44
+      name "oil barrel(5)"
+    }
+    OilBarrel {
+      translation -6.55 2.95 0.44
+      name "oil barrel(6)"
+    }
+    OilBarrel {
+      translation -6.55 2.26 0.44
+      name "oil barrel(7)"
+    }
+    OilBarrel {
+      translation -6.55 1.58 0.44
+      name "oil barrel(8)"
+    }
+  ]
+  name "solid(11)"
+}
+DEF PALETE Solid {
+  translation -10.59 -3.98 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+}
+DEF PALETE Solid {
+  translation -10.59 -11.51 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(12)"
+}
+DEF PALETE Solid {
+  translation 5.84 -11.51 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(13)"
+}
+DEF PALETE Solid {
+  translation -10.59 3.07 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(2)"
+}
+DEF PALETE Solid {
+  translation -10.59 10.58 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(4)"
+}
+DEF PALETE Solid {
+  translation 5.68 10.58 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(5)"
+}
+DEF PALETE Solid {
+  translation 5.68001 3.22 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(6)"
+}
+DEF PALETE Solid {
+  translation 5.68004 -4.24 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(7)"
+}
+DEF PALETE Solid {
+  translation -10.59 3.07 0
+  rotation 0 0 1 1.5708
+  scale 2.90288 2.90288 2.90288
+  children [
+    WoodenPalletStack {
+      translation 0 0 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(8)"
+    }
+    WoodenPalletStack {
+      translation 4.99558e-06 -1.36 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(2)"
+    }
+    WoodenPalletStack {
+      translation 9.77071e-06 -2.66 1.13
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(5)"
+    }
+    WoodenPalletStack {
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(3)"
+    }
+    WoodenPalletStack {
+      translation 4.95884e-06 -1.35 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(1)"
+    }
+    WoodenPalletStack {
+      translation 9.80748e-06 -2.67 0
+      rotation 0 0 1 1.5708
+      name "wooden pallet stack(4)"
+    }
+  ]
+  name "solid(3)"
+}
+WoodenBox {
+  translation -2.99 -19.24 0.44
+  name "wooden box(6)"
+}
+WoodenBox {
+  translation 0 -19.12 1.1
+  name "wooden box(10)"
+}
+WoodenBox {
+  translation 3.6 -19.14 1.1
+  name "wooden box(11)"
+}
+WoodenBox {
+  translation 7.18 -19.06 1.1
+  name "wooden box(13)"
+}
+SolidBox {
+  translation -20.9169 -13.0432 2.49973
+  rotation 0.5773502691896258 0.5773502691896258 0.5773502691896258 -2.094
+  name "box(1)"
+  size 0.02 1.2 2.5
+  appearance PBRAppearance {
+    baseColor 0 0 0
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/tagged_wall.jpg"
+      ]
+    }
+    roughness 0.5
+    metalness 0
+  }
+}
+ConveyorBelt {
+  translation 2.47 -19.13 0
+  name "conveyor belt(1)"
+  size 10 0.8 0.8
+  speed 0
+}
+BmwX5 {
+  translation 10.0188 16.1767 0.4
+  rotation 0 0 1 -0.785395307179586
+}
+WoodenPallet {
+  translation -3.11 -19.17 0
+  name "wooden pallet(1)"
+}
+StraightStairs {
+  translation -20.86 -15.61 0
+  rotation 0 0 1 1.5708
+  stepSize 0.2 1.1 0.03
+  stepRise 0.13
+  nSteps 20
+  stringerWidth 0.03
+  stepAppearance ThreadMetalPlate {
+    textureTransform TextureTransform {
+      scale 0.4 2.2
+    }
+  }
+  stringerAppearance BrushedAluminium {
+    colorOverride 0.53333 0.54118 0.52157
+    textureTransform TextureTransform {
+      scale 20 20
+    }
+  }
+  leftRail []
+  rightRail [
+    StraightStairsRail {
+      translation -0.02 0 -0.13
+      run 3.84
+      rise 2.5
+      newelHeight 0.8
+      balusterHeight 0.62
+      appearance Rubber {
+      }
+    }
+  ]
+}
+TrafficCone {
+  translation -5.39465 2.14373 0
+  rotation 0 0 1 0.262
+  name "traffic cone(3)"
+}

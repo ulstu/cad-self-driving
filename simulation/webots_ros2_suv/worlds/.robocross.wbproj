@@ -5,7 +5,7 @@ sceneTreePerspectives: 000000ff00000001000000030000001e0000032d000000fc010000000
 maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
-textFiles: 0 "../../../../../../usr/local/webots/projects/vehicles/controllers/autonomous_vehicle/autonomous_vehicle.c"
+textFiles: 0 "controllers/supervisor_controller/supervisor_controller.py"
 globalOptionalRendering: LidarPointClouds::RangeFinderFrustums
 consoles: Console:All:All
 renderingDevicePerspectives: vehicle:camera;1;0.316667;0;0

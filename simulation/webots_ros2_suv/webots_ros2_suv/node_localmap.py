@@ -4,6 +4,7 @@ import cv2
 import traceback
 import os
 import math
+import torch
 import pathlib
 import sensor_msgs.msg
 import nav_msgs.msg
@@ -17,7 +18,6 @@ from fastseg import MobileV3Large
 from fastseg.image import colorize, blend
 from PIL import Image
 from ament_index_python.packages import get_package_share_directory
-import torch
 from datetime import datetime
 from ament_index_python.packages import get_package_share_directory
 from ackermann_msgs.msg import AckermannDrive
@@ -134,6 +134,9 @@ class LocalMapNode(Node):
         command_message = AckermannDrive()
         command_message.speed = 3.0
         command_message.steering_angle = error / math.pi * p_coef
+
+        with open('/home/hiber/angle.csv','a') as fd:
+            fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
         #command_message.steering_angle = 0.0
         #self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
         self.__ackermann_publisher.publish(command_message)
@@ -185,15 +188,15 @@ class LocalMapNode(Node):
             ipm_image = self.__map_builder.put_objects(ipm_image, tbs, widths, results)
             colorized = np.asarray(colorize(ipm_image))[:pov_point[1], :]
             ipm_image = ipm_image[:pov_point[1], :]
-            colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
+            #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
 
 
             path = self.plan_path(pov_point, goal_point, ipm_image, colorized)
             self.drive(path, pov_point)
 
             colorized_resized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
-            cv2.circle(colorized, pov_point, 7, (0, 255, 0), 5)
-            cv2.circle(colorized, goal_point, 7, (255, 0, 0), 5)
+            cv2.circle(colorized, pov_point, 9, (0, 255, 0), 5)
+            cv2.circle(colorized, goal_point, 9, (255, 0, 0), 5)
             cv2.imshow("colorized seg", colorized_resized)
             cv2.imshow("composited image", np.asarray(colorize(image_seg)))
             cv2.imshow("yolo drawing", results[0].plot())
