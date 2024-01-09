@@ -3,7 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/vehicles/protos/bmw/BmwX5.proto"
+EXTERNPROTO "../protos/BmwX5.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/Road.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/trees/protos/SimpleTree.proto"
@@ -28,8 +28,13 @@ WorldInfo {
   ]
 }
 Viewpoint {
+<<<<<<< Updated upstream
   orientation 0.04089188419731347 -0.9014758928847896 -0.43089333756089193 6.00720521753882
   position -13.08953368430851 -9.427248775391613 8.833681850660128
+=======
+  orientation 0.10186282477147392 0.04558731378045056 -0.9937533706870426 2.679881972705021
+  position 18.87505499236851 2.9374785622721995 4.276124479150855
+>>>>>>> Stashed changes
   follow "vehicle"
 }
 TexturedBackground {
