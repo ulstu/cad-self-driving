@@ -20,7 +20,13 @@ pip install ultralytics
 ```
 
 ## Установка решения
-* Необходимо установить символические ссылки на папки simulation/pcl_maps и simulation/webots_ros2_suv в папку ~/ros_ws/src
+* Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros_ws/src
+```
+ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/pcl_maps
+ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/robot_interfaces
+ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/webots_ros2_suv
+```
+
 * В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
 ```
 source /opt/ros/humble/setup.bash

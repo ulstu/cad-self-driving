@@ -13,7 +13,7 @@ def generate_data_files(share_path, dir):
     return data_files
 
 package_name = 'webots_ros2_suv'
-submodules = "webots_ros2_suv/lib"
+
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
 data_files.append(('share/' + package_name, ['package.xml']))
@@ -28,7 +28,7 @@ data_files += generate_data_files('share/' + package_name + '/map-server/', 'map
 setup(
     name=package_name,
     version='2023.0.1',
-    packages=[package_name, submodules],
+    packages=[package_name, "webots_ros2_suv/lib"],
     data_files=data_files,
     install_requires=['setuptools', 'launch'],
     zip_safe=True,
@@ -52,7 +52,8 @@ setup(
             'field_follower = webots_ros2_suv.field_follower:main',
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
             'node_localmap = webots_ros2_suv.node_localmap:main',
-            'node_globalmap = webots_ros2_suv.node_globalmap:main'
+            'node_globalmap = webots_ros2_suv.node_globalmap:main',
+            'node_path_controller = webots_ros2_suv.node_path_controller:main'
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

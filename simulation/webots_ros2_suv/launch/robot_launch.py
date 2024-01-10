@@ -59,6 +59,14 @@ def get_ros2_nodes(*args):
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
+    node_path_controller = Node(
+        package=PACKAGE_NAME,
+        executable='node_path_controller',
+        name='node_path_controller',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
     package_dir = get_package_share_directory(PACKAGE_NAME)
     urdf = os.path.join(
         package_dir,
@@ -124,6 +132,7 @@ def get_ros2_nodes(*args):
         node_localmap,
         # pcl_map_node,
         node_globalmap,
+        node_path_controller,
         #depth_to_laserscan,
     ] + static_transform_nodes
 

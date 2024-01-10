@@ -7,6 +7,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
 import * as ol_color from 'ol/color';
 import {useGeographic, fromLonLat} from 'ol/proj.js';
+import {getCenter} from 'ol/extent.js';
 
 let init_point = [48.387626, 54.351436]
 let current_map_file = null;
@@ -34,21 +35,23 @@ const vector = new VectorLayer({
 let ego_feature = new Feature({
   geometry: new Point(init_point),//(fromLonLat(init_point)),
   name: 'Ego vehicle',
-}); 
+});
+
+const ego_marker_style = new Style({
+  image: new Icon({
+    anchor: [0.5, 46],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'pixels',
+    src: 'https://cdn2.iconfinder.com/data/icons/top-view-cars-1/50/51-64.png'//'https://openlayers.org/en/latest/examples/data/icon.png'
+  })
+});
 
 const ego_vehicle_layer = new VectorLayer({
   source: new VectorSource({
     wrapX: false,
     features: [ego_feature]
   }),
-  style: new Style({
-    image: new Icon({
-      anchor: [0.5, 46],
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'pixels',
-      src: 'https://openlayers.org/en/latest/examples/data/icon.png'
-    })
-  })
+  style: ego_marker_style
 });
 
 const map = new Map({
@@ -137,13 +140,6 @@ $.get('/get_point_types', function(data){
   addInteraction();
 });
 
-setTimeout(
-  () => $.get('/get_position', function(data){
-    console.log(data)
-    ego_feature.geometry = new Point([data['lat'], data['lon']])
-  }),
-  500,
-);
 
 function load_maps() {
   $.get('/get_maps', function(data){
@@ -250,4 +246,19 @@ document.getElementById('loadmap').addEventListener('click', function () {
   load_map(null);
 });
 
+map.on('click', function(event) {
+  var coords = event.coordinate;
+  console.log('Координаты клика:', coords);
+  // var transformedCoords = ol.proj.transform(coords, 'EPSG:3857', 'EPSG:4326');
+  // console.log('Преобразованные координаты (широта, долгота):', transformedCoords);
+});
+
 load_maps();
+
+setInterval(
+  () => $.get('/get_position', function(data){
+    ego_feature.setGeometry(new Point([data['lat'], data['lon']]));
+    ego_marker_style.getImage().setRotation(data['orientation']);
+  }),
+  500,
+);

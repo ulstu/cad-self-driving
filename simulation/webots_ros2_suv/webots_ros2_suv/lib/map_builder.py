@@ -29,7 +29,7 @@ class MapBuilder(object):
 
     def detect_objects(self, image):
         #results = self.__model.predict(source=image, save=False, save_txt=False)
-        results = self.__model.track(source=image, persist=True)
+        results = self.__model.track(source=image, persist=True, verbose=False)
         return results
 
     def load_ipm_config(self, config_path):

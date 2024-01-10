@@ -15,13 +15,13 @@ class CarModel(object):
     def update(self, speed=None, lat=None, lon=None, orientation=None):
         if speed:
             self.__speed = speed
-        if x:
+        if lat:
             self.__lat = lat
-        if y:
+        if lon:
             self.__lon = lon
         if orientation:
             self.__orientation = orientation
 
     def get_position(self):
-        return self.__lat, self.__lon
+        return self.__lat, self.__lon, self.__orientation
 

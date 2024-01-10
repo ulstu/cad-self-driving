@@ -7,11 +7,14 @@ import pathlib
 import json
 from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus
+from std_msgs.msg import Float32, String
 from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from os import listdir
 from os.path import isfile, join
-from .lib.world_model import WorldModel
+from robot_interfaces.srv import PoseService
+from robot_interfaces.msg import EgoPose
+import time
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
@@ -19,8 +22,8 @@ BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
-YAML_PATH = BASE_PATH + 'resource/map-config/robocross.yaml'
-MAPS_PATH = BASE_PATH + 'resource/global_maps/'
+YAML_PATH = BASE_PATH + 'config/map-config/robocross.yaml'
+MAPS_PATH = BASE_PATH + 'config/global_maps/'
 ASSETS_PATH = STATIC_PATH + 'assets/'
 
 class MapServer(Node):
@@ -28,16 +31,14 @@ class MapServer(Node):
         try:
             super().__init__('node_globalmap')
             self.get_logger().info('map server started')
-            qos = qos_profile_sensor_data
-            qos.reliability = QoSReliabilityPolicy.RELIABLE
-            self.create_subscription(NavSatFix, '/vehicle/gps_nav', self.__on_gps_message, qos)
-            self.__world_model = WorldModel()
+
+            self.__cli_pos = self.create_client(PoseService, 'get_current_global_pos')
+            while not self.__cli_pos.wait_for_service(timeout_sec=1.0):
+                self.get_logger().info('pos service not available, waiting again...')
+        
         except  Exception as err:
             print(''.join(traceback.TracebackException.from_exception(err).format()))
 
-    def __on_gps_message(self, data):
-        lat, lon = self.__world_model.get_global_coords(data.latitude, data.longitude)
-        self.get_logger().info(f'lat: {lat}; lon: {lon}')
 
     @cherrypy.expose
     def index(self):
@@ -46,8 +47,18 @@ class MapServer(Node):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_position(self):
-        lat, lon = self.__world_model.get_current_position()
-        return {'lat': lat, 'lon': lon}
+        try:
+            req = PoseService.Request()
+            req.request.data = "Request"
+            future = self.__cli_pos.call_async(req)
+            self.get_logger().info(f"REQUEST STARTED")
+            rclpy.spin_until_future_complete(self, future)
+            response = future.result()
+            self.get_logger().info(f"REQUEST FINISHED");
+            return {'status' : 'ok', 'lat': response.response.lat, 'lon': response.response.lon, 'orientation': response.response.orientation}
+        except Exception as e:
+            self.get_logger().error('Position service call failed %r' % (e,))
+            return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -125,7 +136,8 @@ def main(args=None):
                                                    'tools.staticdir.index': 'index.html'
                                                }
                                                })
-        rclpy.shutdown()
+    except KeyboardInterrupt:
+        print('server stopped cleanly')
     except  Exception as err:
         print(''.join(traceback.TracebackException.from_exception(err).format()))
     finally:

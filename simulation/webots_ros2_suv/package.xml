@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>webots_ros2_suv</name>
   <version>2023.0.1</version>
   <description>SUV ROS2 interface for Webots.</description>
@@ -26,6 +26,7 @@
   <exec_depend>nav2_common</exec_depend>
   <exec_depend>nav2_bringup</exec_depend>
   <exec_depend>prometheus_client</exec_depend>
+  <exec_depend>robot_interfaces</exec_depend>
 
 
   <test_depend>ament_copyright</test_depend>
@@ -36,4 +37,7 @@
   <export>
     <build_type>ament_python</build_type>
   </export>
+
+
+
 </package>

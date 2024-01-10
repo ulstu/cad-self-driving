@@ -132,7 +132,7 @@ class LocalMapNode(Node):
         error = angle - 0.7   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
         p_coef = 0.7
         command_message = AckermannDrive()
-        command_message.speed = 3.0
+        command_message.speed = 8.0
         command_message.steering_angle = error / math.pi * p_coef
 
         with open('/home/hiber/angle.csv','a') as fd:

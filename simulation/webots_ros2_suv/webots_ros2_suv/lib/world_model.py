@@ -3,6 +3,7 @@ import os
 import pathlib
 import yaml
 import numpy as np
+import math
 from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 
@@ -37,14 +38,15 @@ class WorldModel(object):
             return
         with open(config_path) as file:
             config = yaml.full_load(file)
-        self.__coord_corrections = (config['x'], config['y'], config['orientation'])
+        self.__coord_corrections = (config['lat'], config['lon'], config['orientation'])
         print('Translation coordinates: ', self.__coord_corrections)
 
-    def get_global_coords(self, lat, lon):
+    def get_global_coords(self, lat, lon, yaw):
         latitude = self.__get_latitude(self.__coord_corrections[0], lat)
         longitude = self.__get_longitude(self.__coord_corrections[1], lon)
-        self.__car_model.update(lat=latitude, lon=longitude)
-        return latitude, longitude
+        o = self.__coord_corrections[2] - yaw
+        self.__car_model.update(lat=latitude, lon=longitude, orientation=o)
+        return latitude, longitude, o
 
     def get_current_position(self):
         return self.__car_model.get_position()
