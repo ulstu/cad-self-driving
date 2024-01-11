@@ -113,7 +113,7 @@ class MapServer(Node):
             return
         with open(config_path) as file:
             config = yaml.full_load(file)
-        return {'lat': config['lat'], 'lon': config['lon']}
+        return {'lat': config['lat'], 'lon': config['lon'], 'mapfile': config['mapfile']}
 
 def main(args=None):
     try:

@@ -135,8 +135,8 @@ class LocalMapNode(Node):
         command_message.speed = 8.0
         command_message.steering_angle = error / math.pi * p_coef
 
-        with open('/home/hiber/angle.csv','a') as fd:
-            fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
+        # with open('/home/hiber/angle.csv','a') as fd:
+        #     fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
         #command_message.steering_angle = 0.0
         #self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
         self.__ackermann_publisher.publish(command_message)

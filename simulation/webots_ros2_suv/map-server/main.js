@@ -12,31 +12,47 @@ import {getCenter} from 'ol/extent.js';
 let init_point = [48.387626, 54.351436]
 let current_map_file = null;
 
+// AJAX-запрос для получения типов точек и добавления их в выпадающий список
+$.get('/get_point_types', function(data){
+  if (data['status'] != 'ok')
+    return;
+  data['pointtypes']['map-elements'].forEach(
+    (element) => 
+    $('<option/>', { value : element['ol-type']})
+    .attr('data-color', element['color'])
+    .attr('data-id', element['id'])
+    .text(element['name'])
+      .appendTo('#point-type')
+  );
+  addInteraction();
+});
+
+// AJAX-запрос для получения начальной точки
 $.ajax({
-    url: '/get_init_point',
-    success: function(data){
-        init_point = [data['lat'], data['lon']]
-    },
-    async: false
+  url: '/get_init_point',
+  success: function(data){
+      init_point = [data['lat'], data['lon']];
+      if (data['mapfile'] != null) {
+        current_map_file = data['mapfile'];
+      }
+  },
+  async: false
 });
 
 useGeographic();
 
-const raster = new TileLayer({
-  source: new OSM(),
-});
-
+// Создание источника векторных слоёв и самого векторного слоя, на которых осуществляется добавление объектов карты
+const raster = new TileLayer({source: new OSM()});
 const source = new VectorSource({wrapX: false});
+const vector = new VectorLayer({source: source});
 
-const vector = new VectorLayer({
-  source: source,
-});
-
+// Создание объекта (feature) для отображения на карте
 let ego_feature = new Feature({
   geometry: new Point(init_point),//(fromLonLat(init_point)),
   name: 'Ego vehicle',
 });
 
+// Стиль маркера для объекта автомобиля
 const ego_marker_style = new Style({
   image: new Icon({
     anchor: [0.5, 46],
@@ -46,6 +62,7 @@ const ego_marker_style = new Style({
   })
 });
 
+// Создание слоя для отображения объекта автомобиля
 const ego_vehicle_layer = new VectorLayer({
   source: new VectorSource({
     wrapX: false,
@@ -54,6 +71,7 @@ const ego_vehicle_layer = new VectorLayer({
   style: ego_marker_style
 });
 
+// Инициализация карты с добавлением созданных слоёв
 const map = new Map({
   layers: [raster, vector, ego_vehicle_layer],
   target: 'map',
@@ -68,11 +86,13 @@ const typeSelect = document.getElementById('point-type');
 const mapSelect = document.getElementById('maps');
 
 
+// Функция для создания цвета с альфа-каналом
 function colorWithAlpha(color, alpha) {
   const [r, g, b] = Array.from(ol_color.asArray(color));
   return ol_color.asString([r, g, b, alpha]);
 }
 
+// Функция для установки стиля рисования элемента редактора
 function set_style(fill_color, stroke_color, stroke_width) {
   let style_stroke = new Stroke({
     color: stroke_color,
@@ -95,6 +115,7 @@ function set_style(fill_color, stroke_color, stroke_width) {
   return style;
 }
 
+// Функция для добавления инструмента рисования на карту
 function addInteraction() {
   const value = typeSelect.value;
   if (value !== 'None') {
@@ -117,44 +138,7 @@ function addInteraction() {
   }
 }
 
-document.getElementById('undo').addEventListener('click', function () {
-  draw.removeLastPoint();
-});
-
-typeSelect.onchange = function () {
-  map.removeInteraction(draw);
-  addInteraction();
-};
-
-$.get('/get_point_types', function(data){
-  if (data['status'] != 'ok')
-    return;
-  data['pointtypes']['map-elements'].forEach(
-    (element) => 
-    $('<option/>', { value : element['ol-type']})
-    .attr('data-color', element['color'])
-    .attr('data-id', element['id'])
-    .text(element['name'])
-      .appendTo('#point-type')
-  );
-  addInteraction();
-});
-
-
-function load_maps() {
-  $.get('/get_maps', function(data){
-    if (data['status'] != 'ok')
-        return;
-    $('#maps').empty();
-    data['maps'].forEach(
-      (element) => 
-      $('<option/>', { value : element})
-      .text(element)
-      .appendTo('#maps')
-    );
-  });
-}
-
+// отправка запроса на сохранение карты
 function save_map_request(filename){
   var geojson  = new GeoJSON();
   var features = [];
@@ -172,6 +156,8 @@ function save_map_request(filename){
   });
 }
 
+// Сохранение карты. Если используемый файл определен, то сохранение происходит в этот файл, если нет, то 
+// Выводится диалоговое окно с предложением ввести имя файла
 function save_map(filename) {
   if (filename == null) {
     $("<div id='dynamic_dialog'><input name='map_filename' /></div>").dialog({
@@ -194,23 +180,21 @@ function save_map(filename) {
     save_map_request(current_map_file);
 }
 
-function isDict(v) {
-  return typeof v==='object' && v!==null && !(v instanceof Array) && !(v instanceof Date);
-}
-
-function load_map(){
-  $.post('/load_map', {'filename': mapSelect.value}, function(data){
+// Функция для загрузки сохраненных ранее карт
+function load_map(filename){
+  $.post('/load_map', {'filename': filename}, function(data){
     if (data['status'] == 'ok'){
       source.clear();
       source.addFeatures(new GeoJSON().readFeatures(data['features']));
-      current_map_file = mapSelect.value.split('.')[0];
+      current_map_file = filename.split('.')[0];
 
       vector.getSource().forEachFeature(function(feature) {
         var fill_color = null;
         var stroke_color = null;
         var stroke_width = null;
         var id = null;
-        if (isDict(feature.values_)) {
+        var v = feature.values_;
+        if (typeof v==='object' && v!==null && !(v instanceof Array) && !(v instanceof Date)) {
           fill_color = feature.values_.fill_.color_;
           stroke_color = feature.values_.stroke_.color_;
           stroke_width = feature.values_.stroke_.width_;
@@ -229,10 +213,33 @@ function load_map(){
     }
     else
       alert(data['message']);
-    
   });
-  
 }
+
+// Метод загрузки списка ранее сохраненных карт и заполнение списка карт
+function load_maps() {
+  $.get('/get_maps', function(data){
+    if (data['status'] != 'ok')
+        return;
+    $('#maps').empty();
+    data['maps'].forEach(
+      (element) => 
+      $('<option/>', { value : element})
+      .text(element)
+      .appendTo('#maps')
+    );
+  });
+}
+
+// Установка обработчиков событий для элементов управления 
+document.getElementById('undo').addEventListener('click', function () {
+  draw.removeLastPoint();
+});
+
+typeSelect.onchange = function () {
+  map.removeInteraction(draw);
+  addInteraction();
+};
 
 document.getElementById('save').addEventListener('click', function () {
   save_map(current_map_file);
@@ -243,9 +250,11 @@ document.getElementById('saveas').addEventListener('click', function () {
 });
 
 document.getElementById('loadmap').addEventListener('click', function () {
-  load_map(null);
+  load_map(mapSelect.value);
 });
 
+
+// Обработчик клика по карте для вывода координат в консоль
 map.on('click', function(event) {
   var coords = event.coordinate;
   console.log('Координаты клика:', coords);
@@ -253,8 +262,14 @@ map.on('click', function(event) {
   // console.log('Преобразованные координаты (широта, долгота):', transformedCoords);
 });
 
+// Загрузка карт и установка периодического обновления позиции маркера
 load_maps();
+if (current_map_file != null) {
+  load_map(current_map_file);
+  mapSelect.value = current_map_file;
+}
 
+// периодический запрос на обновление координат ТС
 setInterval(
   () => $.get('/get_position', function(data){
     ego_feature.setGeometry(new Point([data['lat'], data['lon']]));
