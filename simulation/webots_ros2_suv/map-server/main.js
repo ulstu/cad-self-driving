@@ -8,6 +8,7 @@ import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
 import * as ol_color from 'ol/color';
 import {useGeographic, fromLonLat} from 'ol/proj.js';
 import {getCenter} from 'ol/extent.js';
+import Translate from 'ol/interaction/Translate.js';
 
 let init_point = [48.387626, 54.351436]
 let current_map_file = null;
@@ -46,6 +47,14 @@ const raster = new TileLayer({source: new OSM()});
 const source = new VectorSource({wrapX: false});
 const vector = new VectorLayer({source: source});
 
+const movePointSource = new VectorSource({wrapX: false});
+const movePointLayer = new VectorLayer({
+  source: movePointSource,
+});
+const translate = new Translate({
+  source: movePointSource, 
+});
+
 // Создание объекта (feature) для отображения на карте
 let ego_feature = new Feature({
   geometry: new Point(init_point),//(fromLonLat(init_point)),
@@ -73,7 +82,7 @@ const ego_vehicle_layer = new VectorLayer({
 
 // Инициализация карты с добавлением созданных слоёв
 const map = new Map({
-  layers: [raster, vector, ego_vehicle_layer],
+  layers: [raster, vector, ego_vehicle_layer, movePointLayer],
   target: 'map',
   view: new View({
     center: init_point,
@@ -96,7 +105,7 @@ function colorWithAlpha(color, alpha) {
 function set_style(fill_color, stroke_color, stroke_width) {
   let style_stroke = new Stroke({
     color: stroke_color,
-    width: 2
+    width: 8
   });
   let style_fill = new Fill({
     color: colorWithAlpha(fill_color, 0.2)
@@ -253,13 +262,71 @@ document.getElementById('loadmap').addEventListener('click', function () {
   load_map(mapSelect.value);
 });
 
+let selected = null;
+let isPointsMoveMode = false;
 
-// Обработчик клика по карте для вывода координат в консоль
+$('#changePointsCheckbox').change(function() {
+  if($(this).is(":checked")) {
+      isPointsMoveMode = true;
+  }
+  else {
+    isPointsMoveMode = false;
+    if (selected != null)
+      // Удаление translate interaction после перетаскивания
+      map.removeInteraction(translate);
+      movePointSource.clear();
+      selected = null;
+  }
+  console.log('Change points mode: ' + isPointsMoveMode);
+});
+
+// Обработчик клика по карте для вывода координат в консоль и изменения объектов
 map.on('click', function(event) {
   var coords = event.coordinate;
-  console.log('Координаты клика:', coords);
-  // var transformedCoords = ol.proj.transform(coords, 'EPSG:3857', 'EPSG:4326');
-  // console.log('Преобразованные координаты (широта, долгота):', transformedCoords);
+  console.log('Координаты клика:', coords, event.pixel);
+  
+  if (isPointsMoveMode) {
+    map.forEachFeatureAtPixel(event.pixel, function(f, selLayer) {
+      selected = f;
+      movePointSource.clear();
+
+      let geometry = selected.getGeometry();
+      let type = geometry.getType();
+  
+      let coordinates;
+      if (type === 'Point') {
+        coordinates = [geometry.getCoordinates()];
+      } else if (type === 'LineString') {
+        coordinates = geometry.getCoordinates();
+      } else if (type === 'Polygon') {
+        coordinates = geometry.getCoordinates()[0]; // только внешний контур
+      } else 
+        return;
+
+      coordinates.forEach((coord, index) => {
+        const pointFeature = new Feature(new Point(coord));
+        pointFeature.set('index', index); // Сохраняем индекс точки
+        movePointSource.addFeature(pointFeature);
+      });
+
+      map.addInteraction(translate);
+
+      translate.on('translateend', function (evt) {
+        // Обновляем только координаты перетаскиваемой точки
+        evt.features.forEach((pfeature) => {
+          const newIndex = pfeature.get('index');
+          coordinates[newIndex] = pfeature.getGeometry().getCoordinates();
+        });
+  
+        if (type === 'Polygon') {
+          // Для Polygon обновляем внешний контур
+          selected.getGeometry().setCoordinates([coordinates]);
+        } else {
+          selected.getGeometry().setCoordinates(coordinates);
+        }
+      });
+    });
+  }
 });
 
 // Загрузка карт и установка периодического обновления позиции маркера

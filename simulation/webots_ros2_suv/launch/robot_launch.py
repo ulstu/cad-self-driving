@@ -126,14 +126,14 @@ def get_ros2_nodes(*args):
 
     return [
         state_publisher_node,
-        #rviz2_node,
-        #lane_follower,
         node_sensors_webots,
-        node_localmap,
-        # pcl_map_node,
+        #node_localmap,
         node_globalmap,
         node_path_controller,
         #depth_to_laserscan,
+        # pcl_map_node,
+        #rviz2_node,
+        #lane_follower,
     ] + static_transform_nodes
 
 
