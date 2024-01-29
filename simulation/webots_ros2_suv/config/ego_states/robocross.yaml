@@ -1,0 +1,14 @@
+states:
+  start: "StartState.py"
+  moving: "MovingState.py"
+  stopped: "StoppedState.py"
+  emergency: "EmergencyState.py"
+transitions:
+  start:
+    start_move: ["moving"]
+  moving:
+    stop: ["stopped", "emergency"]
+  stopped:
+    start_move: ["moving"]
+  emergency:
+    reset: ["start"]

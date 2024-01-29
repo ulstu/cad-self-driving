@@ -19,7 +19,6 @@ from fastseg.image import colorize, blend
 from PIL import Image
 from ament_index_python.packages import get_package_share_directory
 from datetime import datetime
-from ament_index_python.packages import get_package_share_directory
 from ackermann_msgs.msg import AckermannDrive
 from .lib.map_builder import MapBuilder
 from .lib.timeit import timeit

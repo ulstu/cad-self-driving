@@ -127,7 +127,7 @@ def get_ros2_nodes(*args):
     return [
         state_publisher_node,
         node_sensors_webots,
-        #node_localmap,
+        node_localmap,
         node_globalmap,
         node_path_controller,
         #depth_to_laserscan,
