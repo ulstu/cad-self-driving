@@ -28,7 +28,7 @@ data_files += generate_data_files('share/' + package_name + '/map-server/', 'map
 setup(
     name=package_name,
     version='2023.0.1',
-    packages=[package_name, "webots_ros2_suv/lib", "webots_ros2_suv/states"],
+    packages=[package_name, "webots_ros2_suv/lib", "webots_ros2_suv/states", "webots_ros2_suv/workers"],
     data_files=data_files,
     install_requires=['setuptools', 'launch'],
     zip_safe=True,
@@ -53,7 +53,7 @@ setup(
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
             'node_localmap = webots_ros2_suv.node_localmap:main',
             'node_globalmap = webots_ros2_suv.node_globalmap:main',
-            'node_path_controller = webots_ros2_suv.node_path_controller:main'
+            'node_ego_controller = webots_ros2_suv.node_ego_controller:main'
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

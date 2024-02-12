@@ -59,10 +59,10 @@ def get_ros2_nodes(*args):
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
 
-    node_path_controller = Node(
+    node_ego_controller = Node(
         package=PACKAGE_NAME,
-        executable='node_path_controller',
-        name='node_path_controller',
+        executable='node_ego_controller',
+        name='node_ego_controller',
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
@@ -127,9 +127,9 @@ def get_ros2_nodes(*args):
     return [
         state_publisher_node,
         node_sensors_webots,
-        node_localmap,
+        #node_localmap,
         node_globalmap,
-        node_path_controller,
+        node_ego_controller,
         #depth_to_laserscan,
         # pcl_map_node,
         #rviz2_node,

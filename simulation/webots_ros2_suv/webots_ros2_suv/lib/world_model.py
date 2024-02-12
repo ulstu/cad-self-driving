@@ -17,6 +17,19 @@ class WorldModel(object):
         # кортеж значений (x, y, direction)
         self.__coord_corrections = (0, 0, 0)
         self.__load_config()
+        
+        self.path = None            # спланированный путь
+        self.rgb_image = None       # цветное изображение с камеры
+        self.range_image = None     # изображение с камеры глубины
+        self.point_cloud = None     # облако точек от лидара
+        self.seg_image = None       # сегментированное изображение во фронтальной проекции
+        self.seg_colorized = None   # раскрашенное сегментированное изображение во фронтальной проекции
+        self.seg_composited = None   # раскрашенное сегментированное изображение во фронтальной проекции
+        self.objects = None         # объекты во фронтальной проекции   
+        self.ipm_image = None       # BEV сегментированное изображение 
+        self.ipm_colorized = None   # раскрашенное BEV сегментированное изображение
+        self.pov_point = None       # Точка в BEV, соответствующая арсположению авто
+        self.goal_point = None      # Точка в BEV, соответствующая цели
 
         self.__EARTH_RADIUS_KM = 6378.137
 

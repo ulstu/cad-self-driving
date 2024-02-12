@@ -3,6 +3,18 @@ states:
   moving: "MovingState.py"
   stopped: "StoppedState.py"
   emergency: "EmergencyState.py"
+workers:
+  lightswitch: "LightSwitchDetectorWorker.py"
+  roadsign: "RoadSignDetectorWorker.py"
+  ipm: "IPMWorker.py"
+  semanticsegmentation: "SemanticSegmentationWorker.py"
+  pathplanning: "PathPlanningWorker.py"
+  behavioranalysis: "BehavioralAnalysisWorker.py"
+workerstates:
+  start: ["lightswitch"]
+  moving: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  stopped: []
+  emergency: ["ipm", "semanticsegmentation", "pathplanning", "behavioranalysis"]
 transitions:
   start:
     start_move: ["moving"]
