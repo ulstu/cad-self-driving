@@ -6,3 +6,5 @@ pyyaml
 ultralytics
 pyserial
 json-rpc
+shapely
+pyproj

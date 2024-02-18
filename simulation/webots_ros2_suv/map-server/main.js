@@ -186,7 +186,7 @@ function save_map(filename) {
     });
   }
   else 
-    save_map_request(current_map_file);
+    save_map_request(current_map_file.replace(".geojson", ""));
 }
 
 // Функция для загрузки сохраненных ранее карт
@@ -342,5 +342,5 @@ setInterval(
     ego_feature.setGeometry(new Point([data['lat'], data['lon']]));
     ego_marker_style.getImage().setRotation(data['orientation']);
   }),
-  500,
+  2000,
 );

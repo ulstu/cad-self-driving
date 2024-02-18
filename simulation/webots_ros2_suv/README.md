@@ -17,6 +17,8 @@ pip install fastseg
 pip install cherrypy
 pip install pyyaml
 pip install ultralytics
+pip install shapely
+pip install pyproj
 ```
 
 ## Установка решения

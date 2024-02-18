@@ -6,6 +6,7 @@ from webots_ros2_suv.lib.map_builder import MapBuilder
 import numpy as np
 from fastseg.image import colorize, blend
 from ament_index_python.packages import get_package_share_directory
+from webots_ros2_suv.lib.timeit import timeit
 
 
 PACKAGE_NAME = 'webots_ros2_suv'
@@ -33,9 +34,9 @@ class IPMWorker(AbstractWorker):
 
 
     def on_event(self, event, scene=None):
-        print("IPM Worker")
         return None
     
+    #@timeit
     def __process_frame(self, world_model):
         try:
             image = world_model.rgb_image
@@ -68,7 +69,6 @@ class IPMWorker(AbstractWorker):
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))
     
     def on_data(self, world_model):
-        print("IPMWorker data received")
         return self.__process_frame(world_model)
 
 

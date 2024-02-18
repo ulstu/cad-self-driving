@@ -8,5 +8,5 @@ class LightSwitchDetectorWorker(AbstractWorker):
         return None
 
     def on_data(self, world_model):
-        super().log("LightSwitchDetectorWorker data received")
+        #super().log("LightSwitchDetectorWorker data received")
         return world_model

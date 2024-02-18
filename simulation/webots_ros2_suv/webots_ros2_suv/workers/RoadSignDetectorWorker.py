@@ -9,5 +9,5 @@ class RoadSignDetectorWorker(AbstractWorker):
         return None
 
     def on_data(self, world_model):
-        super().log("RoadSignDetectorWorker data received")
+        #super().log("RoadSignDetectorWorker data received")
         return world_model

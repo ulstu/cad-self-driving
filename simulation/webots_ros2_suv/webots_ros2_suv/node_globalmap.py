@@ -5,6 +5,7 @@ import yaml
 import os
 import pathlib
 import json
+from rclpy.callback_groups import ReentrantCallbackGroup
 from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import Image, NavSatFix, NavSatStatus
 from std_msgs.msg import Float32, String
@@ -22,7 +23,7 @@ BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
-YAML_PATH = BASE_PATH + 'config/map-config/robocross.yaml'
+YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
 MAPS_PATH = BASE_PATH + 'config/global_maps/'
 ASSETS_PATH = STATIC_PATH + 'assets/'
 
@@ -51,23 +52,22 @@ class MapServer(Node):
             req = PoseService.Request()
             req.request.data = "Request"
             future = self.__cli_pos.call_async(req)
-            self.get_logger().info(f"REQUEST STARTED")
+            # self.__cli_pos.call(req)
             rclpy.spin_until_future_complete(self, future)
             response = future.result()
-            self.get_logger().info(f"REQUEST FINISHED");
+            #response = self.__cli_pos.response
             return {'status' : 'ok', 'lat': response.response.lat, 'lon': response.response.lon, 'orientation': response.response.orientation}
         except Exception as e:
             self.get_logger().error('Position service call failed %r' % (e,))
             return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
+
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_point_types(self):
         try:
             with open(YAML_PATH, 'r') as file:
-                point_types = yaml.safe_load(file)
-                print(point_types)
-                return {'status': 'ok', 'pointtypes': point_types}
+                return {'status': 'ok', 'pointtypes': {"map-elements": yaml.safe_load(file)['map-elements']}}
         except Exception as err:
             return {'status': ''.join(traceback.TracebackException.from_exception(err).format())}
         
@@ -84,6 +84,7 @@ class MapServer(Node):
     @cherrypy.tools.json_out()
     def save_map(self, filename, map_data):
         try:
+            self._logger.info(f'SAVED MAP DATA: {map_data}')
             with open(f'{MAPS_PATH}/{filename}.geojson', 'w') as f:
                 json.dump(json.loads(map_data), f)
             return {'status': 'ok'} 
@@ -118,6 +119,10 @@ class MapServer(Node):
 def main(args=None):
     try:
         rclpy.init(args=args)
+        # executor = MultiThreadedExecutor()
+        # map_server = MapServer()
+        # executor.add_node(map_server)
+        # executor.spin()
 
         cherrypy.quickstart(MapServer(), '/', {'global':
                                                    {'server.socket_host': '127.0.0.1',

@@ -28,7 +28,7 @@ data_files += generate_data_files('share/' + package_name + '/map-server/', 'map
 setup(
     name=package_name,
     version='2023.0.1',
-    packages=[package_name, "webots_ros2_suv/lib", "webots_ros2_suv/states", "webots_ros2_suv/workers"],
+    packages=[package_name, "webots_ros2_suv/lib", "webots_ros2_suv/states", "webots_ros2_suv/states/robocross", "webots_ros2_suv/workers"],
     data_files=data_files,
     install_requires=['setuptools', 'launch'],
     zip_safe=True,

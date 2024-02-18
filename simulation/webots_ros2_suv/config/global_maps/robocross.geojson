@@ -1,1 +1,373 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [43.642087774482725, 56.33446020546813]}, "properties": {"id": "finish_point", "geometry_": null, "fill_": {"color_": "rgba(255,0,0,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {"1": {}}, "hitDetectionCanvas_": {}, "fill_": {"color_": "rgba(255,0,0,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#ff0000", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#ff0000", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#ff0000", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[43.641616421840475, 56.33448770137798], [43.64256055941373, 56.334621519052035], [43.642635605603566, 56.334285494653784], [43.6418578813747, 56.33419927640736], [43.64175593719112, 56.33430928091295]]]}, "properties": {"id": "reverse_point", "geometry_": null, "fill_": {"color_": "rgba(255,255,0,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(255,255,0,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#ffff00", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#ffff00", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#ffff00", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [43.63654095274597, 56.334489939044886]}, "properties": {"id": "start_point", "geometry_": null, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {"1": {}}, "hitDetectionCanvas_": {}, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#00ff00", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[43.636594610420225, 56.334525627531406], [43.63766218189724, 56.335019303735834], [43.63918576264169, 56.335224461116326], [43.64122405763778, 56.33492109854106], [43.64209850331874, 56.33446020546816]]}, "properties": {"id": "way_point", "geometry_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#0000ff", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "text_": null}}]}
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            [
+              43.63925228114837,
+              56.33520384573774
+            ]
+          ]
+        },
+        "properties": {
+          "id": "start",
+          "geometry_": null,
+          "fill_": {
+            "color_": "rgba(0,255,0,0.2)"
+          },
+          "image_": {
+            "opacity_": 1,
+            "rotateWithView_": false,
+            "rotation_": 0,
+            "scale_": 1,
+            "scaleArray_": [
+              1,
+              1
+            ],
+            "displacement_": [
+              0,
+              0
+            ],
+            "canvas_": {},
+            "hitDetectionCanvas_": null,
+            "fill_": {
+              "color_": "rgba(0,255,0,0.2)"
+            },
+            "origin_": [
+              0,
+              0
+            ],
+            "points_": null,
+            "radius_": 8,
+            "angle_": 0,
+            "stroke_": {
+              "color_": "#00ff00",
+              "lineDash_": null,
+              "width_": 8
+            },
+            "size_": [
+              24,
+              24
+            ],
+            "renderOptions_": {
+              "strokeStyle": "#00ff00",
+              "strokeWidth": 8,
+              "size": 24,
+              "lineDash": null,
+              "lineJoin": "round",
+              "miterLimit": 10
+            }
+          },
+          "renderer_": null,
+          "hitDetectionRenderer_": null,
+          "stroke_": {
+            "color_": "#00ff00",
+            "lineDash_": null,
+            "width_": 8
+          },
+          "text_": null
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                43.64023016222942,
+                56.33514776777878
+              ],
+              [
+                43.64018951231313,
+                56.3350520947981
+              ],
+              [
+                43.64049929183528,
+                56.3350089088847
+              ],
+              [
+                43.64055644739696,
+                56.33510541945196
+              ],
+              [
+                43.64044758343395,
+                56.335124937226425
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "id": "turn",
+          "geometry_": null,
+          "fill_": {
+            "color_": "rgba(255,255,0,0.2)"
+          },
+          "image_": {
+            "opacity_": 1,
+            "rotateWithView_": false,
+            "rotation_": 0,
+            "scale_": 1,
+            "scaleArray_": [
+              1,
+              1
+            ],
+            "displacement_": [
+              0,
+              0
+            ],
+            "canvas_": {},
+            "hitDetectionCanvas_": null,
+            "fill_": {
+              "color_": "rgba(255,255,0,0.2)"
+            },
+            "origin_": [
+              0,
+              0
+            ],
+            "points_": null,
+            "radius_": 8,
+            "angle_": 0,
+            "stroke_": {
+              "color_": "#ffff00",
+              "lineDash_": null,
+              "width_": 8
+            },
+            "size_": [
+              24,
+              24
+            ],
+            "renderOptions_": {
+              "strokeStyle": "#ffff00",
+              "strokeWidth": 8,
+              "size": 24,
+              "lineDash": null,
+              "lineJoin": "round",
+              "miterLimit": 10
+            }
+          },
+          "renderer_": null,
+          "hitDetectionRenderer_": null,
+          "stroke_": {
+            "color_": "#ffff00",
+            "lineDash_": null,
+            "width_": 8
+          },
+          "text_": null
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                43.639201769189,
+                56.33527817953947
+              ],
+              [
+                43.63916946134311,
+                56.33522922748941
+              ],
+              [
+                43.63930515429582,
+                56.33520893027952
+              ],
+              [
+                43.6393374621417,
+                56.33525668840332
+              ],
+              [
+                43.639201769189,
+                56.33527817953947
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "id": "stop",
+          "geometry_": null,
+          "fill_": {
+            "color_": "rgba(128,0,128,0.2)"
+          },
+          "image_": {
+            "opacity_": 1,
+            "rotateWithView_": false,
+            "rotation_": 0,
+            "scale_": 1,
+            "scaleArray_": [
+              1,
+              1
+            ],
+            "displacement_": [
+              0,
+              0
+            ],
+            "canvas_": {},
+            "hitDetectionCanvas_": null,
+            "fill_": {
+              "color_": "rgba(128,0,128,0.2)"
+            },
+            "origin_": [
+              0,
+              0
+            ],
+            "points_": null,
+            "radius_": 8,
+            "angle_": 0,
+            "stroke_": {
+              "color_": "#800080",
+              "lineDash_": null,
+              "width_": 8
+            },
+            "size_": [
+              24,
+              24
+            ],
+            "renderOptions_": {
+              "strokeStyle": "#800080",
+              "strokeWidth": 8,
+              "size": 24,
+              "lineDash": null,
+              "lineJoin": "round",
+              "miterLimit": 10
+            }
+          },
+          "renderer_": null,
+          "hitDetectionRenderer_": null,
+          "stroke_": {
+            "color_": "#800080",
+            "lineDash_": null,
+            "width_": 8
+          },
+          "text_": null
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              43.63932418632458,
+              56.33516581636317
+            ],
+            [
+              43.63949683974886,
+              56.3351542989935
+            ],
+            [
+              43.639696795547756,
+              56.33513432044944
+            ],
+            [
+              43.64009259783708,
+              56.33510309888703
+            ],
+            [
+              43.640203458681825,
+              56.335089065569065
+            ],
+            [
+              43.640340824530305,
+              56.33507164484419
+            ],
+            [
+              43.64044596633581,
+              56.3350597064383
+            ],
+            [
+              43.64045887018594,
+              56.33510693400382
+            ],
+            [
+              43.64028889506867,
+              56.3351250554862
+            ],
+            [
+              43.64017767152748,
+              56.33514532346638
+            ],
+            [
+              43.63996839914051,
+              56.33517191926299
+            ],
+            [
+              43.6398270672767,
+              56.33517993539627
+            ],
+            [
+              43.63953065524166,
+              56.335220723037736
+            ],
+            [
+              43.63928568690733,
+              56.335248528331704
+            ]
+          ]
+        },
+        "properties": {
+          "id": "moving",
+          "geometry_": null,
+          "fill_": {
+            "color_": "rgba(0,0,255,0.2)"
+          },
+          "image_": {
+            "opacity_": 1,
+            "rotateWithView_": false,
+            "rotation_": 0,
+            "scale_": 1,
+            "scaleArray_": [
+              1,
+              1
+            ],
+            "displacement_": [
+              0,
+              0
+            ],
+            "canvas_": {},
+            "hitDetectionCanvas_": null,
+            "fill_": {
+              "color_": "rgba(0,0,255,0.2)"
+            },
+            "origin_": [
+              0,
+              0
+            ],
+            "points_": null,
+            "radius_": 8,
+            "angle_": 0,
+            "stroke_": {
+              "color_": "#0000ff",
+              "lineDash_": null,
+              "width_": 8
+            },
+            "size_": [
+              24,
+              24
+            ],
+            "renderOptions_": {
+              "strokeStyle": "#0000ff",
+              "strokeWidth": 8,
+              "size": 24,
+              "lineDash": null,
+              "lineJoin": "round",
+              "miterLimit": 10
+            }
+          },
+          "renderer_": null,
+          "hitDetectionRenderer_": null,
+          "stroke_": {
+            "color_": "#0000ff",
+            "lineDash_": null,
+            "width_": 8
+          },
+          "text_": null
+        }
+      }
+    ]
+  }

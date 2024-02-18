@@ -8,7 +8,7 @@ class BehavioralAnalysisWorker(AbstractWorker):
         return None
     
     def on_data(self, world_model):
-        super().log("BehavioralAnalysisWorker data received")
+        #super().log("BehavioralAnalysisWorker data received")
         return world_model
 
 
