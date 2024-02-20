@@ -76,13 +76,13 @@ class NodeEgoController(Node):
         #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
 
     def drive(self):
-        if not self.__world_model.path or len(self.__world_model.path) < 3:
+        if not self.__world_model.path or len(self.__world_model.path) < 2:
             command_message = AckermannDrive()
             command_message.speed = 0.0
             command_message.steering_angle = 0.0
             self.__ackermann_publisher.publish(command_message)
             return
-        p1, p2 = self.__world_model.path[0], self.__world_model.path[2]
+        p1, p2 = self.__world_model.path[0], self.__world_model.path[1]
         angle = math.asin((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
         #self._logger.info(f'angle: {angle}')
         error = angle - 0.7   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!

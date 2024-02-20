@@ -8,7 +8,7 @@ class MovingState(AbstractState):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
-        self.__cur_path_point = 0
+        self.__cur_path_point = 1
 
     def find_goal_point_x(self, arr, val=100):
         max_length = 0
@@ -55,9 +55,9 @@ class MovingState(AbstractState):
             return (0, 0)
         points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][0]
 
-        if len(points) > self.__cur_path_point - 2:
-            if self.calc_dist_point(points[self.__cur_path_point + 1], world_model.get_current_position()) < self.calc_dist_point(points[self.__cur_path_point], world_model.get_current_position()):
-                self.__cur_path_point = self.__cur_path_point + 2
+        if len(points) > self.__cur_path_point - 1:
+            if self.calc_dist_point(points[self.__cur_path_point - 1], world_model.get_current_position()) < 0.01:
+                self.__cur_path_point = self.__cur_path_point + 1
         if len(points) < self.__cur_path_point + 1:
             self.__cur_path_point = len(points) - 1
 
