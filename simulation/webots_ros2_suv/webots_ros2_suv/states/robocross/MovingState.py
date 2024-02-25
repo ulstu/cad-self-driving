@@ -56,7 +56,9 @@ class MovingState(AbstractState):
         points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][0]
 
         if len(points) > self.__cur_path_point - 1:
-            if self.calc_dist_point(points[self.__cur_path_point - 1], world_model.get_current_position()) < 0.01:
+            dist = self.calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
+            self.log(f'DIST: {dist}')
+            if  dist< 1.0:
                 self.__cur_path_point = self.__cur_path_point + 1
         if len(points) < self.__cur_path_point + 1:
             self.__cur_path_point = len(points) - 1
