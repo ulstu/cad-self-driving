@@ -54,14 +54,17 @@ class MovingState(AbstractState):
         if not world_model.global_map:
             return (0, 0)
         points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][0]
+        self.log(f"POINTS: {points}")
 
         if len(points) > self.__cur_path_point - 1:
-            if self.calc_dist_point(points[self.__cur_path_point - 1], world_model.get_current_position()) < 0.01:
+            dist = self.calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
+            self.log(f"DIST: {dist}")
+            if dist < 1.5:
                 self.__cur_path_point = self.__cur_path_point + 1
         if len(points) < self.__cur_path_point + 1:
             self.__cur_path_point = len(points) - 1
 
-        x, y = world_model.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1])
+        x, y = world_model.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], self)
         self.log(f"CURRENT POS: {world_model.get_current_position()}")
         # x = int(world_model.pov_point[0] - x) if world_model.pov_point[0] - x >=0 else 0
         # y = int(world_model.pov_point[1] - y) if world_model.pov_point[1] - y >=0 else 0

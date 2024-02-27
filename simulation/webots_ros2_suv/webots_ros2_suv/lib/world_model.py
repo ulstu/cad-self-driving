@@ -74,11 +74,11 @@ class WorldModel(object):
     def get_current_position(self):
         return self.__car_model.get_position()
     
-    def get_relative_coordinates(self, target_lat, target_lon):
+    def get_relative_coordinates(self, target_lat, target_lon, s=None):
         # Разбиваем кортеж на составляющие
         pos = self.get_current_position()
-        start_lat, start_lon, start_angle, scale_x, scale_y = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[3]
-        start_angle = math.pi - start_angle
+        start_lat, start_lon, start_angle, scale_x, scale_y = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4]
+        #start_angle = 2 * math.pi - start_angle
 
         # Пересчитываем разницу в метрах для широты и долготы
         delta_lat_meters = self.__delta_latitude_in_meters(target_lat, start_lat)
@@ -94,6 +94,8 @@ class WorldModel(object):
         scaled_x = int(self.pov_point[0] + scaled_x) if self.pov_point[0] + scaled_x >=0 else 0
         scaled_y = int(self.pov_point[1] - scaled_y) if self.pov_point[1] - scaled_y >=0 else 0
 
+        if s:
+            s.log(f"start_angle: {start_angle} delta_lat: {delta_lat_meters} delta_lon: {delta_lon_meters} rot_x: {rotated_x} rot_y: {rotated_y} scaled_x: {scaled_x} scaled_y: {scaled_y}" )
         return (int(scaled_x), int(scaled_y))
 
     def __delta_latitude_in_meters(self, target_lat, start_lat):

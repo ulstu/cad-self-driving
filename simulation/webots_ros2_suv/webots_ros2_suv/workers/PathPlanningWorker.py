@@ -74,7 +74,7 @@ class PathPlanningWorker(AbstractWorker):
         # self.plan_rrt_star_reeds_shepp(world_model)
         self.plan_rrt_star_direct(world_model)
 
-        super().log(f'PATH: {world_model.path}')
+        #super().log(f'PATH: {world_model.path}')
         return world_model
 
     def draw_scene(self, world_model):
@@ -92,8 +92,7 @@ class PathPlanningWorker(AbstractWorker):
 
         for p in points:
             x, y = world_model.get_relative_coordinates(p[0], p[1])
-            #self.log(f'WAYPOINT: {x, y}')
-            cv2.circle(colorized, (x, y), 9, (0, 0, 255), 3)
+            cv2.circle(colorized, (x, y), 8, (0, 0, 255), 2)
 
         colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
         cv2.imshow("colorized seg", colorized)
