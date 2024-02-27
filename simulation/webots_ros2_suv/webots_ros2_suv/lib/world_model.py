@@ -78,7 +78,7 @@ class WorldModel(object):
         # Разбиваем кортеж на составляющие
         pos = self.get_current_position()
         start_lat, start_lon, start_angle, scale_x, scale_y = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4]
-        #start_angle = 2 * math.pi - start_angle
+        #start_angle = math.pi - start_angle
 
         # Пересчитываем разницу в метрах для широты и долготы
         delta_lat_meters = self.__delta_latitude_in_meters(target_lat, start_lat)
