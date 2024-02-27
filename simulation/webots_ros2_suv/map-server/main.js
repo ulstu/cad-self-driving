@@ -264,6 +264,7 @@ document.getElementById('loadmap').addEventListener('click', function () {
 
 let selected = null;
 let isPointsMoveMode = false;
+let isDeleteMode= false;
 
 $('#changePointsCheckbox').change(function() {
   if($(this).is(":checked")) {
@@ -280,12 +281,30 @@ $('#changePointsCheckbox').change(function() {
   console.log('Change points mode: ' + isPointsMoveMode);
 });
 
+$('#deletePointsCheckbox').change(function() {
+  if($(this).is(":checked")) {
+      isDeleteMode = true;
+  }
+  else {
+    isDeleteMode = false;
+    if (selected != null)
+      // Удаление translate interaction после перетаскивания
+      selected = null;
+  }
+  console.log('Change points mode: ' + isPointsMoveMode);
+});
+
 // Обработчик клика по карте для вывода координат в консоль и изменения объектов
 map.on('click', function(event) {
   var coords = event.coordinate;
   console.log('Координаты клика:', coords, event.pixel);
-  
-  if (isPointsMoveMode) {
+  if (isDeleteMode) {
+    map.forEachFeatureAtPixel(event.pixel, function(f, selLayer) {
+      vector.getSource().removeFeature(f);
+    });
+
+  } 
+  else if (isPointsMoveMode) {
     map.forEachFeatureAtPixel(event.pixel, function(f, selLayer) {
       selected = f;
       movePointSource.clear();
