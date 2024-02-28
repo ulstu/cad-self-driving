@@ -3,6 +3,9 @@ from shapely.geometry import Point, Polygon
 from shapely.ops import transform
 from functools import partial
 import pyproj
+import math
+
+EARTH_RADIUS_KM = 6371.0  # Радиус Земли в километрах
 
 def is_point_in_polygon_epsg(lat, lon, polygon):
     """
@@ -37,3 +40,20 @@ def is_point_in_polygon(lat, lon, polygon):
             c = not c
         j = i
     return c
+
+def calc_dist_point(p1, p2):
+    """
+    Возвращает дистанцию между двумя точками, заданными кортежами (lat, lon),
+    используя формулу гаверсинуса.
+    """
+    lat1, lon1 = p1[0], p1[1]#map(math.radians, p1)
+    lat2, lon2 = p2[0], p2[1]#map(math.radians, p2)
+
+    delta_lat = lat2 - lat1
+    delta_lon = lon2 - lon1
+
+    a = math.sin(delta_lat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(delta_lon / 2)**2
+    c = 2 * math.asin(math.sqrt(a))
+
+    distance_km = EARTH_RADIUS_KM * c
+    return distance_km

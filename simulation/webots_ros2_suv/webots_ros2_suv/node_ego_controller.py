@@ -83,12 +83,13 @@ class NodeEgoController(Node):
             self.__ackermann_publisher.publish(command_message)
             return
         p1, p2 = self.__world_model.path[0], self.__world_model.path[1]
-        angle = math.asin((p2[0] - p1[0]) / math.sqrt((p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2))
+        div = (p2[1] - p1[1]) ** 2 + (p2[0] - p1[0]) ** 2
+        angle = math.asin((p2[0] - p1[0]) / math.sqrt(div)) if (div > 0.001) else 0
         #self._logger.info(f'angle: {angle}')
         error = angle - 0.7   # !!!!!!!!!!! зависит от матрицы гомографии!!!!!!!!
         p_coef = 0.7
         command_message = AckermannDrive()
-        command_message.speed = 8.0
+        command_message.speed = 25.0
         command_message.steering_angle = error / math.pi * p_coef
 
         # with open('/home/hiber/angle.csv','a') as fd:

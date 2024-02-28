@@ -1,10 +1,9 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
-from webots_ros2_suv.lib.map_utils import is_point_in_polygon
+from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
 import math
 
 class MovingState(AbstractState):
     # Реализация методов для StartState
-    __EARTH_RADIUS_KM = 6371.0  # Радиус Земли в километрах
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
@@ -32,43 +31,30 @@ class MovingState(AbstractState):
         else:
             return 0
 
-    def calc_dist_point(self, p1, p2):
-        """
-        Возвращает дистанцию между двумя точками, заданными кортежами (lat, lon),
-        используя формулу гаверсинуса.
-        """
-        lat1, lon1 = p1[0], p1[1]#map(math.radians, p1)
-        lat2, lon2 = p2[0], p2[1]#map(math.radians, p2)
-
-        delta_lat = lat2 - lat1
-        delta_lon = lon2 - lon1
-
-        a = math.sin(delta_lat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(delta_lon / 2)**2
-        c = 2 * math.asin(math.sqrt(a))
-
-        distance_km = self.__EARTH_RADIUS_KM * c
-        return distance_km
-    
     def find_next_goal_point(self, world_model):
-        self.log(f"{world_model.get_coord_corrections()}")
+        #self.log(f"{world_model.get_coord_corrections()}")
         if not world_model.global_map:
             return (0, 0)
-        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][0]
-        self.log(f"POINTS: {points}")
+        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][world_model.cur_path_segment]
+        #self.log(f"POINTS: {points}")
 
-        if len(points) > self.__cur_path_point - 1:
-            dist = self.calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
+        dists = []
+        for p in points:
+            dists.append(calc_dist_point(p, world_model.get_current_position()))
+
+        if self.__cur_path_point < len(points) - 2:
+            dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
             self.log(f"DIST: {dist}")
-            if dist < 1.5:
+            if dist < 1.7:
                 self.__cur_path_point = self.__cur_path_point + 1
-        if len(points) < self.__cur_path_point + 1:
+        else:
             self.__cur_path_point = len(points) - 1
 
         x, y = world_model.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], self)
-        self.log(f"CURRENT POS: {world_model.get_current_position()}")
+        #self.log(f"CURRENT POS: {world_model.get_current_position()}")
         # x = int(world_model.pov_point[0] - x) if world_model.pov_point[0] - x >=0 else 0
         # y = int(world_model.pov_point[1] - y) if world_model.pov_point[1] - y >=0 else 0
-        self.log(f'GOAL POINT: {x, y} CUR_POINT: {self.__cur_path_point}')
+        self.log(f'CUR_POINT: {self.__cur_path_point} GOAL POINT: {x, y} X: {points[self.__cur_path_point][0]} Y:{points[self.__cur_path_point][1]} DISTS: {dists}')
         return (x, y)
 
     def on_event(self, event, world_model=None):
@@ -80,6 +66,7 @@ class MovingState(AbstractState):
         for p in world_model.global_map:
             if p['name'] == 'turn':
                 if is_point_in_polygon(lat, lon, p['coordinates'][0]):
+                    world_model.cur_turn_polygon = p['coordinates'][0]
                     event = "turn"
             # if p['name'] == 'finish':
             #     if is_point_in_polygon(lat, lon, p['coordinates'][0]):

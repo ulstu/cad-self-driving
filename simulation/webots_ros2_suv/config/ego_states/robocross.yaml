@@ -12,11 +12,12 @@ workers:
   semanticsegmentation: "SemanticSegmentationWorker.py"
   pathplanning: "PathPlanningWorker.py"
   behavioranalysis: "BehavioralAnalysisWorker.py"
+  reedsshepp: "ReedsSheppPlanningWorker.py"
 workerstates:
   start: []
   moving: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   stopped: []
-  turn: ["semanticsegmentation", "ipm", "behavioranalysis", "pathplanning"]
+  turn: ["semanticsegmentation", "ipm", "reedsshepp"]
   emergency: []
 transitions:
   start:
