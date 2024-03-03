@@ -255,7 +255,7 @@ class RRT:
             for i in range(int(p[0] - half_car_length), int(p[0] + half_car_length) + 1):
                 for j in range(int(p[1] - half_car_width), int(p[1] + half_car_width) + 1):
                     if 0 <= i < obstacleList.shape[1] and 0 <= j < obstacleList.shape[0]:
-                        if obstacleList[j, i] != 100:
+                        if obstacleList[j, i] != 100 and obstacleList[j, i] != 0:
                             return False
 
         return True  # safe

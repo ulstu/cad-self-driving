@@ -20,6 +20,7 @@ class WorldModel(object):
         self.__load_config()
         
         self.path = None            # спланированный путь
+        self.gps_path = None        # спланированный путь в глобальных координатах
         self.rgb_image = None       # цветное изображение с камеры
         self.range_image = None     # изображение с камеры глубины
         self.point_cloud = None     # облако точек от лидара
@@ -34,6 +35,7 @@ class WorldModel(object):
         self.global_map = None      # текущие загруженные координаты точек глобальной карты
         self.cur_path_segment = 0   # Текущий сегмент пути, заданный в редакторе карт
         self.cur_turn_polygon = None# Текущий полигон для разворота
+        self.command_message = None # Сообщение типа AckermanDrive для движения автомобиля
 
         self.__EARTH_RADIUS_KM = 6378.137
 
@@ -162,3 +164,40 @@ class WorldModel(object):
         if cv2.waitKey(10) & 0xFF == ord('q'):
             return
 
+    def get_speed(self):
+        return self.__car_model.get_speed()
+    
+    def set_speed(self, speed):
+        self.__car_model.set_speed(speed)
+
+    def get_global_coordinates_from_ipm_coords(self, relative_x, relative_y):
+        # Разбиваем кортеж на составляющие
+        pos = self.get_current_position()
+        start_lat, start_lon, start_angle, scale_x, scale_y, bev_orientation = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4], self.__coord_corrections[5]
+        #start_lat, start_lon, start_angle, scale_x, scale_y, bev_orientation = self.__coord_corrections
+
+        # Применяем обратное масштабирование
+        unscaled_x = relative_x / scale_x
+        unscaled_y = relative_y / scale_y
+
+        # Применяем обратный поворот
+        start_angle = start_angle - bev_orientation
+        angle_rad = math.radians(-start_angle)  # Обратный угол
+        rotated_x = unscaled_x * math.cos(angle_rad) + unscaled_y * math.sin(angle_rad)
+        rotated_y = -unscaled_x * math.sin(angle_rad) + unscaled_y * math.cos(angle_rad)
+
+        # Преобразуем относительные координаты в глобальные
+        latitude = self.__get_latitude_back(start_lat, rotated_y)
+        longitude = self.__get_longitude_back(start_lon, rotated_x, start_lat)
+
+        return latitude, longitude
+
+    def __get_latitude_back(self, start_lat, delta_meters):
+        m = (1 / ((2 * math.pi / 360) * self.__EARTH_RADIUS_KM)) / 1000
+        return start_lat - (delta_meters * m)
+
+    def __get_longitude_back(self, start_lon, delta_meters, start_lat):
+        m = (1 / ((2 * math.pi / 360) * self.__EARTH_RADIUS_KM)) / 1000
+        cos_lat = math.cos(start_lat * (math.pi / 180))
+        return start_lon - (delta_meters * m) / cos_lat        
+    

@@ -24,4 +24,10 @@ class CarModel(object):
 
     def get_position(self):
         return self.__lat, self.__lon, self.__orientation
+    
+    def set_speed(self, speed):
+        self.__speed = speed
 
+    def get_speed(self):
+        return self.__speed
+    

@@ -41,11 +41,13 @@ def is_point_in_polygon(lat, lon, polygon):
         j = i
     return c
 
-def calc_dist_point(p1, p2):
+def calc_dist_point(p1, p2, log=None):
     """
     Возвращает дистанцию между двумя точками, заданными кортежами (lat, lon),
     используя формулу гаверсинуса.
     """
+    if log:
+        log(f'p1: {p1}, p2: {p2}')
     lat1, lon1 = p1[0], p1[1]#map(math.radians, p1)
     lat2, lon2 = p2[0], p2[1]#map(math.radians, p2)
 
