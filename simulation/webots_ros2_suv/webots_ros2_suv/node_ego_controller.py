@@ -23,6 +23,8 @@ from .lib.timeit import timeit
 from .lib.world_model import WorldModel
 from .lib.orientation import euler_from_quaternion
 from .lib.finite_state_machine import FiniteStateMachine
+from .lib.map_server import start_web_server, MapWebServer
+import threading
 
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
@@ -50,7 +52,6 @@ class NodeEgoController(Node):
             self.__world_model = WorldModel()
             package_dir = get_package_share_directory("webots_ros2_suv")
 
-            self.srv = self.create_service(PoseService, 'get_current_global_pos', self.get_current_global_pos)
             self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
 
             # Примеры событий
@@ -63,11 +64,15 @@ class NodeEgoController(Node):
                 with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
                     self.__world_model.load_map(yaml.safe_load(mapdatafile))
             
-
+            self.start_web_server()
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
-    
+
+    def start_web_server(self):
+        self.__ws = MapWebServer(log=self._logger.info)
+        threading.Thread(target=start_web_server, args=[self.__ws]).start()
+
     def __on_range_image_message(self, data):
         image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
         image[image == np.inf] = SENSOR_DEPTH
@@ -93,25 +98,15 @@ class NodeEgoController(Node):
 
     def __on_gps_message(self, data):
         roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
-        lat, lon, orientation = self.__world_model.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+        lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+        self.__world_model.update_car_pos(lat, lon, orientation)
+        self.__ws.update_model(self.__world_model)
         #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
-
-    def get_current_global_pos(self, request, response):
-        self.get_logger().info('Incoming request position')
-        lat, lon, orientation = self.__world_model.get_current_position()
-        response.response.lat = float(lat)
-        response.response.lon = float(lon)
-        response.response.orientation = float(orientation)
-        #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
-        return response
 
 def main(args=None):
     try:
         rclpy.init(args=args)
         path_controller = NodeEgoController()
-        # executor = MultiThreadedExecutor()
-        # executor.add_node(path_controller)
-        # executor.spin()
         rclpy.spin(path_controller)
         rclpy.shutdown()
     except KeyboardInterrupt:

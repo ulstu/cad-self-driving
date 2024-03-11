@@ -35,7 +35,9 @@ class MovingState(AbstractState):
         #self.log(f"{world_model.get_coord_corrections()}")
         if not world_model.global_map:
             return (0, 0)
-        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'][world_model.cur_path_segment]
+        points_seg = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving']
+        self.log(f'PATH SEGMENT: {world_model.cur_path_segment} {len(points_seg)}')
+        points = points_seg[world_model.cur_path_segment]
         #self.log(f"POINTS: {points}")
 
         dists = []
@@ -45,12 +47,15 @@ class MovingState(AbstractState):
         if self.__cur_path_point < len(points) - 2:
             dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
             self.log(f"DIST: {dist}")
-            if dist < 1.7:
+            if dist < 2:
                 self.__cur_path_point = self.__cur_path_point + 1
         else:
             self.__cur_path_point = len(points) - 1
 
-        x, y = world_model.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], self)
+        x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], 
+                                                                       points[self.__cur_path_point][1], 
+                                                                       pos=world_model.get_current_position(),
+                                                                       pov_point=world_model.pov_point)
         #self.log(f"CURRENT POS: {world_model.get_current_position()}")
         # x = int(world_model.pov_point[0] - x) if world_model.pov_point[0] - x >=0 else 0
         # y = int(world_model.pov_point[1] - y) if world_model.pov_point[1] - y >=0 else 0
@@ -65,15 +70,17 @@ class MovingState(AbstractState):
         event = None
         for p in world_model.global_map:
             if p['name'] == 'turn':
-                if is_point_in_polygon(lat, lon, p['coordinates'][0]):
+                if is_point_in_polygon(lat, lon, p['coordinates'][0]) and self.__cur_path_point > 2:
                     world_model.cur_turn_polygon = p['coordinates'][0]
+                    self.__cur_path_point = 0
                     event = "turn"
-            # if p['name'] == 'finish':
-            #     if is_point_in_polygon(lat, lon, p['coordinates'][0]):
-            #         event = "stop"
+            if p['name'] == 'stop':
+                if is_point_in_polygon(lat, lon, p['coordinates'][0]):
+                    self.__cur_path_point = 0
+                    event = "stop"
         if event:
             world_model.path = None
-        world_model.set_speed(25)
+        world_model.set_speed(30)
         self.drive(world_model, speed=25)
         return event
 

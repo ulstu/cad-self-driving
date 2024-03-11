@@ -363,3 +363,21 @@ setInterval(
   }),
   2000,
 );
+
+setInterval(
+  () => {
+    console.log('image obj changed');
+    var unique = $.now();
+    $('#img_obj').attr('src', '/get_image?img_type=obj_detector&tm=' + unique);
+  },
+  700,
+);
+
+setInterval(
+  () => {
+    console.log('image seg changed');
+    var unique = $.now();
+    $('#img_seg').attr('src', '/get_image?img_type=seg&tm=' + unique);
+  },
+  700,
+);

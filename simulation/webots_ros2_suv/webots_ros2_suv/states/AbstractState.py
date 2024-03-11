@@ -10,7 +10,7 @@ class AbstractState:
         raise NotImplementedError
 
     def drive(self, world_model, angle_points_count=3, speed=0.0):
-        self.log(f'PATH: {world_model.path}')
+        #self.log(f'PATH: {world_model.path}')
         
         if world_model.path and len(world_model.path) < angle_points_count:
             angle_points_count = len(world_model.path) - 1

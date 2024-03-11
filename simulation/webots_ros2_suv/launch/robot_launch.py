@@ -128,7 +128,7 @@ def get_ros2_nodes(*args):
         state_publisher_node,
         node_sensors_webots,
         #node_localmap,
-        node_globalmap,
+        #node_globalmap,
         node_ego_controller,
         #depth_to_laserscan,
         # pcl_map_node,

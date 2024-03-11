@@ -19,16 +19,21 @@ class TurnState(AbstractState):
         return None
             
     def on_event(self, event, world_model=None):
-        lat, lon, o = world_model.get_current_position()
         abs_goal = self.find_next_goal_point(world_model)
-        world_model.goal_point = world_model.get_relative_coordinates(abs_goal[0], abs_goal[1])
-        self.log(f'TURN GOALS: [{abs_goal}] [{world_model.goal_point}]')
-        if calc_dist_point(world_model.get_current_position(), world_model.goal_point) < 0.1:
+        pos = world_model.get_current_position()
+        world_model.goal_point = world_model.coords_transformer.get_relative_coordinates(
+            abs_goal[0], 
+            abs_goal[1],
+            pos=pos,
+            pov_point=world_model.pov_point)
+        target_dist = calc_dist_point(world_model.get_current_position(), abs_goal)
+        self.log(f'TARGET DIST: {target_dist} TURN GOALS: [{abs_goal}] [{world_model.goal_point}]')
+        if target_dist < 0.5:
             world_model.cur_path_segment = world_model.cur_path_segment + 1
             self.log("EXIT TURN STATE")
             event = "start_move"
         point_count = len(world_model.path) - 2 if world_model.path else 0
-        self.drive(world_model, angle_points_count=point_count, speed=2)
+        self.drive(world_model, angle_points_count=point_count, speed=5)
         return event
 
 

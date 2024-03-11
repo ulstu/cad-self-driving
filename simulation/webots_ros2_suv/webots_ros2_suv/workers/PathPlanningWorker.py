@@ -71,7 +71,7 @@ class PathPlanningWorker(AbstractWorker):
         try:
             # super().log(f"PathPlanningWorker {str(world_model)}")
             world_model = self.plan_path(world_model)
-            world_model.draw_scene()
+
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))
 
