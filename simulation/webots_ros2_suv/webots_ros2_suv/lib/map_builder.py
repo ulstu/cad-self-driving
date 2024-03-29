@@ -8,7 +8,7 @@ import time
 import traceback
 from fastseg.image import colorize
 from collections import defaultdict
-
+from ament_index_python.packages import get_package_share_directory
 # from orientation import local_to_global
 # from behavioral_analysis import BehaviourAnalyser
 # from ipm_transformer import IPMTransformer
@@ -16,6 +16,7 @@ from .orientation import local_to_global
 from .behavioral_analysis import BehaviourAnalyser
 from .ipm_transformer import IPMTransformer
 
+BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 
 class MapBuilder(object):
     def __init__(self, model_path, ipm_config):
@@ -24,7 +25,8 @@ class MapBuilder(object):
         self.__corr_depth_pos = (0, 10)
         self.__track_history = defaultdict(lambda: [])
         self.__track_history_bev = defaultdict(lambda: [])
-        self.__behaviour_analyser = BehaviourAnalyser()
+        model_dir = BASE_RESOURCE_PATH + 'resource/'
+        self.__behaviour_analyser = BehaviourAnalyser(model_dir=model_dir)
         self.__behaviour_analyser_bev = BehaviourAnalyser()
 
     def detect_objects(self, image):

@@ -26,8 +26,8 @@ from PIL import Image
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
 
-BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
-#BASE_PATH = BASE_RESOURCE_PATH
+#BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
+BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
 YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
 MAPS_PATH = BASE_PATH + 'config/global_maps/'

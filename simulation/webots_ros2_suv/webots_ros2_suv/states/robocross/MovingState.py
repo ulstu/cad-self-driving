@@ -61,7 +61,7 @@ class MovingState(AbstractState):
         # y = int(world_model.pov_point[1] - y) if world_model.pov_point[1] - y >=0 else 0
         self.log(f'CUR_POINT: {self.__cur_path_point} GOAL POINT: {x, y} X: {points[self.__cur_path_point][0]} Y:{points[self.__cur_path_point][1]} DISTS: {dists}')
         return (x, y)
-    
+
     def on_event(self, event, world_model=None):
         lat, lon, o = world_model.get_current_position()
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)

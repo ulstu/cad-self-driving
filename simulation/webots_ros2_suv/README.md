@@ -22,7 +22,7 @@ pip install pyproj
 ```
 
 ## Установка решения
-* Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros_ws/src
+* Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros2_ws/src
 ```
 ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/pcl_maps
 ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/robot_interfaces

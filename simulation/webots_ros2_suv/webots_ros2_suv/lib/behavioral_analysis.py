@@ -8,7 +8,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 class BehaviourAnalyser(object):
-    def __init__(self, model_dir="/home/hiber/models"):
+    def __init__(self, model_dir="~/"):
         self.input_size = 3   # Размер входных данных (класс объекта, x, y координаты)
         self.hidden_size = 128 # Размер скрытого состояния RNN
         self.output_size = 2  # Размер выходных данных (x, y координаты)
