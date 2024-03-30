@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y -o Dpkg::Option
     vim \
     rsync \
     dialog \
-    fuse \
+    fuse
 
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get update && apt-get install -y nodejs
@@ -84,8 +84,9 @@ RUN curl -L -o /opt/Groot2.AppImge \
     chmod +x /opt/Groot2.AppImge && \
     ln -sf /opt/Groot2.AppImge /usr/bin/groot2
 
-RUN python3 -m pip install scipy transforms3d fastseg prometheus_client cameratransform cherrypy pyyaml lapx ultralytics pyserial json-rpc shapely pyproj
+#RUN apt-get install --no-install-recommends -y python3-pip wget
 
+RUN pip3 install scipy transforms3d fastseg prometheus_client cameratransform cherrypy pyyaml lapx ultralytics pyserial json-rpc shapely pyproj
 
 #HOTFIX: https://github.com/ros-controls/ros2_controllers/issues/482
 RUN wget -O /tmp/diff_drive_controller.deb http://snapshots.ros.org/humble/2022-11-23/ubuntu/pool/main/r/ros-humble-diff-drive-controller/ros-humble-diff-drive-controller_2.12.0-1jammy.20221108.202153_amd64.deb && \

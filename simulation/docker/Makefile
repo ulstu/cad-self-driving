@@ -6,6 +6,7 @@ NVIDIA_GPU:=$(shell (docker info | grep Runtimes | grep nvidia 1> /dev/null && c
 FLAVOR=devel
 IMAGE=ulstu
 #ghcr.io/memristor/mep3
+#docker.io/library/ulstu
 
 .PHONY: all
 

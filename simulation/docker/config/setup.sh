@@ -15,6 +15,7 @@ usage() {
 	echo "--configure-proxy configures proxy for use in ftn network"
 	echo "--vnc configures VNC server in the container for outside remote DE use"
 	echo "--first-time-ros-setup configures ros for the first time setup"
+	echo "--default configures ros for the first time setup and vnc"
 	exit
 }
 
@@ -105,6 +106,10 @@ finalize() {
 
 while [ "$#" -gt 0 ]; do
 	case "$1" in
+	--default)
+		_first_time_ros_setup=true
+		_vnc=true
+		;;
 	--configure-proxy)
 		_configure_proxy=true
 		;;
