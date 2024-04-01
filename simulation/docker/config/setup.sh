@@ -8,7 +8,7 @@ _shell_shortcuts=false
 _interactive=false
 
 usage() {
-	echo "Usage: $0 [--help] [--configure-proxy] [--vnc] [--first-time-ros-setup] [--enhanced-shell-prompt] [--shell-shortcuts] [--interactive]"
+	echo "Usage: $0 [--help] [--configure-proxy] [--vnc] [--first-time-ros-setup] [--interactive]"
 	echo "--help print help and exit"
 	echo "--interactive do everything interactively"
 	echo "--no-default do not use default setup configurations"
@@ -58,6 +58,7 @@ first_time_ros_setup() {
 }
 
 interactive_vnc() {
+	echo "Interactive VNC invoked"
 	if dialog --title 'ulstu config' --yesno 'Enable VNC' 5 30; then
 		VNC_CMD='/usr/bin/vnc.sh &>/dev/null'
 		if dialog --title 'ulstu config' --yesno 'Enable GPU acceleration' 5 30; then
@@ -92,6 +93,7 @@ vnc() {
 		exit 1
 	fi
 	if $_interactive; then
+		echo "TurboVNC is installed"
 		interactive_vnc
 		return
 	fi
@@ -108,7 +110,7 @@ while [ "$#" -gt 0 ]; do
 	case "$1" in
 	--default)
 		_first_time_ros_setup=true
-		_vnc=true
+		_vnc=false
 		;;
 	--configure-proxy)
 		_configure_proxy=true
@@ -141,7 +143,7 @@ else
 		first_time_ros_setup
 	fi
 	if $_vnc; then
-		vnc
+		default_vnc
 	fi
 fi
 

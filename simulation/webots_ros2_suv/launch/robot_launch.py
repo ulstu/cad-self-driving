@@ -141,7 +141,7 @@ def generate_launch_description():
     package_dir = get_package_share_directory(PACKAGE_NAME)
     world = LaunchConfiguration('world')
 
-    webots = WebotsLauncher(world=PathJoinSubstitution([package_dir, 'worlds', world]), ros2_supervisor=True)
+    webots = WebotsLauncher(world=PathJoinSubstitution([package_dir, 'worlds', world]), ros2_supervisor=True, stream=True)
     robot_description_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'suv.urdf')))
     vehicle_driver = WebotsController(
         robot_name='vehicle',

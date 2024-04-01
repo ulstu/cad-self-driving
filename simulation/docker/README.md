@@ -11,18 +11,17 @@
 
    ```sh
    cd ./docker
-   make all
+   make build
    ```
 
    > Time to time you can run `make destroy run` to get the newest packages.
 
 3. Wait for the provisioning script to finish
 
-4. _Optional:_ run interactive setup if you prefer to manually configure the container
-
-   ```sh
-   make setup-interactive
-   ```
+4. Setup
+```sh
+make run
+```
 
 5. Acces the environment from any terminal window
    ```sh

@@ -1,5 +1,7 @@
 export WEBOTS_HOME=/usr/local/webots
+export WEBOTS_OFFSCREEN=1
 export USERNAME=default
+
 if uname -v | grep -qi 'ubuntu'; then
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 fi
