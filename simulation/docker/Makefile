@@ -12,7 +12,9 @@ WEBOTS_STREAM_PORT=1234
 
 .PHONY: all
 
-all: run start-code-server
+#
+
+all: test-nvidia copy-working-folders  run copy-working-files start-code-server 
 
 colors:
 	$(eval NC=\033[1;0m)
@@ -26,7 +28,7 @@ build:
 
 #--net=host 
 
-run: test-nvidia copy-working-folders
+run: 
 	docker run \
 		--ipc=host \
 		--cap-add SYS_ADMIN \
@@ -42,9 +44,7 @@ run: test-nvidia copy-working-folders
 		-v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
 		-v /dev/dri:/dev/dri:ro \
 		-v /dev:/dev:rw \
-		-v ${PROJECT_DIR}/docker/projects/${FLAVOR}/webots_ros2_suv:/ulstu/ros2_ws/src/webots_ros2_suv:rw \
-		-v ${PROJECT_DIR}/docker/projects/${FLAVOR}/robot_interfaces:/ulstu/ros2_ws/src/robot_interfaces:rw \
-		-v ${PROJECT_DIR}/docker:/ulstu/docker:rw \
+		-v ${PROJECT_DIR}/docker/projects/${FLAVOR}:/ulstu/repositories:rw \
 		-d -it ${IMAGE} 1>/dev/null
 
 test-nvidia: colors
@@ -56,13 +56,18 @@ test-nvidia: colors
 	printf '%b\n' "${RED}Detected NVIDIA GPU in system, but missing packets, look up NVIDIA GPU section in README!\n${NC}" || \
 	true
 
+copy-working-files:
+	docker exec -it ulstu-${FLAVOR} ln -s /ulstu/repositories/webots_ros2_suv /ulstu/ros2_ws/src/webots_ros2_suv && \
+	docker exec -it ulstu-${FLAVOR} ln -s /ulstu/repositories/robot_interfaces /ulstu/ros2_ws/src/robot_interfaces ; \
+
 copy-working-folders:
 	if [ -d ${PROJECT_DIR}/docker/projects/${FLAVOR}/]; then \
-		echo "project dir exists" ; \
+		echo "project dir exists. Remove it first" ; \
 	else \
 		mkdir ${PROJECT_DIR}/docker/projects/${FLAVOR} && \
 		cp -r ${PROJECT_DIR}/webots_ros2_suv ${PROJECT_DIR}/docker/projects/${FLAVOR}/webots_ros2_suv  && \
 		cp -r ${PROJECT_DIR}/robot_interfaces ${PROJECT_DIR}/docker/projects/${FLAVOR}/robot_interfaces ; \
+#cp -r ${PROJECT_DIR}/docker ${PROJECT_DIR}/docker/projects/${FLAVOR}/docker ; \
 	fi
 
 start-code-server:
