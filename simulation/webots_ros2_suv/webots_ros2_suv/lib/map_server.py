@@ -143,7 +143,7 @@ def start_web_server(map_server):
     try:
 
         cherrypy.quickstart(map_server, '/', {'global':
-                                                   {'server.socket_host': '127.0.0.1',
+                                                   {'server.socket_host': '0.0.0.0',
                                                     'server.socket_port': 8008,
                                                     'tools.staticdir.root': STATIC_PATH,
                                                     'log.error_file': 'site.log'

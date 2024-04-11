@@ -1,0 +1,64 @@
+states_dir: "robocross/"
+states:
+  start: "StartState.py"
+  moving: "MovingState.py"
+  stopped: "StoppedState.py"
+  emergency: "EmergencyState.py"
+  turn: "TurnState.py"
+workers:
+  lightswitch: "LightSwitchDetectorWorker.py"
+  roadsign: "RoadSignDetectorWorker.py"
+  ipm: "IPMWorker.py"
+  semanticsegmentation: "SemanticSegmentationWorker.py"
+  pathplanning: "PathPlanningWorker.py"
+  behavioranalysis: "BehavioralAnalysisWorker.py"
+  reedsshepp: "ReedsSheppPlanningWorker.py"
+workerstates:
+  start: []
+  moving: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  stopped: []
+  turn: ["semanticsegmentation", "ipm", "reedsshepp"]
+  emergency: []
+transitions:
+  start:
+    start_move: ["moving"]
+    stop: ["stopped"]
+  moving:
+    stop: ["stopped", "emergency"]
+    turn: ["turn"]
+  stopped:
+    start_move: ["moving"]
+  emergency:
+    reset: ["start"]
+  turn:
+    start_move: ["moving"]
+    stop: ["stopped", "emergency"]
+map-elements:
+  - element:
+    id: "start"
+    name: !!str Точка старта
+    ol-type: !!str Point
+    color: !!str 00ff00
+  - element:
+    id: "finish"
+    name: !!str Зона  финиша
+    ol-type: !!str Polygon
+    color: !!str ff0000
+  - element:
+    id: "turn"
+    name: !!str Зона разворота
+    ol-type: !!str Polygon
+    color: !!str ffff00
+  - element:
+    id: "moving"
+    name: !!str Путь следования
+    ol-type: !!str LineString
+    color: !!str 0000ff
+  - element:
+    id: "stop"
+    name: !!str Зона остановки
+    ol-type: !!str Polygon
+    color: !!str 800080
+
+
+

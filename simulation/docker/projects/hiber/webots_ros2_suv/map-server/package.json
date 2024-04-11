@@ -1,0 +1,17 @@
+{
+  "name": "map-server",
+  "dependencies": {
+    "i": "^0.3.7",
+    "npm": "^9.8.1",
+    "ol": "7.5.1",
+    "or": "^0.2.0",
+    "watch": "^0.13.0"
+  },
+  "devDependencies": {
+    "vite": "^3.2.3"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build --watch"
+  }
+}
