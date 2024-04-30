@@ -1,0 +1,55 @@
+{
+  "data":{
+    "km_per_hour": [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150],
+    "frequency_turns_per_min": [600,800,1000,1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3200,3400,3600,3800,4000,4200],
+    "gear_ratio": {
+        "hub_1": 4.05,
+        "hub_2": 2.34,
+        "hub_3": 1.395,
+        "hub_4": 1.0,
+        "hub_5": 0.849,
+        "hub_reverse": 3.51,
+        "transfer_case": 1.0,
+        "on_board_gearbox": 1.0,
+        "main_pair": 4.3
+    },
+    "wheel_info": {
+      "profile_width": 185,
+      "profile_height": 80,
+      "diameter": 16
+    },
+    "engine_performance":{
+      "measurements": [
+        {"freq_turns_per_min": 700, "Hm": 178, "horse_power":18 },
+        {"freq_turns_per_min": 800, "Hm": 187, "horse_power":21 },
+        {"freq_turns_per_min": 950, "Hm": 189, "horse_power":26 },
+        {"freq_turns_per_min": 1200, "Hm": 199, "horse_power":34 },
+        {"freq_turns_per_min": 1500, "Hm": 205, "horse_power":44 },
+        {"freq_turns_per_min": 1750, "Hm": 210, "horse_power":52 },
+        {"freq_turns_per_min": 2000, "Hm": 220, "horse_power":63 },
+        {"freq_turns_per_min": 2300, "Hm": 226, "horse_power":74 },
+        {"freq_turns_per_min": 2500, "Hm": 230.5, "horse_power":82 },
+        {"freq_turns_per_min": 2800, "Hm": 230, "horse_power":92 },
+        {"freq_turns_per_min": 3000, "Hm": 229, "horse_power":98 },
+        {"freq_turns_per_min": 3250, "Hm": 226, "horse_power":105 },
+        {"freq_turns_per_min": 3500, "Hm": 214, "horse_power":107 },
+        {"freq_turns_per_min": 3800, "Hm": 199, "horse_power":108 },
+        {"freq_turns_per_min": 4000, "Hm": 191, "horse_power":109 },
+        {"freq_turns_per_min": 4200, "Hm": 177, "horse_power":106 }
+      ]
+    },
+    "number_of_spur_gears": [2, 2, 2, 0, 2],
+    "number_of_bevel_gears": [1, 1, 1, 1, 1],
+    "number_of_cardan_gears": [2, 2, 2, 2, 2],
+    "weights": {
+        "car_weight": 2275,
+        "full_mass": 3500,
+        "passenger_seats": 7
+    },
+    "dimensions": {
+        "car_width": 2.068,
+        "car_height": 2.172,
+        "streamline_coefficient": 0.45
+    }
+  }
+}

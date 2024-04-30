@@ -1,0 +1,26 @@
+version: "3.10"
+services:
+  backend:
+    ports:
+      - "80:8080"
+    container_name: backend
+    build:
+      context: ../
+      dockerfile: .deploy/Dockerfile
+    restart: 'no'
+    command: sh -c 'pip3 install -r backend/requirements.txt && cd backend && python3 app.py'
+    volumes:
+      - static:/usr/src/app/backend/static
+  frontend:
+    ports:
+      - 3001:5173
+    container_name: frontend
+    build:
+      context: ../
+      dockerfile: web/Dockerfile
+    restart: 'no'
+    command: sh -c 'cd web && yarn && yarn dev'
+
+volumes:
+  static:
+    name: static

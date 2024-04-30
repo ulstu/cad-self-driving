@@ -1,0 +1,31 @@
+.aside {
+  height: 100%;
+  background-color: #0f1010;
+  display: flex;
+
+  svg {
+    color: #969696;
+    transition: color 0.3s linear;
+    cursor: pointer;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .aside-points {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    padding-right: 10px;
+    border-right: 1px solid #969696;
+    gap: 20px;
+  }
+
+  .aside-additional {
+    padding: 0 10px;
+    width: 300px;
+    border-right: 1px solid #969696;
+  }
+}
