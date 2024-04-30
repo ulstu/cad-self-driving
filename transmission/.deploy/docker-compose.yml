@@ -8,7 +8,7 @@ services:
       context: ../
       dockerfile: .deploy/Dockerfile
     restart: 'no'
-    command: sh -c 'pip3 install -r backend/requirements.txt && cd backend && python3 app.py'
+    command: sh -c 'cd backend && python3 app.py'
     volumes:
       - static:/usr/src/app/backend/static
   frontend:

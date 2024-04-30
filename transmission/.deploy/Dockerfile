@@ -1,11 +1,11 @@
-FROM ubuntu:latest
+FROM python:3.10
 
 ENV WORKDIR=/usr/src/app
 WORKDIR ${WORKDIR}
 
 COPY . ${WORKDIR}
 
-RUN apt update
-RUN apt install python3 python3-pip -y
+COPY /backend/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 EXPOSE 8080
