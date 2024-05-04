@@ -24,6 +24,6 @@ conf = {
 }
 
 BASE_DIR = os.path.abspath(os.path.curdir)
-GRAPHICS_DIR = BASE_DIR + '\\static\\graphics'
+GRAPHICS_DIR = os.path.join(BASE_DIR, 'static', 'graphics')
 if not os.path.exists(GRAPHICS_DIR):
     os.makedirs(GRAPHICS_DIR)

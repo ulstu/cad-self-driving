@@ -15,7 +15,7 @@ WEBOTS_STREAM_PORT=1234
 #
 
 all: test-nvidia copy-working-folders  run copy-working-files start-code-server 
-
+allmac: copy-working-folders  run copy-working-files start-code-server 
 colors:
 	$(eval NC=\033[1;0m)
 	$(eval RED=\033[1;31m)
@@ -26,6 +26,9 @@ build:
 	echo ${NO_CACHE_ARG}
 	DOCKER_BUILDKIT=1 docker build ${DOCKER_DIR} -f ${DOCKER_DIR}/Dockerfile.base -t ulstu ${DOCKER_ARGS} --build-arg UID=${UID}
 
+buildmacos:
+	echo ${NO_CACHE_ARG}
+	docker build --platform=linux/amd64 ${DOCKER_DIR} -f ${DOCKER_DIR}/Dockerfile.base -t ulstu ${DOCKER_ARGS} --build-arg UID=${UID} 
 #--net=host 
 
 run: 
@@ -62,13 +65,12 @@ copy-working-files:
 
 copy-working-folders:
 	if [ -d ${PROJECT_DIR}/docker/projects/${FLAVOR}/]; then \
-		echo "project dir exists. Remove it first" ; \
+        echo "project dir exists. Remove it first" ; \
 	else \
-		mkdir ${PROJECT_DIR}/docker/projects/${FLAVOR} && \
-		cp -r ${PROJECT_DIR}/webots_ros2_suv ${PROJECT_DIR}/docker/projects/${FLAVOR}/webots_ros2_suv  && \
-		cp -r ${PROJECT_DIR}/robot_interfaces ${PROJECT_DIR}/docker/projects/${FLAVOR}/robot_interfaces ; \
-#cp -r ${PROJECT_DIR}/docker ${PROJECT_DIR}/docker/projects/${FLAVOR}/docker ; \
-	fi
+        mkdir ${PROJECT_DIR}/docker/projects/${FLAVOR} && \
+        cp -r ${PROJECT_DIR}/webots_ros2_suv ${PROJECT_DIR}/docker/projects/${FLAVOR}/webots_ros2_suv  && \
+        cp -r ${PROJECT_DIR}/robot_interfaces ${PROJECT_DIR}/docker/projects/${FLAVOR}/robot_interfaces ; \
+    fi
 
 start-code-server:
 	docker exec -d -it ulstu-${FLAVOR} bash -c 'pgrep code-server || code-server /ulstu/ros2_ws' && \

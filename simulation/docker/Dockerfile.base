@@ -59,21 +59,23 @@ RUN curl -L -o /tmp/vscode.deb \
 
 #ENV DONT_PROMPT_WSL_INSTALL=No_Prompt_please
 
-RUN su ulstu -c 'code --install-extension eamodio.gitlens' && \
-    su ulstu -c 'code --install-extension ms-python.python' && \
-    su ulstu -c 'code --install-extension ms-vscode.cpptools-extension-pack' && \
-    su ulstu -c 'code --install-extension usernamehw.errorlens' && \
-    su ulstu -c 'code --install-extension redhat.vscode-xml' && \
-    su ulstu -c 'code --install-extension ms-iot.vscode-ros'
+# RUN su ulstu -c 'code --install-extension eamodio.gitlens' && \
+#     su ulstu -c 'code --install-extension ms-python.python' && \
+#     su ulstu -c 'code --install-extension ms-vscode.cpptools-extension-pack' && \
+#     su ulstu -c 'code --install-extension usernamehw.errorlens' && \
+#     su ulstu -c 'code --install-extension redhat.vscode-xml' && \
+#     su ulstu -c 'code --install-extension ms-iot.vscode-ros'
+
 
 # VS Code server
-RUN su ulstu -c 'curl -fsSL https://code-server.dev/install.sh | sh' && \
-    su ulstu -c 'code-server --install-extension eamodio.gitlens' && \
-    su ulstu -c 'code-server --install-extension ms-python.python' && \
-    su ulstu -c 'code-server --install-extension ms-vscode.cpptools-extension-pack' && \
-    su ulstu -c 'code-server --install-extension usernamehw.errorlens' && \
-    su ulstu -c 'code-server --install-extension redhat.vscode-xml' && \
-    su ulstu -c 'code-server --install-extension ms-iot.vscode-ros'
+# RUN su ulstu -c 'curl -fsSL https://code-server.dev/install.sh | sh' && \
+#     su ulstu -c 'code-server --install-extension eamodio.gitlens' && \
+#     su ulstu -c 'code-server --install-extension ms-python.python' && \
+#     su ulstu -c 'code-server --install-extension ms-vscode.cpptools-extension-pack' && \
+#     su ulstu -c 'code-server --install-extension usernamehw.errorlens' && \
+#     su ulstu -c 'code-server --install-extension redhat.vscode-xml' && \
+#     su ulstu -c 'code-server --install-extension ms-iot.vscode-ros'
+RUN su ulstu -c 'curl -fsSL https://code-server.dev/install.sh | sh' 
 
 # Webots
 RUN curl -L -o /tmp/webots.deb \

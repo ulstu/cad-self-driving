@@ -28,7 +28,7 @@ class TurnState(AbstractState):
             pov_point=world_model.pov_point)
         target_dist = calc_dist_point(world_model.get_current_position(), abs_goal)
         self.log(f'TARGET DIST: {target_dist} TURN GOALS: [{abs_goal}] [{world_model.goal_point}]')
-        if target_dist < 0.5:
+        if target_dist < 0.1:
             world_model.cur_path_segment = world_model.cur_path_segment + 1
             self.log("EXIT TURN STATE")
             event = "start_move"

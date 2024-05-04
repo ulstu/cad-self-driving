@@ -60,3 +60,4 @@ ros2 launch webots_ros2_suv robot_launch.py
 
 ## Установка через docker в MacOS m1 не поддерживается, т.к. отсутствует linux дистрибутив webots arm
 
+https://everythingdevops.dev/building-x86-images-on-an-apple-m1-chip/
