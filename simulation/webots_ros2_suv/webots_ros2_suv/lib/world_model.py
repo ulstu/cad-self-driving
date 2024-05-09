@@ -59,7 +59,7 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def draw_scene(self):
-        colorized = self.ipm_colorized
+        colorized = self.ipm_colorized_lines
         prev_point = None
         if self.path:
             for n in self.path:
