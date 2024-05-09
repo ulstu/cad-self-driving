@@ -10,14 +10,15 @@ workers:
   roadsign: "RoadSignDetectorWorker.py"
   ipm: "IPMWorker.py"
   semanticsegmentation: "SemanticSegmentationWorker.py"
+  lanelinedetection: "LaneLineDetectionWorker.py"
   pathplanning: "PathPlanningWorker.py"
   behavioranalysis: "BehavioralAnalysisWorker.py"
   reedsshepp: "ReedsSheppPlanningWorker.py"
 workerstates:
   start: []
-  moving: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   stopped: []
-  turn: ["semanticsegmentation", "ipm", "reedsshepp"]
+  turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]
   emergency: []
 transitions:
   start:

@@ -91,3 +91,10 @@ class FiniteStateMachine:
             #self.node._logger.info(f'Invoking on_data event from {source} on worker {str(worker)} ')
             world_model = worker.on_data(world_model)
         return world_model
+
+
+    def find_worker(self, worker_state):
+        for state_key, state in self.current_states.items():
+            if worker_state in self.workerstates[state_key]: 
+                return self.workerstates[state_key][worker_state]
+        return None

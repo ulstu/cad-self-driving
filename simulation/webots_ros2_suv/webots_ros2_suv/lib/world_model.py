@@ -8,6 +8,8 @@ import math
 from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 from .coords_transformer import CoordsTransformer
+from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask
+
 
 class WorldModel(object):
     '''
@@ -24,11 +26,18 @@ class WorldModel(object):
         self.point_cloud = None     # облако точек от лидара
         self.seg_image = None       # сегментированное изображение во фронтальной проекции
         self.seg_colorized = None   # раскрашенное сегментированное изображение во фронтальной проекции
-        self.seg_composited = None   # раскрашенное сегментированное изображение во фронтальной проекции
+        self.seg_composited = None  # раскрашенное сегментированное изображение во фронтальной проекции
+        self.lane_contours = None   # контуры линий дорожной разметки на изображении во фронтальной проекции
+        self.lane_lines = None      # линии дорожной разметки на изображении во фронтальной проекции
+        self.lane_contours_bev = None # контуры линий дорожной разметки на изображении в BEV проекции
+        self.lane_lines_bev = None  # линии дорожной разметки на изображении во BEV проекции
         self.img_front_objects = None # изображение с камеры с детектированными объектами
+        self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
         self.objects = None         # объекты во фронтальной проекции   
         self.ipm_image = None       # BEV сегментированное изображение 
         self.ipm_colorized = None   # раскрашенное BEV сегментированное изображение
+        self.ipm_colorized_lines = None   # раскрашенное BEV сегментированное изображение + линии дорожной разметки
+        self.map_builder = None     # класс, хранящий BEV матрицу
         self.pov_point = None       # Точка в BEV, соответствующая арсположению авто
         self.goal_point = None      # Точка в BEV, соответствующая цели
         self.global_map = None      # текущие загруженные координаты точек глобальной карты
@@ -71,6 +80,8 @@ class WorldModel(object):
             image = cv2.putText(colorized, f'{i}', (x + 20, y), font,  fontScale, color, thickness, cv2.LINE_AA)
 
         colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
+
+
         # cv2.imshow("colorized seg", colorized)
         # cv2.imshow("yolo drawing", self.img_front_objects)
 

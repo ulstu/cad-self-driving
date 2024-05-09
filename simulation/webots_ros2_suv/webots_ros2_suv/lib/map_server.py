@@ -107,15 +107,14 @@ class MapWebServer(object):
     @cherrypy.expose
     def get_image(self, img_type, tm):
         if img_type == "obj_detector":
-            if self.world_model.img_front_objects is None:
+            if self.world_model.img_front_objects_lines is None:
                 return None
-            data = self.world_model.img_front_objects
+            data = self.world_model.img_front_objects_lines
         elif img_type == "seg":
             self.world_model.draw_scene()
-            if self.world_model.ipm_colorized is None:
+            if self.world_model.ipm_colorized_lines is None:
                 return None
-            data = self.world_model.ipm_colorized
-            data = np.array(data)
+            data = self.world_model.ipm_colorized_lines
             # use StringIO to stream the image out to the browser direct from RAM
             # output = StringIO.StringIO()
             # format = 'PNG' # JPEG and other formats are available
