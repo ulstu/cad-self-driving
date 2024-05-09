@@ -15,7 +15,7 @@ import time
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-use_cpu = True
+use_cpu = False
 
 HOST = "192.168.1.188"  # Standard loopback interface address (localhost)
 PORT = 65432

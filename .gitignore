@@ -132,3 +132,4 @@ dmypy.json
 .pyre/
 
 perception/signs_detector/weights/*
+simulation/webots_ros2_suv/resource/*

@@ -14,3 +14,4 @@ class AbstractWorker:
     def on_data(self, world_model):
         raise NotImplementedError
     
+    

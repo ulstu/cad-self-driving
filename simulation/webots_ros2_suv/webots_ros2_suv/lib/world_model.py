@@ -33,6 +33,7 @@ class WorldModel(object):
         self.lane_lines_bev = None  # линии дорожной разметки на изображении во BEV проекции
         self.img_front_objects = None # изображение с камеры с детектированными объектами
         self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
+        self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
         self.objects = None         # объекты во фронтальной проекции   
         self.ipm_image = None       # BEV сегментированное изображение 
         self.ipm_colorized = None   # раскрашенное BEV сегментированное изображение

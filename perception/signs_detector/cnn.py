@@ -1,5 +1,5 @@
 import tensorflow as tf
-from keras.callbacks import ModelCheckpoint, Callback
+from keras._tf_keras.keras.callbacks import ModelCheckpoint, Callback
 import cv2
 import time
 import numpy as np
@@ -7,7 +7,7 @@ from collections import deque
 import math
 import os
 from keras import datasets, layers, models
-from keras.callbacks import ModelCheckpoint
+from keras._tf_keras.keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import OneHotEncoder
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)

@@ -16,7 +16,7 @@ workers:
   reedsshepp: "ReedsSheppPlanningWorker.py"
 workerstates:
   start: []
-  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "lightswitch", "behavioranalysis", "pathplanning"]
   stopped: []
   turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]
   emergency: []
