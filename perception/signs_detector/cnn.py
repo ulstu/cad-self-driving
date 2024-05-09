@@ -1,12 +1,13 @@
 import tensorflow as tf
+from keras.callbacks import ModelCheckpoint, Callback
 import cv2
 import time
 import numpy as np
 from collections import deque
 import math
 import os
-from tensorflow.keras import datasets, layers, models
-from tensorflow.keras.callbacks import ModelCheckpoint
+from keras import datasets, layers, models
+from keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import OneHotEncoder
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -27,7 +28,7 @@ class CNN():
         self.test_analize = {}
         self.enc = 0
 
-    def init_model(self):
+    def init_model(self, num_classes, labels):
         param = [64,
                  [16, 3, 2],
                  [32, 3, 2],
@@ -38,8 +39,10 @@ class CNN():
                  # [256, 5, 2],
                  #[512, 5, 2]
                  ]
+        
+        self.labels = labels
+        self.num_classes = num_classes
         self.image_size = param[0]
-        num_classes = 18
         is_training = True
         channels = 1
         image_channels = 3
@@ -106,23 +109,77 @@ class CNN():
             # self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
             # self.merged_summary = tf.summary.merge_all()
 
-    def load_model(self, path_to_weights):
-        self.model.load_weights(path_to_weights)
+    def load_model(self, path_to_model_folder):
+        path_to_model = os.path.join(path_to_model_folder, "model.h5")
+        path_to_labels = os.path.join(path_to_model_folder, "labels.txt")
+        
+        self.model = tf.keras.models.load_model(path_to_model)
+        
+        with open(path_to_labels, "r") as file:
+            self.labels = [line.strip("\n") for line in file.readlines()]
 
     def predict(self, images):
         predicted = self.model.predict_on_batch(np.array(images)/255.0)
         return None, predicted
 
 
-    def train(self, train_dataset, valid_dataset, test_dataset, good_test_dataset):
-        filepath = "weights/saved-model-{epoch:02d}-{val_accuracy:.5f}.hdf5"
-        checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max')
-        print(len(train_dataset.data_x), len(train_dataset.data_y), train_dataset.data_y[0])
+    class SavingCallback(Callback):
+        def __init__(self, folder_path, labels):
+            self.folder_path = folder_path
+            self.labels = labels
+        
+        def on_epoch_end(self, epoch, logs=None):
+            val_accuracy = logs.get('val_accuracy')
+            model_path = os.path.join(self.folder_path, f"model(epoch={epoch + 1}, val={round(val_accuracy, 3)}).keras")
+            
+            for filename in os.listdir(self.folder_path):
+                file_path = os.path.join(self.folder_path, filename)
+                if os.path.isfile(file_path):
+                    if filename.split('.')[-1] == "keras":
+                        os.remove(file_path)
+            
+            self.model.save(model_path)
+            
+            labels_str = ""
+            for idx, label in enumerate(self.labels):
+                labels_str += label
+                if idx < len(self.labels) - 1:
+                    labels_str += '\n'
+            
+            labels_path = os.path.join(self.folder_path, "labels.txt")
+            with open(labels_path, "w") as file:
+                file.write(labels_str)
+
+
+    def train(self, 
+              train_dataset, 
+              valid_dataset, 
+              test_dataset, 
+              good_test_dataset,
+              path_to_save):
+    
+        model_path = os.path.join(path_to_save, "model.h5")
+        labels_path = os.path.join(path_to_save, "labels.txt")
+    
+        labels_str = ""
+        for idx, label in enumerate(self.labels):
+            labels_str += label
+            if idx < len(self.labels) - 1:
+                labels_str += '\n'
+        
+        with open(labels_path, "w") as file:
+            file.write(labels_str)
+        
+        checkpoint = ModelCheckpoint(model_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+        #checkpoint = CNN.SavingCallback(path_to_save, self.labels)
+        
         self.model.fit(np.array(train_dataset.data_x)/255.0,
           train_dataset.data_y,
           epochs=50,
           validation_data=(np.array(valid_dataset.data_x)/255.0, valid_dataset.data_y),
           callbacks=[checkpoint])  # Pass callback to training
+        
+        
 
 
     def viz(self, batch_predict_mask, batch_true_mask, batch_image, cc, iter, path):

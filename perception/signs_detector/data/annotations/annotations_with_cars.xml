@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>784155</id>
+      <size>2</size>
+      <mode>annotation</mode>
+      <overlap>0</overlap>
+      <bugtracker></bugtracker>
+      <created>2024-04-28 17:26:17.426362+00:00</created>
+      <updated>2024-04-28 20:46:18.906170+00:00</updated>
+      <subset>default</subset>
+      <start_frame>0</start_frame>
+      <stop_frame>1</stop_frame>
+      <frame_filter></frame_filter>
+      <segments>
+        <segment>
+          <id>785767</id>
+          <start>0</start>
+          <stop>1</stop>
+          <url>https://app.cvat.ai/api/jobs/784155</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>spectre</username>
+        <email>emailgax8@gmail.com</email>
+      </owner>
+      <assignee></assignee>
+      <labels>
+        <label>
+          <name>Stop</name>
+          <color>#fb0b00</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Main road</name>
+          <color>#fafa37</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Car</name>
+          <color>#32b7fa</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+      </labels>
+    </job>
+    <dumped>2024-04-28 20:46:35.354020+00:00</dumped>
+  </meta>
+  <image id="0" name="Screenshot 2024-04-28 212510.png" width="1773" height="793">
+    <box label="Stop" source="manual" occluded="0" xtl="1137.83" ytl="270.25" xbr="1202.14" ybr="325.37" z_order="0">
+    </box>
+    <box label="Main road" source="manual" occluded="0" xtl="226.53" ytl="384.17" xbr="259.60" ybr="420.91" z_order="0">
+    </box>
+    <box label="Main road" source="manual" occluded="0" xtl="623.38" ytl="369.47" xbr="652.78" ybr="402.54" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="623.38" ytl="340.07" xbr="650.94" ybr="363.96" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="39.73" ytl="407.19" xbr="373.51" ybr="598.58" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="476.09" ytl="349.01" xbr="653.70" ybr="509.78" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="713.41" ytl="381.17" xbr="808.34" ybr="499.06" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="800.68" ytl="439.35" xbr="838.96" ybr="477.62" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="854.27" ytl="448.53" xbr="887.96" ybr="480.69" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="342.89" ytl="437.82" xbr="417.91" ybr="486.81" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="440.88" ytl="447.00" xbr="482.22" ybr="486.81" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="1690.25" ytl="477.32" xbr="1773.00" ybr="774.35" z_order="0">
+    </box>
+  </image>
+  <image id="1" name="Screenshot 2024-04-28 212536.png" width="1782" height="802">
+    <box label="Car" source="manual" occluded="0" xtl="1147.30" ytl="418.34" xbr="1293.49" ybr="504.51" z_order="0">
+    </box>
+    <box label="Main road" source="manual" occluded="0" xtl="978.39" ytl="144.08" xbr="1044.87" ybr="203.17" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="557.36" ytl="354.60" xbr="583.21" ybr="378.60" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="862.05" ytl="349.06" xbr="889.75" ybr="373.07" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="1495.08" ytl="441.42" xbr="1607.42" ybr="495.28" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="486.97" ytl="419.88" xbr="556.37" ybr="476.81" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="0.00" ytl="52.09" xbr="534.83" ybr="704.57" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="627.16" ytl="366.02" xbr="742.58" ybr="489.13" z_order="0">
+    </box>
+    <box label="Car" source="manual" occluded="0" xtl="747.04" ytl="409.10" xbr="782.59" ybr="455.27" z_order="0">
+    </box>
+  </image>
+</annotations>
