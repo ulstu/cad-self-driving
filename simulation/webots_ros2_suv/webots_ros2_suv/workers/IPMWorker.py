@@ -59,8 +59,11 @@ class IPMWorker(AbstractWorker):
             world_model.pov_point = self.__map_builder.calc_bev_point(world_model.pov_point)
             world_model.pov_point = (world_model.pov_point[0], world_model.pov_point[1] - 15)
             world_model.ipm_image = self.__map_builder.put_objects(world_model.ipm_image, tbs, widths, results)
-            world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))[:world_model.pov_point[1], :]
-            world_model.ipm_image = world_model.ipm_image[:world_model.pov_point[1], :]
+
+            ipm_image_height = self.__map_builder.calc_bev_point((0, image_seg.shape[0]))[1]
+
+            world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))[:ipm_image_height, :]
+            world_model.ipm_image = world_model.ipm_image[:ipm_image_height, :]
             world_model.img_front_objects = results[0].plot()
             world_model.map_builder = self.__map_builder
             

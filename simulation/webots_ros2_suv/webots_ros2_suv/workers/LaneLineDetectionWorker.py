@@ -40,42 +40,52 @@ class LaneLineDetectionWorker(AbstractWorker):
             line_batches, mask_batches, results = self.lane_line_model.predict([img])
 
             world_model.img_front_objects_lines = self.lane_line_model.generate_prediction_plots([world_model.img_front_objects], self.labels, mask_batches, line_batches)[0]
-            world_model.ipm_colorized_lines = world_model.ipm_colorized
+            world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
 
             lines_bev = []
+            masks_bev = []
+
+            line_batches_bev = []
+            mask_batches_bev = []
+            
             
             for line in line_batches[0]:
                 points_bev = []
                 for point in line.points:
+
                     x, y = world_model.map_builder.calc_bev_point(point)
-                    point_bev = np.array([x, y])
-
-                    global_pos = world_model.coords_transformer.get_global_coordinates_from_ipm_coords(point[0], point[1], world_model.get_current_position())
-                    local_pos = world_model.coords_transformer.get_relative_coordinates(global_pos[0], global_pos[1], world_model.get_current_position(), world_model.pov_point)
-
-                    points_bev.append([local_pos[0], local_pos[1]])
+                    points_bev.append([x, y])
                 
                 points_bev = np.array(points_bev, dtype=np.int32)
                 
                 lines_bev.append(LaneLine(points_bev, line.label, line.points_n, line.elapsed_time, line.mask_count_points))
             
             line_batches_bev = [lines_bev]
-
-            world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
-
-            image_size = np.array(world_model.ipm_colorized_lines.shape[0:2])[::-1]
-            center_point = image_size / 2
-            for line in line_batches_bev[0]:
-                for point in line.points:
-                    cv2.line(world_model.ipm_colorized_lines, center_point.astype(int), point.astype(int), (0, 0, 255), thickness=2)
-
-            draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 255, 0)], thickness=8)
-
             
-            # count_points = [20, 20]
+            for mask in mask_batches[0]:
+                points_bev = []
+                for point in mask.points:
+                    x, y = world_model.map_builder.calc_bev_point(point)
+                    points_bev.append([x, y])
+                
+                points_bev = np.array(points_bev, dtype=np.int32)
+
+                masks_bev.append(LaneMask(points_bev, mask.points_n, mask.label, mask.orig_shape))
+            
+            mask_batches_bev = [masks_bev]
+
+            world_model.lane_contours = mask_batches[0]
+            world_model.lane_lines = line_batches[0]
+            
+            world_model.lane_contours = mask_batches_bev[0]
+            world_model.lane_lines = line_batches_bev[0]
+
+            draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 255, 0)], thickness=2)
+
+            # count_points = [50, 50]
             # obj_image_size = np.array(world_model.img_front_objects_lines.shape[0:2])[::-1]
-            # for x in range(obj_image_size[0] // count_points[0]):
-            #     for y in range(obj_image_size[1] // count_points[1]):
+            # for x in range(count_points[0]):
+            #     for y in range(count_points[1]):
             #         point_x = obj_image_size[0] / count_points[0] * x
             #         point_y = obj_image_size[1] / count_points[1] * y
 
@@ -90,8 +100,9 @@ class LaneLineDetectionWorker(AbstractWorker):
             #         colorBG = tuple(colorBG.astype(int).tolist())
 
             #         point_x_bev, point_y_bev = world_model.map_builder.calc_bev_point((point_x, point_y))
-            #         cv2.circle(world_model.img_front_objects_lines, (int(point_x), int(point_y)), 3, colorRB, -1)
-            #         cv2.circle(world_model.img_front_objects_lines, (int(point_x_bev), int(point_y_bev)), 3, colorBG, -1)
+
+            #         #cv2.circle(world_model.img_front_objects_lines, (int(point_x), int(point_y)), 3, colorRB, -1)
+            #         cv2.circle(world_model.img_front_objects_lines, (int(point_x_bev), int(point_y_bev)), 3, colorRB, -1)
                 
             # cv2.circle(world_model.img_front_objects_lines, (img.shape[0], int(img.shape[1] / 2)), 5, (255, 0, 0), -1)
 
