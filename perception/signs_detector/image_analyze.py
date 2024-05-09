@@ -399,8 +399,62 @@ class ImageAnalyzer:
             return np.zeros(shape=(64, 64, 3), dtype=np.uint8) # Заглушка
     
 
-    def plot_predictions(image):
-        pass
+    def predict_labels(self, image):
+        if use_cpu == True:
+            labels = detector.seg_model.predict_one(np.array(analyze_image), device='cpu')
+        else:
+            labels = detector.seg_model.predict_one(np.array(analyze_image))
+        return labels
+
+
+    def predict_traffic_lights(self, image, labels=None):
+        if labels is None:
+            labels = self.predict_labels(image)
+
+        traffic_light_mask = np.ones_like(labels)
+        traffic_light_mask[labels != 6] = 0
+
+        traffic_light_images, light_rects = detector.cut_image4segments(image, np.array(traffic_light_mask, dtype=np.uint8))
+
+        return traffic_light_mask, traffic_light_images, light_rects
+
+
+    def predict_signs(self, image, labels=None):
+        if labels is None:
+            labels = self.predict_labels(image)
+
+        traffic_sign_mask = np.ones_like(labels)
+        traffic_sign_mask[labels != 7] = 0
+
+        traffic_sign_images, sign_rects = detector.cut_image4segments(image, np.array(traffic_sign_mask, dtype=np.uint8))
+
+        found_signs = []
+        if traffic_sign_images and not detector.is_red:
+            sign, found_signs = detector.get_classify_images(traffic_sign_images)
+        
+        return traffic_sign_mask, traffic_sign_images, sign_rects, found_signs
+
+
+    def plot_predictions(self, image, image_to_plot_on=None):
+        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        
+        if use_cpu == True:
+            labels = detector.seg_model.predict_one(np.array(analyze_image), device='cpu')
+        else:
+            labels = detector.seg_model.predict_one(np.array(analyze_image))
+
+        traffic_light_mask, traffic_light_images, light_rects = detector.predict_traffic_lights(image, labels)
+        traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = detector.predict_signs(image, labels)
+
+        if image_to_plot_on is not None:
+            image = image_to_plot_on
+
+        detector.draw_mask(image, traffic_light_mask, [255, 0, 0])
+        detector.draw_mask(image, traffic_sign_mask, [0, 0, 255])
+        detector.draw_signs(image, sign_rects, found_signs)
+        detector.draw_traffic_light(image, 2, [detector.is_red, not detector.is_red])
+        return image
+        
 
     
     # def predcit_
@@ -469,37 +523,10 @@ if __name__ == '__main__':
                                 correct_width=1000)
         
         image = cv2.imread("perception/signs_detector/data/annotations/images/Screenshot 2024-04-28 212510.png")
+        image2 = cv2.imread("perception/signs_detector/data/annotations/images/Screenshot 2024-04-28 212510.png")
 
-        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        
-        if use_cpu == True:
-            labels = detector.seg_model.predict_one(np.array(analyze_image), device='cpu')
-        else:
-            labels = detector.seg_model.predict_one(np.array(analyze_image))
-        traffic_light_mask = np.ones_like(labels)
-        traffic_light_mask[labels != 6] = 0
-        traffic_sign_mask = np.ones_like(labels)
-        traffic_sign_mask[labels != 7] = 0
+        detector.plot_predictions(image, image2)
 
-        # Идёт прибавление по причине того, что маска светофора путается со знаками
-        # if self.is_red:
-        #     traffic_light_mask += traffic_sign_mask
-        
-        traffic_light_images, light_rects = detector.cut_image4segments(image, np.array(traffic_light_mask, dtype=np.uint8))
-        traffic_sign_images, sign_rects = detector.cut_image4segments(image, np.array(traffic_sign_mask, dtype=np.uint8))
-
-        finded_signs = []
-        if traffic_sign_images and not detector.is_red:
-            sign, finded_signs = detector.get_classify_images(traffic_sign_images)
-        #     signs_que[:size_que-1] = signs_que[1:]
-        #     signs_que[-1] = sign
-
-        detector.draw_mask(image, traffic_light_mask, [255, 0, 0])
-        detector.draw_mask(image, traffic_sign_mask, [0, 0, 255])
-        detector.draw_signs(image, sign_rects, finded_signs)
-        detector.draw_traffic_light(image, 2, [detector.is_red, not detector.is_red])
-        # detector.draw_finded_sign(image, most_common_item)
-
-        cv2.imshow("Image", image)
+        cv2.imshow("Image", image2)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
