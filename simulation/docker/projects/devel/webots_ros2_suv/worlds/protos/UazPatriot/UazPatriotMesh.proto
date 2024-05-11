@@ -1,0 +1,26 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+
+EXTERNPROTO "webots://projects/appearances/protos/GlossyPaint.proto"
+
+PROTO UazPatriotMesh [
+]
+{
+  Group {
+    children [
+      DEF UazMesh Pose {
+        translation 0 0.65 1.41
+        rotation 0 0 0 0
+        children [
+          CadShape {
+            url [
+              "models/uaz_mesh.dae"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

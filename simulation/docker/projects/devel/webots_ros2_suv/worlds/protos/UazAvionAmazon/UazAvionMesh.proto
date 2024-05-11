@@ -1,0 +1,71 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+
+EXTERNPROTO "webots://projects/appearances/protos/GlossyPaint.proto"
+EXTERNPROTO "Amazon.proto"
+
+PROTO UazAvionMesh [
+  field     SFColor  color                    0.43 0.11 0.1
+]
+{
+  Group {
+    children [
+      Amazon {}
+      DEF METALLICPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              metalness 0
+              baseColor IS color
+            }
+            geometry Mesh {
+              url [
+                "models/UazAvionBody.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF PLASTICPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.196078 0.196078 0.196078
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/UazAvionPlastic.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF LIGHTSPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 1 1
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/UazAvionLights.dae"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

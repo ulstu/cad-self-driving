@@ -1,0 +1,33 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+# template language: javascript
+
+EXTERNPROTO "webots://projects/appearances/protos/Leather.proto"
+
+PROTO TumanInterior []
+{
+  Group {
+    children [
+      DEF INTERIORPARTS Pose {
+        translation 0 1.2 1.8
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.196078 0.196078 0.196078
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/TumanInterior.dae"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

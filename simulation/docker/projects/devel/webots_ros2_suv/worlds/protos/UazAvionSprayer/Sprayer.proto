@@ -1,0 +1,104 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+
+EXTERNPROTO "webots://projects/appearances/protos/GlossyPaint.proto"
+
+PROTO Sprayer [
+]
+{
+  Group {
+    children [
+      DEF BLACKPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              metalness 0.4
+              baseColor 0.196078 0.196078 0.196078
+            }
+            geometry Mesh {
+              url [
+                "models/Sprayer/SprayerBlack.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF GLOSSYPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 1 1
+              roughness 0.01
+              metalness 1
+            }
+            geometry Mesh {
+              url [
+                "models/Sprayer/SprayerGlossy.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF GREENPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0 0.7 0
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/Sprayer/SprayerGreen.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF YELLOWPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 0.7 0
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/Sprayer/SprayerYellow.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF REDPARTS Pose {
+        translation 0 0.75 1.75
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.7 0 0
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/Sprayer/SprayerRed.dae"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
