@@ -1,0 +1,11 @@
+Webots Proto Cache File version 1.5
+protoFileHash: afac790f2ce4eacc318ae3a0c569ee98
+needsRobotAncestor: 0
+baseType: Robot
+slotType: 
+parameters: window
+tags: hidden
+license:  Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+licenseUrl:  https://cyberbotics.com/webots_assets_license
+documentationUrl: 
+info: Supervisor\sthat\smanages\sthe\sPick\sand\sPlace\sbenchmark.\n
