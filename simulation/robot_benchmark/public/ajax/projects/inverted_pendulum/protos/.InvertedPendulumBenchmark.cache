@@ -1,0 +1,11 @@
+Webots Proto Cache File version 1.5
+protoFileHash: ff247ba4c36a4e06cdc8a7f8c16fc891
+needsRobotAncestor: 1
+baseType: Robot
+slotType: 
+parameters: controllerArgs,window
+tags: hidden
+license:  Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+licenseUrl:  https://cyberbotics.com/webots_assets_license
+documentationUrl: 
+info: This\sPROTO\smanages\sthe\sinverted\spendulum\sbenchmark.\n

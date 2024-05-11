@@ -1,0 +1,119 @@
+#VRML_SIM R2020b utf8
+WorldInfo {
+  info [
+    "The humanoid sprint benchmark aims at programing a NAO robot in Python to run a 10 meter race. "
+    "The goal is to run the 10 meter as fast as possible. "
+    "All the sensors and actuators of the robot can be used to achieve the best performance. "
+    "Records are stored on the challenge web site. "
+  ]
+  title "Humanoid Sprint"
+  window "humanoid_sprint"
+  basicTimeStep 20
+  FPS 20
+  coordinateSystem "NUE"
+  contactProperties [
+    ContactProperties {
+      material1 "NAO foot material"
+      coulombFriction [
+        7
+      ]
+      bounce 0.3
+      bounceVelocity 0.003
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.4229511610638218 -0.8985389522600371 -0.11721803029483097 5.5889281
+  position -3.2842069 1.4798389 2.2429662
+  follow "NAO"
+}
+TexturedBackground {
+  texture "noon_cloudy_countryside"
+}
+TexturedBackgroundLight {
+  texture "noon_cloudy_countryside"
+  luminosity 0.4
+  castShadows FALSE
+}
+SpotLight {
+  attenuation 0 0 1
+  beamWidth 0.2
+  cutOffAngle 0.7
+  direction 0 -1 0
+  intensity 10
+  location -5 4 0.5
+  castShadows TRUE
+}
+SpotLight {
+  attenuation 0 0 1
+  beamWidth 0.2
+  cutOffAngle 0.7
+  direction 0 -1 0
+  intensity 10
+  location 0 4 0.5
+  castShadows TRUE
+}
+SpotLight {
+  attenuation 0 0 1
+  beamWidth 0.2
+  cutOffAngle 0.7
+  direction 0 -1 0
+  intensity 10
+  location 5 4 0.5
+  castShadows TRUE
+}
+DEF TRACK Floor {
+  translation 0 0 0.39
+  size 11 3
+  tileSize 11 3
+  appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "textures/nao_10m_track_base_color.jpg"
+      ]
+    }
+    roughness 1
+    roughnessMap ImageTexture {
+      url [
+        "textures/nao_10m_track_roughness.jpg"
+      ]
+    }
+    metalness 0
+    normalMap ImageTexture {
+      url [
+        "textures/nao_10m_track_normal.jpg"
+      ]
+    }
+  }
+}
+DEF GRASS Solid {
+  translation 0 -0.005 0
+  children [
+    Shape {
+      appearance Grass {
+        colorOverride 0.905486 0.988983 0.47155
+        textureTransform TextureTransform {
+          scale 20 20
+        }
+      }
+      geometry Cylinder {
+        bottom FALSE
+        height 0.001
+        radius 10
+        side FALSE
+      }
+    }
+  ]
+  name "grass"
+  model "floor"
+  locked TRUE
+}
+DEF NAO Nao {
+  translation -5.345 0.334 -0.65
+  controller "sprinter"
+}
+RaceStopwatch {
+  translation 4.73 0 -1.19623
+  rotation 0 -1 0 -1.57
+  window "humanoid_sprint"
+}
