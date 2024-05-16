@@ -5,11 +5,13 @@ import os
 import pathlib
 import numpy as np
 from PIL import Image
+import yaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
-local_path_to_cnn_model = "weights/model-ep50-signs16/"
-local_path_to_seg_model = "mobilev3large-lraspp-sign.pt"
-local_path_to_icons = "signs_icon/"
+local_path_to_cnn_model = "resource/weights/model-ep50-signs16/"
+local_path_to_seg_model = "resource/mobilev3large-lraspp-sign.pt"
+local_path_to_icons = "resource/signs_icon/"
+local_project_settings_config_path = "config/project_settings.yaml"
 
 
 class RoadSignDetectorWorker(AbstractWorker):
@@ -17,9 +19,13 @@ class RoadSignDetectorWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
 
         package_dir = get_package_share_directory(PACKAGE_NAME)
-        path_to_cnn_model = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', local_path_to_cnn_model)))
-        path_to_seg_model = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', local_path_to_seg_model)))
-        path_to_icons = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', local_path_to_icons)))
+        path_to_cnn_model = os.path.join(package_dir, local_path_to_cnn_model)
+        path_to_seg_model = os.path.join(package_dir, local_path_to_seg_model)
+        path_to_icons = os.path.join(package_dir, local_path_to_icons)
+        project_settings_config_path = os.path.join(package_dir, local_project_settings_config_path)
+
+        with open(project_settings_config_path, "r") as file:
+            project_settings_config = yaml.safe_load(file)
 
         self.detector = ImageAnalyzer(path_to_cnn_model,
                         path_to_seg_model,
@@ -27,7 +33,8 @@ class RoadSignDetectorWorker(AbstractWorker):
                         is_video=False,
                         is_red=False,
                         is_correct_size=True,
-                        correct_width=1000)
+                        correct_width=1000, 
+                        use_gpu=project_settings_config['use_gpu'])
 
     def on_event(self, event, scene=None):
         print("Emergency State")

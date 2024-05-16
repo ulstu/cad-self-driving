@@ -11,9 +11,9 @@ import torch
 
 
 class LaneLineModel:
-    def __init__(self, path: str, use_curve_line=True):
+    def __init__(self, path: str, use_curve_line=True, use_gpu=True):
         self.model = YOLO(path)
-        if torch.cuda.is_available():
+        if use_gpu and torch.cuda.is_available():
             self.model.to('cuda')
         self.use_curve_line = use_curve_line
     

@@ -80,8 +80,6 @@ import time
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-use_cpu = False
-
 HOST = "192.168.1.188"  # Standard loopback interface address (localhost)
 PORT = 65432
 
@@ -96,12 +94,14 @@ class ImageAnalyzer:
                  is_video=False,
                  is_correct_size=True,
                  correct_width=1000,
-                 video_dir='perception/signs_detector/data/road2.mp4'):
+                 video_dir='perception/signs_detector/data/road2.mp4', 
+                 use_gpu=True):
         self.is_viz = is_viz
         self.is_video = is_video
         self.delay = delay
         self.is_correct_size = is_correct_size
         self.correct_width = correct_width
+        self.use_gpu = use_gpu
         if self.is_video:
             self.cap = cv2.VideoCapture(video_dir)
 #        self.cap = cv2.VideoCapture(2)
@@ -109,12 +109,12 @@ class ImageAnalyzer:
         #     self.init_camera()
 
         #self.seg_model = MobileV3Large.from_pretrained('mobilev3large-lraspp.pt').cuda().eval()
-        if use_cpu == True:
+        if self.use_gpu == False:
             self.seg_model = MobileV3Large.from_pretrained(path_to_seg_model).eval()
         else:
             self.seg_model = MobileV3Large.from_pretrained(path_to_seg_model).cuda().eval()
         
-        if use_cpu == True:
+        if self.use_gpu == False:
             with tf.device('/CPU:0'):
                 self.cnn_model = CNN(gpu_load=0.7)
         else:
@@ -317,7 +317,7 @@ class ImageAnalyzer:
 
             analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
             
-            if use_cpu == True:
+            if self.use_gpu == False:
                 labels = self.seg_model.predict_one(np.array(analyze_image), device='cpu')
             else:
                 labels = self.seg_model.predict_one(np.array(analyze_image))
@@ -465,7 +465,7 @@ class ImageAnalyzer:
     
 
     def predict_labels(self, image):
-        if use_cpu == True:
+        if self.use_gpu == False:
             labels = self.seg_model.predict_one(np.array(image), device='cpu')
         else:
             labels = self.seg_model.predict_one(np.array(image))
@@ -503,7 +503,7 @@ class ImageAnalyzer:
     def plot_predictions(self, image, image_to_plot_on=None):
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         
-        if use_cpu == True:
+        if self.use_gpu == False:
             labels = self.seg_model.predict_one(np.array(analyze_image), device='cpu')
         else:
             labels = self.seg_model.predict_one(np.array(analyze_image))

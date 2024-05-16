@@ -13,18 +13,19 @@ from webots_ros2_suv.lib.lane_line_model import LaneLineModel
 from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask, default_palette
 from webots_ros2_suv.lib.map_builder import MapBuilder
 import cv2
+import yaml
 
-PACKAGE_NAME = 'webots_ros2_suv'
-local_model_path = 'lane_line_model/lane_line_detection_yolo8s-seg_model.pt'
-local_config_path = 'lane_line_model/config.yaml'
+PACKAGE_NAME = "webots_ros2_suv"
+local_model_path = "resource/lane_line_model/lane_line_detection_yolo8s-seg_model.pt"
+local_model_config_path = "resource/lane_line_model/config.yaml"
 
 class LaneLineDetectionWorker(AbstractWorker):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         package_dir = get_package_share_directory(PACKAGE_NAME)
-        model_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', local_model_path)))
-        config_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', local_config_path)))
+        model_path = os.path.join(package_dir, local_model_path)
+        config_path = os.path.join(package_dir, local_model_config_path)
 
         self.labels = get_label_names(config_path)
         self.lane_line_model = LaneLineModel(model_path, use_curve_line=True)
