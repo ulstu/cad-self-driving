@@ -19,6 +19,7 @@ pip install pyyaml
 pip install ultralytics
 pip install shapely
 pip install pyproj
+pip install geopy
 ```
 
 ## Установка решения

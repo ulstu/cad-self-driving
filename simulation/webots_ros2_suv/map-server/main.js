@@ -5,6 +5,7 @@ import {Circle, Fill, Stroke, Style, Icon} from 'ol/style.js';
 import {OSM, Vector as VectorSource} from 'ol/source.js';
 import GeoJSON from "ol/format/GeoJSON";
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
+import LineString from 'ol/geom/LineString.js';
 import * as ol_color from 'ol/color';
 import {useGeographic, fromLonLat} from 'ol/proj.js';
 import {getCenter} from 'ol/extent.js';
@@ -55,6 +56,19 @@ const translate = new Translate({
   source: movePointSource, 
 });
 
+let polylineSource = new VectorSource();
+let polylineLayer = new VectorLayer({
+    source: polylineSource,
+    style: new Style({
+        stroke: new Stroke({
+            color: '#FF0000',
+            width: 2
+        })
+    })
+});
+
+
+
 // Создание объекта (feature) для отображения на карте
 let ego_feature = new Feature({
   geometry: new Point(init_point),//(fromLonLat(init_point)),
@@ -82,7 +96,7 @@ const ego_vehicle_layer = new VectorLayer({
 
 // Инициализация карты с добавлением созданных слоёв
 const map = new Map({
-  layers: [raster, vector, ego_vehicle_layer, movePointLayer],
+  layers: [raster, vector, ego_vehicle_layer, movePointLayer, polylineLayer],
   target: 'map',
   view: new View({
     center: init_point,
@@ -262,6 +276,10 @@ document.getElementById('loadmap').addEventListener('click', function () {
   load_map(mapSelect.value);
 });
 
+document.getElementById('savesegment').addEventListener('click', function () {
+  $.get('/save_segment', function(data){comsole.log('path segment saved')});
+});
+
 let selected = null;
 let isPointsMoveMode = false;
 let isDeleteMode= false;
@@ -355,14 +373,52 @@ if (current_map_file != null) {
   mapSelect.value = current_map_file;
 }
 
+
+const updatePolyline = (path) => {
+  polylineSource.clear(); // Очищаем текущий источник данных
+
+  if (path.length === 0) return; // Если путь пуст, ничего не делаем
+
+  const pathFeature = new Feature({
+      geometry: new LineString(path) // Создаем линию с преобразованными координатами
+  });
+
+  // Устанавливаем стиль для линии
+  pathFeature.setStyle(new Style({
+      stroke: new Stroke({
+          color: '#FF0000', // Цвет линии
+          width: 2 // Толщина линии
+      })
+  }));
+
+  polylineSource.addFeature(pathFeature); // Добавляем новую линию
+};
+
+
+const fetchData = () => {
+    fetch('/get_driving_points')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok' && Array.isArray(data.path)) {
+                updatePolyline(data.path);
+            } else {
+                console.error('Invalid data format:', data);
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+};
+setInterval(fetchData, 2000); // Запрос каждые 2 секунды
+
+
 // периодический запрос на обновление координат ТС
 setInterval(
   () => $.get('/get_position', function(data){
     ego_feature.setGeometry(new Point([data['lat'], data['lon']]));
     ego_marker_style.getImage().setRotation(data['orientation']);
   }),
-  2000,
+  1000,
 );
+
 
 setInterval(
   () => {

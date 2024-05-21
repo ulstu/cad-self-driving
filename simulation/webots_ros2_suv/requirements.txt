@@ -8,3 +8,4 @@ pyserial
 json-rpc
 shapely
 pyproj
+geopy
