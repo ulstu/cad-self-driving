@@ -48,11 +48,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'lane_follower = webots_ros2_suv.lane_follower:main',
             'field_follower = webots_ros2_suv.field_follower:main',
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
-            'node_localmap = webots_ros2_suv.node_localmap:main',
-            'node_ego_controller = webots_ros2_suv.node_ego_controller:main'
+            'node_ego_controller = webots_ros2_suv.node_ego_controller:main',
+            'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }
