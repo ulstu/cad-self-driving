@@ -381,3 +381,25 @@ setInterval(
   },
   700,
 );
+
+setInterval(
+  () => {
+    console.log('image seg changed');
+    var unique = $.now();
+    $('#img_sign').attr('src', '/get_image?img_type=sign&tm=' + unique);
+    $.ajax({
+      url: '/get_sign_label',
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          $('#img_sign').attr('hidden', !data['detected'])
+          if (data['detected'])
+            $('#sign_text').text(data['sign']);
+      },
+      error: function() {
+        console.error('Не удалось сделать запрос на текст знака.')
+      }
+    });
+  },
+  700,
+);

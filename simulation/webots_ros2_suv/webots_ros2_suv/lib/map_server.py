@@ -104,6 +104,13 @@ class MapWebServer(object):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
             return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
 
+
+    @cherrypy.expose
+    def get_sign_label(self):
+        if self.world_model.found_sign is None:
+            return json.dumps({"detected": False, "sign": "знак не обнаружен"})
+        return json.dumps({"detected": True, "sign": self.world_model.found_sign[1]})
+
     @cherrypy.expose
     def get_image(self, img_type, tm):
         if img_type == "obj_detector":
@@ -115,6 +122,10 @@ class MapWebServer(object):
             if self.world_model.ipm_colorized_lines is None:
                 return None
             data = self.world_model.ipm_colorized_lines
+        elif img_type == "sign":
+            if self.world_model.found_sign is None:
+                return None
+            data = self.world_model.found_sign[2]
             # use StringIO to stream the image out to the browser direct from RAM
             # output = StringIO.StringIO()
             # format = 'PNG' # JPEG and other formats are available

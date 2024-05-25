@@ -65,6 +65,7 @@ class FiniteStateMachine:
     def on_event(self, event, world_model=None):
         new_states = {}
         for key, state in self.current_states.items():
+            print("#" * 30 + type(state).__name__)
             new_event = state.on_event(event, world_model)
             if new_event:
                 event = new_event

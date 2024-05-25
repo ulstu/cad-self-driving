@@ -38,6 +38,7 @@ class NodeEgoController(Node):
             self._logger.info(f'Node Ego Started')
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
+            self.__ws = None
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
@@ -54,17 +55,17 @@ class NodeEgoController(Node):
 
             self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
 
-            # Примеры событий
-            self.__fsm.on_event("start_move")
-            # self.__fsm.on_event("stop")
-            # self.__fsm.on_event("reset")
-
             # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
             with open(f'{package_dir}/config/map_config.yaml') as file:
                 with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
                     self.__world_model.load_map(yaml.safe_load(mapdatafile))
             
             self.start_web_server()
+
+            # Примеры событий
+            self.__fsm.on_event(None)
+            # self.__fsm.on_event("stop")
+            # self.__fsm.on_event("reset")
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
@@ -100,7 +101,8 @@ class NodeEgoController(Node):
         roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
         lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
         self.__world_model.update_car_pos(lat, lon, orientation)
-        self.__ws.update_model(self.__world_model)
+        if self.__ws != None:
+            self.__ws.update_model(self.__world_model)
         #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
 
 def main(args=None):

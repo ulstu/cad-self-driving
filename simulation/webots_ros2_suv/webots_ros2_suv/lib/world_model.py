@@ -9,6 +9,7 @@ from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 from .coords_transformer import CoordsTransformer
 from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask
+from ackermann_msgs.msg import AckermannDrive
 
 
 class WorldModel(object):
@@ -44,8 +45,11 @@ class WorldModel(object):
         self.global_map = None      # текущие загруженные координаты точек глобальной карты
         self.cur_path_segment = 0   # Текущий сегмент пути, заданный в редакторе карт
         self.cur_turn_polygon = None# Текущий полигон для разворота
-        self.command_message = None # Сообщение типа AckermanDrive для движения автомобиля
-
+        self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
+        self.traffic_light_state = "red" # Текущее состояние светофора
+        self.found_sign = None # Найденный знак
+    
+    
 
     def load_map(self, mapyaml):
         self.global_map = []

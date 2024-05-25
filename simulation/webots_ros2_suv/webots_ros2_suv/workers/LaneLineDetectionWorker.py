@@ -53,8 +53,7 @@ class LaneLineDetectionWorker(AbstractWorker):
             for line in line_batches[0]:
                 points_bev = []
                 for point in line.points:
-
-                    x, y = world_model.map_builder.calc_bev_point(point)
+                    x, y = world_model.map_builder.calc_bev_point([point[0], point[1] - world_model.map_builder.get_horizont_line()])
                     points_bev.append([x, y])
                 
                 points_bev = np.array(points_bev, dtype=np.int32)
@@ -66,7 +65,7 @@ class LaneLineDetectionWorker(AbstractWorker):
             for mask in mask_batches[0]:
                 points_bev = []
                 for point in mask.points:
-                    x, y = world_model.map_builder.calc_bev_point(point)
+                    x, y = world_model.map_builder.calc_bev_point([point[0], point[1] - world_model.map_builder.get_horizont_line()])
                     points_bev.append([x, y])
                 
                 points_bev = np.array(points_bev, dtype=np.int32)
@@ -81,7 +80,7 @@ class LaneLineDetectionWorker(AbstractWorker):
             world_model.lane_contours = mask_batches_bev[0]
             world_model.lane_lines = line_batches_bev[0]
 
-            draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 255, 0)], thickness=2)
+            draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 0, 255)], thickness=4)
 
             # count_points = [50, 50]
             # obj_image_size = np.array(world_model.img_front_objects_lines.shape[0:2])[::-1]

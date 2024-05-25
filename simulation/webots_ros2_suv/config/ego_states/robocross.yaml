@@ -15,7 +15,7 @@ workers:
   behavioranalysis: "BehavioralAnalysisWorker.py"
   reedsshepp: "ReedsSheppPlanningWorker.py"
 workerstates:
-  start: []
+  start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign"]
   moving: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "lightswitch", "behavioranalysis", "pathplanning"]
   stopped: []
   turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]

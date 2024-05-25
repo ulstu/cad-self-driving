@@ -24,6 +24,7 @@ data_files += generate_data_files('share/' + package_name + '/resource/', 'resou
 data_files += generate_data_files('share/' + package_name + '/config/', 'config/')
 data_files += generate_data_files('share/' + package_name + '/maps/', 'maps/')
 data_files += generate_data_files('share/' + package_name + '/map-server/', 'map-server/')
+data_files += generate_data_files('share/' + package_name + '/protos/', 'protos/')
 
 setup(
     name=package_name,

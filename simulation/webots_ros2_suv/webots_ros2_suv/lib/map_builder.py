@@ -67,7 +67,7 @@ class MapBuilder(object):
                     61: u'dining table', 62: u'toilet', 63: u'tv', 64: u'laptop', 65: u'mouse', 66: u'remote',
                     67: u'keyboard', 68: u'cell phone', 69: u'microwave', 70: u'oven', 71: u'toaster', 72: u'sink',
                     73: u'refrigerator', 74: u'book', 75: u'clock', 76: u'vase', 77: u'scissors', 78: u'teddy bear',
-                    79: u'hair drier', 80: u'toothbrush'}
+                    79: u'hair drier', 80: u'toothbrush', 81: u'plastic_drum'}
 
         return labels
 
