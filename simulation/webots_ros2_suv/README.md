@@ -36,6 +36,10 @@ source /home/user/ros2_ws/install/setup.bash
 export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
+* Также необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
+```
+https://drive.google.com/drive/folders/1g0zeD9U5zDlcSzxGUSaNpjHt7rWFJAjv?usp=drive_link
+```
 * Компиляция командой 'colcon build' из папки ~/ros2_ws 
 * Запуск командой 'ros2 launch webots_ros2_suv robot_launch.py'
 * Если стоит conda/miniconda, необходимо ее деактивировать 'conda deactivate'
