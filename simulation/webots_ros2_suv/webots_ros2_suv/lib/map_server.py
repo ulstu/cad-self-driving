@@ -139,12 +139,7 @@ class MapWebServer(object):
                 return None
             data = self.world_model.ipm_colorized
             data = np.array(data)
-            # use StringIO to stream the image out to the browser direct from RAM
-            # output = StringIO.StringIO()
-            # format = 'PNG' # JPEG and other formats are available
-            # data.save(output, format)
-            # contents = output.getvalue()
-            # output.close()
+
         cherrypy.response.headers['Content-Type'] = "image/png"
         contents = cv2.imencode('.png', data)[1].tostring()
         return contents

@@ -8,6 +8,9 @@
 ```
 sudo apt install ros-humble-nav2-common
 sudo apt install ros-humble-webots-ros2
+sudo apt-get install ros-$ROS_DISTRO-pcl-ros ros-$ROS_DISTRO-pluginlib  ros-$ROS_DISTRO-pcl-conversions
+sudo apt-get install libpcap-dev
+sudo apt-get install libboost${BOOST_VERSION}-dev 
 ```
 ## Установка пакетов python
 ```
@@ -20,6 +23,7 @@ pip install ultralytics
 pip install shapely
 pip install pyproj
 pip install geopy
+pip install open3d
 ```
 
 ## Установка решения
@@ -30,10 +34,22 @@ ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/robot_interface
 ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/webots_ros2_suv
 ```
 
-* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!)(Выполнять каждый раз при запуске):
+Для установки драйвера лидара 
+```
+ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_msgs/ lslidar_msgs
+ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_driver/ lslidar_driver
+```
+
+Для установки драйвера ZED
+```
+ln -s ~/repositories/cad-self-driving/drivers/zed-ros2-wrapper zed-ros2-wrapper
+rosdep install --from-paths src --ignore-src -r -y
+```
+
+* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
 ```
 source /opt/ros/humble/setup.bash
-source /home/max/ros2_ws/install/setup.bash
+source /home/user/ros2_ws/install/setup.bash
 export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
