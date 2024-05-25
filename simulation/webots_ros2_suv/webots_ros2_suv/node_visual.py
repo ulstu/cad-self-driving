@@ -1,12 +1,17 @@
+import os
+import struct
+from datetime import datetime
+
 import yaml
 import sensor_msgs.msg
 from ament_index_python.packages import get_package_share_directory
 from PIL import Image
+
+from .lib import point_cloud2
 from .lib.world_model import WorldModel
 from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
 import threading
-
 import rclpy
 import numpy as np
 import cv2
@@ -15,11 +20,17 @@ from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDrive
 from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
-from .lib.orientation import quaternion_from_euler, euler_from_quaternion
+from .log_server import set_lidar_hz
 import traceback
-from log_server import set_lidar_hz
+import pathlib
+import pickle
+from traceback import format_exc
 
 SENSOR_DEPTH = 40
+FPS = 0.1
+
+DATACAMERA = "/home/max/data/camera"
+DATALIDAR = "/home/max/data/lidar"
 
 
 class NodeVisual(Node):
@@ -29,53 +40,61 @@ class NodeVisual(Node):
             self._logger.info(f'Node Visual Started')
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
-            self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos)
             self.create_subscription(PointCloud2, '/vehicle/range_finder/point_cloud', self.__on_point_cloud, qos)
 
-            self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
-
-            self.__world_model = WorldModel()
-            package_dir = get_package_share_directory("webots_ros2_suv")
-
-            self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
-
-            # Примеры событий
-            self.__fsm.on_event("start_move")
-            # self.__fsm.on_event("stop")
-            # self.__fsm.on_event("reset")
-
-            # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
-            with open(f'{package_dir}/config/map_config.yaml') as file:
-                with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
-                    self.__world_model.load_map(yaml.safe_load(mapdatafile))
-
-            self.start_web_server()
+            self.__last_image_time = datetime.now()
+            self.__lidar_last_time = datetime.now()
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
-    def start_web_server(self):
-        self.__ws = MapWebServer(log=self._logger.info)
-        threading.Thread(target=start_web_server, args=[self.__ws]).start()
-
     # @timeit
     def __on_image_message(self, data):
+        if (datetime.now() - self.__last_image_time).total_seconds() < 1 / FPS:
+            return
+        self.__last_image_time = datetime.now()
         image = data.data
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
-        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
-
+        analyze_image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+        img_filename = datetime.now().strftime("%Y%m%d-%H%M%S") + ".png"
+        cv2.imwrite(os.path.join(DATACAMERA, img_filename), analyze_image)
+        self._logger.info(f'saved: {os.path.join(DATACAMERA, img_filename)}')
         # self.__world_model.rgb_image = np.asarray(analyze_image)
         # # вызов текущих обработчиков данных
         # self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
         # # вызов обработки состояний с текущими данными
         # self.__fsm.on_event(None, self.__world_model)
 
+    def set_last_time(self, last_time, set_func):
+        cur_time = self.get_clock().now()
+
+        time_diff = (cur_time - last_time).nanoseconds / 1e9
+        if time_diff == 0.0:
+            time_diff = 0.0
+        else:
+            time_diff = 1 / time_diff
+        set_func(time_diff)
+        return cur_time
+
     def __on_point_cloud(self, data):
         try:
-            self.__lidar_last_time = self.set_last_time(self.__lidar_last_time, set_lidar_hz)
-            p = data
-            print(PointCloud2(p))
+            if (datetime.now() - self.__lidar_last_time).total_seconds() < 1 / FPS:
+                return
+            self.__lidar_last_time = datetime.now()
+            # assert isinstance(data, PointCloud2)
+            self._logger.info(f'type: {type(data)}')
+            filename = datetime.now().strftime("%Y%m%d-%H%M%S")
+            try:
+                points = point_cloud2.read_points(data)
+                lst = []
+                for p in points:
+                    lst.append(np.array(p))
+                a = np.array(lst)
+                np.save(os.path.join(DATALIDAR, filename), a)
+                self._logger.info(f'saved: {os.path.join(DATALIDAR, filename)}')
+            except Exception as err:
+                self._logger.info(f'Exception occurred: {type(err).__name__}, Message: {format_exc()}')
             # p.header.stamp = self.get_clock().now().to_msg()
             # p.header.frame_id = 'base_link'
             # self.__pc_publisher.publish(p)

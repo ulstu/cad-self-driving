@@ -30,10 +30,10 @@ ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/robot_interface
 ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/webots_ros2_suv
 ```
 
-* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
+* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!)(Выполнять каждый раз при запуске):
 ```
 source /opt/ros/humble/setup.bash
-source /home/user/ros2_ws/install/setup.bash
+source /home/max/ros2_ws/install/setup.bash
 export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
