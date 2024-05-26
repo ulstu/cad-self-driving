@@ -89,6 +89,8 @@ class ImageAnalyzer:
                  path_to_seg_model,
                  path_to_icons,
                  is_red=False,
+                 traffic_light_queue_length=16,
+                 sign_queue_length=16,
                  delay=5, 
                  is_viz=True, 
                  is_video=False,
@@ -102,6 +104,11 @@ class ImageAnalyzer:
         self.is_correct_size = is_correct_size
         self.correct_width = correct_width
         self.use_gpu = use_gpu
+        self.sign = 0
+        self.traffic_light_state = "red"
+        self.traffic_light_queue = [self.traffic_light_state] * traffic_light_queue_length
+        self.sign_queue = [-1] * sign_queue_length
+
         if self.is_video:
             self.cap = cv2.VideoCapture(video_dir)
 #        self.cap = cv2.VideoCapture(2)
@@ -114,13 +121,15 @@ class ImageAnalyzer:
         else:
             self.seg_model = MobileV3Large.from_pretrained(path_to_seg_model).cuda().eval()
         
-        if self.use_gpu == False:
-            with tf.device('/CPU:0'):
-                self.cnn_model = CNN(gpu_load=0.7)
-        else:
-            self.cnn_model = CNN(gpu_load=0.7)
+        # if self.use_gpu == False:
+        #     with tf.device('/CPU:0'):
+        #         self.cnn_model = CNN(gpu_load=0.7)
+        # else:
+        #     self.cnn_model = CNN(gpu_load=0.7)
 
-        self.cnn_model.load_model(path_to_cnn_model)
+        with tf.device('/CPU:0'):
+            self.cnn_model = CNN(gpu_load=0.7)
+            self.cnn_model.load_model(path_to_cnn_model)
         print('init model')
         self.count = 0
         self.is_red = is_red
@@ -259,6 +268,18 @@ class ImageAnalyzer:
                 lights = 'green'
             #print(f'Светофор: {lights}')
         return lights
+    
+    def to_update_traffic_light_state(self, traffic_light_state):
+        self.traffic_light_queue[:len(self.traffic_light_queue) - 1] = self.traffic_light_queue[1:]
+        self.traffic_light_queue[-1] = traffic_light_state
+        self.traffic_light_state = max(self.traffic_light_queue, key=self.traffic_light_queue.count)
+        self.is_red = self.traffic_light_state == "red"
+
+    def to_update_sign_state(self, found_signs):
+        self.sign_queue[:len(self.sign_queue) - 1] = self.sign_queue[1:]
+        self.sign_queue[-1] = max(found_signs, key=lambda x: x[1])[0] if len(found_signs) > 0 else -1
+        self.sign = max(self.sign_queue, key=self.sign_queue.count)
+
 
 
     def get_classify_images(self, images):
@@ -424,11 +445,11 @@ class ImageAnalyzer:
                            padding=5, 
                            radius=20, 
                            offset=5):
-        lb_traffic_light_possition = np.array([margin, image.shape[0] - margin])
         traffic_light_height = (radius * 2 + offset) * count_circles - offset + padding * 2
         traffic_light_width = padding * 2 + radius * 2
         traffic_light_size = [traffic_light_width, traffic_light_height]
-        
+
+        lb_traffic_light_possition = np.array([image.shape[1] - traffic_light_width - margin, image.shape[0] - margin])
         lt_traffic_light_position = lb_traffic_light_possition - np.array([0, traffic_light_height])
         
         image_mask = np.zeros_like(image)
@@ -494,13 +515,13 @@ class ImageAnalyzer:
         traffic_sign_images, sign_rects = self.cut_image4segments(image, np.array(traffic_sign_mask, dtype=np.uint8))
 
         found_signs = []
-        if traffic_sign_images and not self.is_red:
+        if traffic_sign_images is not None and len(traffic_sign_images) > 0:
             sign, found_signs = self.get_classify_images(traffic_sign_images)
         
         return traffic_sign_mask, traffic_sign_images, sign_rects, found_signs
 
 
-    def plot_predictions(self, image, image_to_plot_on=None):
+    def plot_predictions(self, image, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         
         if self.use_gpu == False:
@@ -511,11 +532,18 @@ class ImageAnalyzer:
         traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, labels)
         traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
 
+        if update_traffic_light_state and len(traffic_light_images) > 0:
+            traffic_light_state = self.classify_traffic_light(traffic_light_images)
+            self.to_update_traffic_light_state(traffic_light_state)
+        
+        if update_sign_state:
+            self.to_update_sign_state(found_signs)
+
         if image_to_plot_on is not None:
             image = image_to_plot_on
 
-        self.draw_mask(image, traffic_light_mask, [255, 0, 0])
-        self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
+        # self.draw_mask(image, traffic_light_mask, [255, 0, 0])
+        # self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
         self.draw_signs(image, sign_rects, found_signs)
         self.draw_traffic_light(image, 2, [self.is_red, not self.is_red])
         return image
@@ -525,7 +553,7 @@ class ImageAnalyzer:
     # def predcit_
 
         
-    def draw_signs(self, image, sign_rects, sign_values, color=(0, 255, 0), icon_color=(255, 0, 0), thickness=2, min_value=0.8, icon_ratio=0.7, min_icon_size=30):
+    def draw_signs(self, image, sign_rects, sign_values, color=(0, 255, 0), icon_color=(255, 0, 0), thickness=2, min_value=0.7, icon_ratio=0.7, min_icon_size=30):
         for idx, (label, value) in enumerate(sign_values):
             if value >= min_value:
                 x, y, w, h = sign_rects[idx]
