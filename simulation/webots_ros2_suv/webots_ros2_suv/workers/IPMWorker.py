@@ -16,7 +16,7 @@ class IPMWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
 
-        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l.pt',
+        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
 
     def __save_image_files(self, labels, composited, source):

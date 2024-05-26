@@ -39,6 +39,15 @@ class NodeEgoController(Node):
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__ws = None
+
+            self.__world_model = WorldModel()
+            package_dir = get_package_share_directory("webots_ros2_suv")
+
+            # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
+            with open(f'{package_dir}/config/map_config.yaml') as file:
+                with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
+                    self.__world_model.load_map(yaml.safe_load(mapdatafile))
+
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
@@ -49,18 +58,10 @@ class NodeEgoController(Node):
             self.create_subscription(sensor_msgs.msg.Image, '/vehicle/range_finder/image', self.__on_range_image_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
-
-            self.__world_model = WorldModel()
-            package_dir = get_package_share_directory("webots_ros2_suv")
-
-            self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
-
-            # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
-            with open(f'{package_dir}/config/map_config.yaml') as file:
-                with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
-                    self.__world_model.load_map(yaml.safe_load(mapdatafile))
             
             self.start_web_server()
+
+            self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
 
             # Примеры событий
             self.__fsm.on_event(None)
@@ -75,34 +76,38 @@ class NodeEgoController(Node):
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
 
     def __on_range_image_message(self, data):
-        image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
-        image[image == np.inf] = SENSOR_DEPTH
-        image[image == -np.inf] = 0
-        self.__world_model.range_image = image / SENSOR_DEPTH
-        #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
+        if self.__world_model:
+            image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
+            image[image == np.inf] = SENSOR_DEPTH
+            image[image == -np.inf] = 0
+            self.__world_model.range_image = image / SENSOR_DEPTH
+            #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
 
     def drive(self):
-        self.__ackermann_publisher.publish(self.__world_model.command_message)
+        if self.__world_model:
+            self.__ackermann_publisher.publish(self.__world_model.command_message)
 
     #@timeit
     def __on_image_message(self, data):
-        image = data.data
-        image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
-        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
+        if self.__world_model:
+            image = data.data
+            image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
+            analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
 
-        self.__world_model.rgb_image = np.asarray(analyze_image)
-        # вызов текущих обработчиков данных
-        self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
-        # вызов обработки состояний с текущими данными
-        self.__fsm.on_event(None, self.__world_model)
-        self.drive()
+            self.__world_model.rgb_image = np.asarray(analyze_image)
+            # вызов текущих обработчиков данных
+            self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
+            # вызов обработки состояний с текущими данными
+            self.__fsm.on_event(None, self.__world_model)
+            self.drive()
 
     def __on_gps_message(self, data):
-        roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
-        lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-        self.__world_model.update_car_pos(lat, lon, orientation)
-        if self.__ws != None:
-            self.__ws.update_model(self.__world_model)
+        if self.__world_model:
+            roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
+            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            self.__world_model.update_car_pos(lat, lon, orientation)
+            if self.__ws != None:
+                self.__ws.update_model(self.__world_model)
         #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
 
 def main(args=None):

@@ -11,8 +11,8 @@ class StartState(AbstractState):
     def on_event(self, event, world_model=None):
         super().log("Start State")
         #self.drive(world_model, speed=0)
-
-        if world_model.traffic_light_state == "green":
-            return "start_move"
+        if world_model:
+            if world_model.traffic_light_state == "green":
+                return "start_move"
         return None
 

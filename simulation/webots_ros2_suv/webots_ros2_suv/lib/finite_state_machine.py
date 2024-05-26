@@ -90,7 +90,7 @@ class FiniteStateMachine:
     def on_data(self, world_model, source="general"):
         for idx, (key, worker) in enumerate(self.current_workers.items()):
             #self.node._logger.info(f'Invoking on_data event from {source} on worker {str(worker)} ')
-            #print(f"{'T' * 30}  id: {idx}   worker name: {type(worker).__name__}")
+            print(f"{'T' * 250}  id: {idx}   worker name: {type(worker).__name__}")
             world_model = worker.on_data(world_model)
             #worker.test()
         return world_model
