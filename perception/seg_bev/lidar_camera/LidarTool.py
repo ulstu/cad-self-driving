@@ -21,8 +21,8 @@ class LidarTool:
     def get_points(self):
         return self.points
 
-    def get_XYPlane_colored_by_height(self, scale_factor=10):
-        img_size = (50 * scale_factor, 50 * scale_factor)  # Размер изображения
+    def get_XYPlane_colored_by_height(self, size, scale_factor=10):
+        img_size = (size[0] * scale_factor, size[1] * scale_factor)  # Размер изображения
 
         x = self.points[:, 0]
         max_x = np.max(x[x != 100])
@@ -41,8 +41,6 @@ class LidarTool:
         z_normal, miz, maz = self.normalize_points(z)
         print(z_normal, miz, maz)
 
-
-
         # # Создание пустого изображения
         image = np.zeros((img_size[0], img_size[1], 3), dtype=np.uint8)
         #
@@ -52,12 +50,11 @@ class LidarTool:
 
         return image, miz, maz
 
-
-    def get_YZPlane_colored_by_height(self, scale_factor=10):
+    def get_YZPlane_colored_by_height(self, size, scale_factor=10):
         # # Предполагаем, что point_cloud - это массив Nx3 (N точек, каждая имеет координаты x, y, z)
         #
         # # Нормализация x и y для размера изображения
-        img_size = (50 * scale_factor, 50 * scale_factor)  # Размер изображения
+        img_size = (size[0] * scale_factor, size[1] * scale_factor)  # Размер изображения
 
         x = self.points[:, 2]
         max_x = np.max(x[x != 100])
