@@ -9,6 +9,7 @@ from ament_index_python.packages import get_package_share_directory
 from fastseg import MobileV3Large
 from fastseg.image import colorize, blend
 from webots_ros2_suv.lib.timeit import timeit
+import cv2
 
 PACKAGE_NAME = 'webots_ros2_suv'
 
@@ -41,8 +42,6 @@ class SemanticSegmentationWorker(AbstractWorker):
             world_model.seg_image = np.asarray(world_model.seg_image)
             world_model.seg_colorized = np.asarray(world_model.seg_colorized)
             world_model.seg_composited = np.asarray(world_model.seg_composited)
-
-            #super().log("SemanticSegmentationWorker data proceed")
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))
         

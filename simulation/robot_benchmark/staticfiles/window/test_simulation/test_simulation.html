@@ -1,0 +1,34 @@
+<div id='infotabs' class='webotsTabs webotsRobotWindowTabs'>
+  <ul>
+    <li><a href='#infotab-overview'>Обзор</a></li>
+    <li><a href='#infotab-metrics'>Метрики</a></li>
+    <li><a href='#infotab-instructions'>Инструкции</a></li>
+  </ul>
+  <div id='infotab-overview'>
+    <p>Цель упражнения: познакомиться с функцией setPosition()</p>
+    <p>На вкладке <a class='tablink' onclick='$("#infotabs").tabs({active:1});'>Метрики</a> вы можете посмотреть насколько вы близки к решению упражнения</p>
+    <p>На вкладке <a class='tablink' onclick='$("#infotabs").tabs({active:2});'>Инструкции</a> объясняется как можно редактировать контроллер робота</p>
+  </div>
+  <div id='infotab-metrics'>
+    <div style='text-align:center' title='Your performance increases as you get closer to the target position.'>
+      <span id='achievement'>0%</span></div>
+    <br>
+    <p>Ваша задача: сделать так, чтобы робот проехал 20 см по прямой и остановился. Функция setPosition(x) поворачивает колесо на x радианов. В упражнении используется робот e-puck. Радиус колеса этого робота 20 мм.
+     На вкладке <a class='tablink' onclick='$("#infotabs").tabs({active:2});'>Инструкции</a> подробно объясняется как редактировать исходный код контроллера</p>
+  </div>
+  <div id='infotab-instructions'>
+    <h2>Программирование роботов на языке Python</h2>
+     <ol>
+      <li><b>Откройте редактор исходного кода</b>: кликните на роботе правой кнопкой мыши и выберите пункт "Edit controller". После этого откроется исходный код контроллера.
+      </li>
+      <li><b>Отредактируйте контроллер</b>: на 9 строке измените значение переменной <em>position</em></li>
+      <li><b>Сохраните программу</b>: Нажмите на кнопку сохранения или воспользуйтесь комбинацией клавиш Ctrl+S.
+      </li>
+      <li><b>Перезапустите симуляцию</b></li>
+      <li><b>Проверьте ваш результат</b>: После перезапуска симуляции робот будет двигаться прямо. Ваш результат будет обновляться в реальном времени на вкладке
+       <a class='tablink' onclick='$("#infotabs").tabs({active:1});'>Метрики</a>.
+       Вы можете в любой момент отредактировать контроллер и перезапустить симуляцию, чтобы достичь лучшего результата.
+      </li>
+     </ol>
+  </div>
+</div>

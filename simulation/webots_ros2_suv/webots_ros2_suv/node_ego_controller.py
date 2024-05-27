@@ -24,6 +24,7 @@ from .lib.world_model import WorldModel
 from .lib.orientation import euler_from_quaternion
 from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
+from .lib.param_loader import ParamLoader
 import threading
 
 from robot_interfaces.srv import PoseService
@@ -51,11 +52,12 @@ class NodeEgoController(Node):
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
+            param = ParamLoader()
             self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos)
-            # self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos, callback_group=callback_group_img)
-            self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos)
-            #self.create_subscription(sensor_msgs.msg.Image, '/vehicle/left_wing_camera/image_color', self.__on_left_image_message, qos)
-            self.create_subscription(sensor_msgs.msg.Image, '/vehicle/range_finder/image', self.__on_range_image_message, qos)
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image"), self.__on_image_message, qos)
+            self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar"), self.__on_lidar_message, qos)
+            self._logger.info(f'Lidar {param.get_param("lidar")}')
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image"), self.__on_range_image_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             
@@ -74,6 +76,9 @@ class NodeEgoController(Node):
     def start_web_server(self):
         self.__ws = MapWebServer(log=self._logger.info)
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
+
+    def __on_lidar_message(self, data):
+        pass
 
     def __on_range_image_message(self, data):
         if self.__world_model:
@@ -100,6 +105,8 @@ class NodeEgoController(Node):
             # вызов обработки состояний с текущими данными
             self.__fsm.on_event(None, self.__world_model)
             self.drive()
+            if self.__ws != None:
+                self.__ws.update_model(self.__world_model)
 
     def __on_gps_message(self, data):
         if self.__world_model:

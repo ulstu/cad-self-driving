@@ -1,0 +1,109 @@
+#VRML_SIM R2020b utf8
+WorldInfo {
+  info [
+    "The BB-8 robot has to climb out of the pit."
+  ]
+  title "Pit Escape"
+  window "pit_escape"
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.033692242186570645 0.995861522966379 0.0844077004278979 2.1665993209762484
+  position 6.002781727260681 2.413334548520888 -4.013202495503281
+}
+TexturedBackground {
+  texture "mars"
+}
+SpotLight {
+  attenuation 0 0 1
+  beamWidth 0.7
+  color 0.83 0.83 0.75
+  direction 4 -2 -4
+  intensity 40
+  location -10 5 10
+  radius 50
+  castShadows TRUE
+}
+DEF GROUND Solid {
+  children [
+    Transform {
+      translation -0.3 0 115
+      children [
+        Shape {
+          appearance SandyGround {
+            textureTransform TextureTransform {
+              scale 500 210
+            }
+          }
+          geometry Plane {
+            size 500 210
+          }
+          castShadows FALSE
+        }
+      ]
+    }
+    Transform {
+      translation -0.3 0 -115
+      children [
+        Shape {
+          appearance SandyGround {
+            textureTransform TextureTransform {
+              scale 500 210
+            }
+          }
+          geometry Plane {
+            size 500 210
+          }
+          castShadows FALSE
+        }
+      ]
+    }
+    Transform {
+      translation 130 0 0
+      children [
+        Shape {
+          appearance SandyGround {
+            textureTransform TextureTransform {
+              scale 240 20
+            }
+          }
+          geometry Plane {
+            size 240 20
+          }
+          castShadows FALSE
+        }
+      ]
+    }
+    Transform {
+      translation -130 0 0
+      children [
+        Shape {
+          appearance SandyGround {
+            textureTransform TextureTransform {
+              scale 240 20
+            }
+          }
+          geometry Plane {
+            size 240 20
+          }
+          castShadows FALSE
+        }
+      ]
+    }
+  ]
+}
+DEF PIT Pit {
+  size 20 4 20
+  appearance SandyGround {
+    textureTransform TextureTransform {
+      scale 30 30
+    }
+  }
+  pitRadius 2.7
+}
+DEF ROBOT_BB-8 BB-8 {
+  translation 0 -0.02 0
+  controller "pit_escape"
+}
+PitEscapeBenchmark {
+}

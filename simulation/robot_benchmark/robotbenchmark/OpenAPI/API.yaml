@@ -1,0 +1,1291 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api/commands/:
+    get:
+      operationId: commands_retrieve
+      description: Исполняет первую команду в очереди и удаляет ее из очереди
+      tags:
+      - commands
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/finish/{problemuser_id}:
+    get:
+      operationId: finish_retrieve
+      description: Удаляет докер контейнер и файлы в ОС пользователя по айди записи
+        в таблице ProblemUser
+      parameters:
+      - in: path
+        name: problemuser_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - finish
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/leaderboard/:
+    get:
+      operationId: leaderboard_retrieve
+      description: Return Общий Leaderboard
+      tags:
+      - leaderboard
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/leaderboard/problem/{problem_id}/:
+    get:
+      operationId: leaderboard_problem_retrieve
+      description: Return Leaderboard определённой задачи
+      parameters:
+      - in: path
+        name: problem_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leaderboard
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/leaderboard/tournament/{tournament_id}/:
+    get:
+      operationId: leaderboard_tournament_retrieve
+      description: Return Leaderboard определённого турнира
+      parameters:
+      - in: path
+        name: tournament_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leaderboard
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/problem/:
+    get:
+      operationId: problem_list
+      summary: Получение списка задач
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: title
+        schema:
+          type: string
+      tags:
+      - problems
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Problem'
+          description: ''
+    post:
+      operationId: problem_create
+      summary: Создание задачи
+      tags:
+      - problems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Problem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Problem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Problem'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: ''
+  /api/problem/{id}/:
+    get:
+      operationId: problem_retrieve
+      summary: Детальная информация о задаче
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem.
+        required: true
+      tags:
+      - problems
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: ''
+    put:
+      operationId: problem_update
+      summary: Обновление данных о задачи
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem.
+        required: true
+      tags:
+      - problems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Problem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Problem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Problem'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: ''
+    patch:
+      operationId: problem_partial_update
+      summary: Обновление с необязательными полями задачи
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem.
+        required: true
+      tags:
+      - problems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProblem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProblem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProblem'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: ''
+    delete:
+      operationId: problem_destroy
+      summary: Удаление задачи
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem.
+        required: true
+      tags:
+      - problems
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: ''
+  /api/token/:
+    post:
+      operationId: token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/tournament/:
+    get:
+      operationId: tournament_list
+      description: ViewSet Соревнования
+      summary: Получение списка соревнований
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      tags:
+      - tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tournament'
+          description: ''
+    post:
+      operationId: tournament_create
+      description: ViewSet Соревнования
+      summary: Создание соревнования
+      tags:
+      - tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+          description: ''
+  /api/tournament/{id}/:
+    get:
+      operationId: tournament_retrieve
+      description: ViewSet Соревнования
+      summary: Детальная информация о соревновании
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament.
+        required: true
+      tags:
+      - tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+          description: ''
+    put:
+      operationId: tournament_update
+      description: ViewSet Соревнования
+      summary: Обновление данных о соревновании
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament.
+        required: true
+      tags:
+      - tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+          description: ''
+    patch:
+      operationId: tournament_partial_update
+      description: ViewSet Соревнования
+      summary: Обновление с необязательными полями соревнования
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament.
+        required: true
+      tags:
+      - tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTournament'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTournament'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTournament'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+          description: ''
+    delete:
+      operationId: tournament_destroy
+      description: ViewSet Соревнования
+      summary: Удаление соревнования
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament.
+        required: true
+      tags:
+      - tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+          description: ''
+  /api/users/:
+    get:
+      operationId: users_list
+      summary: Получение списка пользователей
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: users_create
+      summary: Создание пользователя
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users-problem/:
+    get:
+      operationId: users_problem_list
+      summary: Детальная информация о всех задачах пользователей
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      tags:
+      - users-problem
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProblemUser'
+          description: ''
+    post:
+      operationId: users_problem_create
+      summary: Создание задачах пользователю
+      tags:
+      - users-problem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemUser'
+          description: ''
+  /api/users-problem/{id}/:
+    get:
+      operationId: users_problem_retrieve
+      summary: Детальная информация о задачах пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem user.
+        required: true
+      tags:
+      - users-problem
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemUser'
+          description: ''
+    put:
+      operationId: users_problem_update
+      summary: Обновление данных о задачах пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem user.
+        required: true
+      tags:
+      - users-problem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProblemUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemUser'
+          description: ''
+    patch:
+      operationId: users_problem_partial_update
+      summary: Обновление с необ. полями задачах пользователю
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem user.
+        required: true
+      tags:
+      - users-problem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProblemUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProblemUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProblemUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemUser'
+          description: ''
+    delete:
+      operationId: users_problem_destroy
+      summary: Удаление задачах пользователю
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this problem user.
+        required: true
+      tags:
+      - users-problem
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemUser'
+          description: ''
+  /api/users-tournament/:
+    get:
+      operationId: users_tournament_list
+      summary: Детальная информация о всех соревнованиях пользователей
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      tags:
+      - users-tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TournamentUser'
+          description: ''
+    post:
+      operationId: users_tournament_create
+      summary: Создание соревнования пользователю
+      tags:
+      - users-tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUser'
+          description: ''
+  /api/users-tournament/{id}/:
+    get:
+      operationId: users_tournament_retrieve
+      summary: Детальная информация о соревнованиях пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament user.
+        required: true
+      tags:
+      - users-tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUser'
+          description: ''
+    put:
+      operationId: users_tournament_update
+      summary: Обновление данных о соревновании пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament user.
+        required: true
+      tags:
+      - users-tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TournamentUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUser'
+          description: ''
+    patch:
+      operationId: users_tournament_partial_update
+      summary: Обновление с необ. полями соревнования пользователю
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament user.
+        required: true
+      tags:
+      - users-tournament
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTournamentUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTournamentUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTournamentUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUser'
+          description: ''
+    delete:
+      operationId: users_tournament_destroy
+      summary: Удаление соревнования пользователю
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tournament user.
+        required: true
+      tags:
+      - users-tournament
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUser'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      summary: Детальная информация пользователе
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      summary: Обновление данных о пользователе
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      summary: Обновление с необязательными полями пользователей
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      summary: Удаление пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+components:
+  schemas:
+    PatchedProblem:
+      type: object
+      description: Сериализатор для модель соревнования
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        world_path:
+          $ref: '#/components/schemas/WorldPathEnum'
+        image:
+          type: string
+          format: uri
+          nullable: true
+        difficulty:
+          type: number
+          format: double
+        author:
+          type: integer
+        users:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+    PatchedProblemUser:
+      type: object
+      description: Сериализатор для модели many-to-many Соревнования-Пользователи
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        is_completed:
+          type: boolean
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        robot_panel_port:
+          type: integer
+          readOnly: true
+        vs_port:
+          type: integer
+          readOnly: true
+        webots_stream_port:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+        problem:
+          type: integer
+    PatchedTournament:
+      type: object
+      description: Сериализатор для модель соревнования
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 5000
+        date_start:
+          type: string
+          format: date-time
+          readOnly: true
+        date_end:
+          type: string
+          format: date-time
+        problems:
+          type: array
+          items:
+            type: integer
+        users:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+    PatchedTournamentUser:
+      type: object
+      description: Сериализатор для модель many-to-many Соревнования-Пользователи
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        is_completed:
+          type: boolean
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        user:
+          type: integer
+        tournament:
+          type: integer
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+    Problem:
+      type: object
+      description: Сериализатор для модель соревнования
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        world_path:
+          $ref: '#/components/schemas/WorldPathEnum'
+        image:
+          type: string
+          format: uri
+          nullable: true
+        difficulty:
+          type: number
+          format: double
+        author:
+          type: integer
+        users:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+      required:
+      - author
+      - difficulty
+      - id
+      - title
+      - users
+      - world_path
+    ProblemUser:
+      type: object
+      description: Сериализатор для модели many-to-many Соревнования-Пользователи
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        is_completed:
+          type: boolean
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        robot_panel_port:
+          type: integer
+          readOnly: true
+        vs_port:
+          type: integer
+          readOnly: true
+        webots_stream_port:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+        problem:
+          type: integer
+      required:
+      - id
+      - problem
+      - robot_panel_port
+      - user
+      - vs_port
+      - webots_stream_port
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    Tournament:
+      type: object
+      description: Сериализатор для модель соревнования
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 5000
+        date_start:
+          type: string
+          format: date-time
+          readOnly: true
+        date_end:
+          type: string
+          format: date-time
+        problems:
+          type: array
+          items:
+            type: integer
+        users:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+      required:
+      - date_end
+      - date_start
+      - description
+      - id
+      - name
+      - problems
+      - users
+    TournamentUser:
+      type: object
+      description: Сериализатор для модель many-to-many Соревнования-Пользователи
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        is_completed:
+          type: boolean
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        user:
+          type: integer
+        tournament:
+          type: integer
+      required:
+      - id
+      - tournament
+      - user
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+      required:
+      - id
+      - password
+      - username
+    WorldPathEnum:
+      enum:
+      - webots_ros2_suv
+      - webots_ros2_tesla
+      - webots_ros2_control
+      - webots_ros2_driver
+      - webots_ros2_epuck
+      - webots_ros2_importer
+      - webots_ros2_mavic
+      - webots_ros2_msgs
+      - webots_ros2_tests
+      - webots_ros2_tiago
+      - webots_ros2_turtlebot
+      - webots_ros2_universal_robot
+      type: string
+      description: |-
+        * `webots_ros2_suv` - webots_ros2_suv
+        * `webots_ros2_tesla` - webots_ros2_tesla
+        * `webots_ros2_control` - webots_ros2_control
+        * `webots_ros2_driver` - webots_ros2_driver
+        * `webots_ros2_epuck` - webots_ros2_epuck
+        * `webots_ros2_importer` - webots_ros2_importer
+        * `webots_ros2_mavic` - webots_ros2_mavic
+        * `webots_ros2_msgs` - webots_ros2_msgs
+        * `webots_ros2_tests` - webots_ros2_tests
+        * `webots_ros2_tiago` - webots_ros2_tiago
+        * `webots_ros2_turtlebot` - webots_ros2_turtlebot
+        * `webots_ros2_universal_robot` - webots_ros2_universal_robot
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

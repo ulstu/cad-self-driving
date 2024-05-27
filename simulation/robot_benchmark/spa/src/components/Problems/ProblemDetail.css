@@ -1,0 +1,16 @@
+.editor-col, .robot-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .editor-col .ant-row, .robot-col .ant-row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  .editor-col > .ant-col, .robot-col > .ant-col {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  

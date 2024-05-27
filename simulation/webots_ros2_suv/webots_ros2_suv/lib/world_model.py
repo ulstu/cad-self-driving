@@ -91,9 +91,9 @@ class WorldModel(object):
         # cv2.imshow("yolo drawing", self.img_front_objects)
 
 
-        #cv2.imshow("composited image", np.asarray(colorize(world_model.ipm_seg)))
-        #img_tracks = draw_absolute_tracks(self.__track_history_bev, 500, 500, self._logger)
-        #cv2.imshow("yolo drawing", img_tracks)
+        # #cv2.imshow("composited image", np.asarray(colorize(world_model.ipm_seg)))
+        # #img_tracks = draw_absolute_tracks(self.__track_history_bev, 500, 500, self._logger)
+        # #cv2.imshow("yolo drawing", img_tracks)
 
 
         # if cv2.waitKey(10) & 0xFF == ord('q'):

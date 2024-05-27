@@ -26,8 +26,8 @@ from PIL import Image
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
 
-#BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
-BASE_PATH = BASE_RESOURCE_PATH
+BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
+#BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
 YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
 MAPS_PATH = BASE_PATH + 'config/global_maps/'
@@ -40,21 +40,44 @@ class MapWebServer(object):
                 log = print
             self.log = log
             self.world_model = None
+            self.init_driving_path()
         except  Exception as err:
             self.log(''.join(traceback.TracebackException.from_exception(err).format()))
     
     def update_model(self, world_model):
         self.world_model = world_model
 
+    def init_driving_path(self):
+        self.driving_points = []
+        self.driving_points_path = f"{os.path.expanduser('~')}/ros2_ws/path_{time.strftime('%Y%m%d-%H%M%S')}.json"
+
+
     @cherrypy.expose
     def index(self):
         raise cherrypy.HTTPRedirect("static/index.html")
+
+    @cherrypy.expose
+    def save_segment(self):
+        self.init_driving_path()
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_driving_points(self):
+        try:
+            return {'status' : 'ok', 'path': self.driving_points}
+        except Exception as e:
+            return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
+
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_position(self):
         try:
             pos = self.world_model.get_current_position()
+            self.driving_points.append([pos[0], pos[1]])
+            with open(self.driving_points_path, 'a') as f:
+                f.write(f"[{pos[0]},{pos[1]}],\n")
+
             if pos:
                 return {'status' : 'ok', 'lat': pos[0], 'lon': pos[1], 'orientation': pos[2]}
             else:
