@@ -124,7 +124,8 @@ class MapBuilder(object):
             l = self.get_labels()[label_num]
             p1 = (int(tbs[i][0] - widths[i] / 0.45), int(tbs[i][1] - widths[i] / 0.8))
             p2 = (int(tbs[i][0] + widths[i] / 0.45), int(tbs[i][1]))
-            ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
+            # Метод colorize имеет ограниченный размер палитры, поэтому ипользуется модуляция. Лучше исправить потом
+            ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num % 18 
         return ipm_image
 
     def track_objects(self, results, ipm_image, pos=(0, 0, 0), only_train=False):

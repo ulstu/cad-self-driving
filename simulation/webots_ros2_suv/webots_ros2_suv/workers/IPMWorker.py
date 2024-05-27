@@ -49,6 +49,7 @@ class IPMWorker(AbstractWorker):
 
             results = self.__map_builder.detect_objects(image)
             cboxes = results[0].boxes.data.cpu()
+            print(results[0].boxes.cls)
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
