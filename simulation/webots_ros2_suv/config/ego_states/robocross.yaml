@@ -2,6 +2,7 @@ states_dir: "robocross/"
 states:
   start: "StartState.py"
   moving: "MovingState.py"
+  gps_follow: "GPSFollowState.py"
   stopped: "StoppedState.py"
   emergency: "EmergencyState.py"
   turn: "TurnState.py"
@@ -16,22 +17,26 @@ workers:
 workerstates:
   start: []
   moving: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  gps_follow: ["semanticsegmentation", "ipm", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   stopped: []
   turn: ["semanticsegmentation", "ipm", "reedsshepp"]
   emergency: []
 transitions:
   start:
-    start_move: ["moving"]
+    start_move: ["gps_follow"]
     stop: ["stopped"]
+  gps_follow:
+    stop: ["stopped", "emergency"]
+    turn: ["turn"]
   moving:
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   stopped:
-    start_move: ["moving"]
+    start_move: ["gps_follow"]
   emergency:
     reset: ["start"]
   turn:
-    start_move: ["moving"]
+    start_move: ["gps_follow"]
     stop: ["stopped", "emergency"]
 map-elements:
   - element:
@@ -44,6 +49,11 @@ map-elements:
     name: !!str Зона  финиша
     ol-type: !!str Polygon
     color: !!str ff0000
+  - element:
+    id: "speed20"
+    name: !!str Скорость 20
+    ol-type: !!str Polygon
+    color: !!str fe00f0
   - element:
     id: "turn"
     name: !!str Зона разворота

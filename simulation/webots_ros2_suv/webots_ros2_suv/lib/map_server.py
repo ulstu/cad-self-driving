@@ -49,7 +49,7 @@ class MapWebServer(object):
 
     def init_driving_path(self):
         self.driving_points = []
-        self.driving_points_path = f"{os.path.expanduser('~')}/ros2_ws/path_{time.strftime('%Y%m%d-%H%M%S')}.json"
+        self.driving_points_path = f"{os.path.expanduser('~')}/ros2_ws/data/paths/path_{time.strftime('%Y%m%d-%H%M%S')}.json"
 
 
     @cherrypy.expose

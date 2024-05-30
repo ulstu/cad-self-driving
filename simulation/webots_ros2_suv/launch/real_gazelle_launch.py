@@ -39,10 +39,25 @@ def get_ros2_nodes(*args):
         #     ('/ch64w/lslidar_point_cloud', '/lidar'),
         # ]
     )
+
+    node_visual = Node(
+        package=PACKAGE_NAME,
+        executable='node_visual',
+        name='node_visual',
+        output='screen',
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+    node_drive_gazelle = Node(
+        package=PACKAGE_NAME,
+        executable='node_drive_gazelle',
+        name='node_drive_gazelle',
+        output='screen',
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
     driver_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'params', 'lslidar_ch64w.yaml')
     rviz_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'rviz_cfg', 'lslidar_ch64w.rviz')
 
-    driver_node = LifecycleNode(package='lslidar_driver',
+    lidar_driver_node = LifecycleNode(package='lslidar_driver',
                                 namespace='ch64w',
                                 executable='lslidar_driver_node',
                                 name='lslidar_driver_node',
@@ -95,8 +110,10 @@ def get_ros2_nodes(*args):
         state_publisher_node,
         node_sensors_gazelle,
         node_ego_controller,
-        driver_node,
-        rviz_node
+        lidar_driver_node,
+        node_drive_gazelle,
+        #node_visual,
+        rviz_node,
     ] + static_transform_nodes
 
 

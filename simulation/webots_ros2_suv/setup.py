@@ -52,6 +52,8 @@ setup(
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
             'node_ego_controller = webots_ros2_suv.node_ego_controller:main',
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
+            'node_visual = webots_ros2_suv.node_visual:main',
+            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

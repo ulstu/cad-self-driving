@@ -24,6 +24,7 @@ pip install shapely
 pip install pyproj
 pip install geopy
 pip install open3d
+pip install pyserial
 ```
 
 ## Установка решения
