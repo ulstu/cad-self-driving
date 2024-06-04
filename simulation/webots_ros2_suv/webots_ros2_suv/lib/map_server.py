@@ -75,15 +75,19 @@ class MapWebServer(object):
         try:
             pos = self.world_model.get_current_position()
             self.driving_points.append([pos[0], pos[1]])
+        except Exception as e:
+            return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
+        try:
             with open(self.driving_points_path, 'a') as f:
                 f.write(f"[{pos[0]},{pos[1]}],\n")
 
-            if pos:
-                return {'status' : 'ok', 'lat': pos[0], 'lon': pos[1], 'orientation': pos[2]}
-            else:
-                return {'status': 'error', 'message': 'position is None'}
         except Exception as e:
-            return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
+            pass
+
+        if pos:
+            return {'status' : 'ok', 'lat': pos[0], 'lon': pos[1], 'orientation': pos[2]}
+        else:
+            return {'status': 'error', 'message': 'position is None'}
 
 
     @cherrypy.expose

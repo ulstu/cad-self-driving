@@ -83,7 +83,7 @@ class NodeEgoController(Node):
         #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
 
     def drive(self):
-        self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
+        # self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
         self.__ackermann_publisher.publish(self.__world_model.command_message)
 
     #@timeit
@@ -104,7 +104,7 @@ class NodeEgoController(Node):
     def __on_gps_message(self, data):
         roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
         lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-        self._logger.info(f'### pos {lat} {lon} {yaw}')
+        # self._logger.info(f'### pos {lat} {lon} {yaw}')
         self.__world_model.update_car_pos(lat, lon, orientation)
         self.__ws.update_model(self.__world_model)
         #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
