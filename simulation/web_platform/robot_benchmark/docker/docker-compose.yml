@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: ./docker/django/Dockerfile
+    container_name: app
+    command: sh -c "python manage.py migrate && python manage.py initadmin && gunicorn application.wsgi:application --bind 0.0.0.0:8000 --reload"
+    env_file:
+      - ../application/.env
+    volumes:
+      - ${APP_DIR}:/usr/src/app/
+    ports:
+      - 8000:8000
+    expose:
+      - 8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+    ports:
+      - 6432:5432
+
+volumes:
+  postgres_data:
+
+

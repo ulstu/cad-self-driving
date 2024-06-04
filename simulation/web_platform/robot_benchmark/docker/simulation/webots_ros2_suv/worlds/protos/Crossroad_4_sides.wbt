@@ -1,0 +1,950 @@
+#VRML_SIM R2023a utf8 
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.21535598205014797 0.055441142021520604 0.9749605534413 2.532122262275602
+  position 155.21429998561274 -143.8813651945597 106.52972134836833
+}
+DEF Ground_for_car Solid {
+  translation 0 0 0.5
+  name "solid(2)"
+  boundingObject Box {
+    size 1000.0 1000.0 0.1
+  }
+}
+DEF Grass Solid {
+  translation 0 0 -0.32
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "textures/grass.jpg"
+          ]
+        }
+        roughness 0.5
+        metalness 0
+        textureTransform TextureTransform {
+          scale 50 50
+        }
+      }
+      geometry Box {
+        size 1000.0 1000.0 0.1
+      }
+    }
+  ]
+  name "solid(3)"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+BmwX5 {
+  translation -11.12 7.47 0.4
+}
+DEF Roads Solid {
+  children [
+    StraightRoadSegment {
+      translation -142.53 9.96 0
+      rotation 0 0 1 -1.5707926535897934
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -142.53 85.01 0
+      rotation 0 0 1 -1.5707926535897934
+      name "road(8)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation 22.48 10.0306 0
+      rotation 0 0 1 -1.5707926535897934
+      name "road(7)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation 22.48 85.0506 0
+      rotation 0 0 1 -1.5707926535897934
+      name "road(11)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -142.51 -60.0 0
+      rotation 0 0 1 -1.5707926535897934
+      name "road(1)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation 22.53 -60.0 0
+      rotation 0 0 1 -1.5707926535897934
+      name "road(4)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -49.98 -82.5 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(5)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -49.98 87.49 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(6)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 20
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -119.98 -82.48 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(2)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 25
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation -119.98 87.55 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(9)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 25
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation 25.01 87.53 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(10)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 25
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    StraightRoadSegment {
+      translation 25.04 -82.4999 0
+      rotation 0 0 1 -3.141587346410207
+      name "road(3)"
+      width 0.0001
+      startingRoadBorderWidth 2.5
+      endingRoadBorderWidth 2.5
+      length 25
+      locked FALSE
+      roadBoundingObject TRUE
+      rightBorderBoundingObject TRUE
+      leftBorderBoundingObject TRUE
+    }
+    DEF Straight Solid {
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 45
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(1)"
+    }
+    DEF Straight Solid {
+      translation 0 -70.01 0
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(8)"
+    }
+    DEF Straight Solid {
+      translation -75.01 0 0
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 45
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(2)"
+    }
+    DEF Straight Solid {
+      translation -70.0 75.0 0
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(19)"
+    }
+    DEF Straight Solid {
+      translation 0 75.0 0
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(20)"
+    }
+    DEF Straight Solid {
+      translation -70.0 -70.0 0
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(7)"
+    }
+    DEF Straight Solid {
+      translation -130.0 10.0 0
+      rotation 0 0 1 -1.5707953071795862
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 55
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(3)"
+    }
+    DEF Straight Solid {
+      translation -60.0 15.0 0
+      rotation 0 0 1 -1.5707953071795862
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(12)"
+    }
+    DEF Straight Solid {
+      translation 10.0 10.0 0
+      rotation 0 0 1 -1.5707953071795862
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 55
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(13)"
+    }
+    DEF Straight Solid {
+      translation -130.0 -10.0 0
+      rotation 0 0 1 1.5708
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(5)"
+    }
+    DEF Straight Solid {
+      translation -60.0 -10.0 0
+      rotation 0 0 1 1.5708
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(11)"
+    }
+    DEF Straight Solid {
+      translation 10.0 -9.99999 0
+      rotation 0 0 1 1.5708
+      children [
+        StraightRoadSegment {
+          rotation 0.0 0.0 1.0 3.141592653589793
+          width 20
+          numberOfLanes 4
+          lines [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startingRoadBorderWidth 5
+          endingRoadBorderWidth 5
+          length 50
+          startLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          endLine [
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          roadBoundingObject TRUE
+          rightBorderBoundingObject TRUE
+          leftBorderBoundingObject TRUE
+        }
+      ]
+      name "solid(14)"
+    }
+    DEF Intersection Solid {
+      translation -50.0 10.0 0
+      children [
+        RoadIntersection {
+          translation -10.0 -10.0 0
+          rotation 0 0 1 0.7853996938995746
+          connectedRoadIDs [
+            ""
+          ]
+          roadsWidth 20
+          startRoadsNumberOfLanes 4
+          startRoadsStartLine [
+            ""
+            ""
+            ""
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_dashed.png"
+          ]
+          startRoadsLine [
+            RoadLine {
+            }
+            RoadLine {
+              type "continuous"
+            }
+          ]
+          startRoadBorderWidth 5
+          startRoadBorderboundingObject TRUE
+          boundingObject TRUE
+        }
+      ]
+    }
+    DEF Crossroad Solid {
+      translation -120.0 10.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(4)"
+    }
+    DEF Crossroad Solid {
+      translation -120.0 85.01 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(16)"
+    }
+    DEF Crossroad Solid {
+      translation -50.0 85.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(17)"
+    }
+    DEF Crossroad Solid {
+      translation 20.0 85.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(18)"
+    }
+    DEF Crossroad Solid {
+      translation 20.0 10.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(9)"
+    }
+    DEF Crossroad Solid {
+      translation 20.0 -60.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(15)"
+    }
+    DEF Crossroad Solid {
+      translation -120.0 -59.96 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(6)"
+    }
+    DEF Crossroad Solid {
+      translation -50.0 -60.0 0
+      children [
+        Crossroad {
+          rotation 0.0 0.0 1.0 1.5707963267948966
+          shape [
+            -0.0 0.0 0.0
+            -20.0 0.0 0.0
+            -20.0 20.0 0.0
+            -0.0 20.0 0.0
+          ]
+          boundingObject TRUE
+        }
+      ]
+      name "solid(10)"
+    }
+  ]
+}
+DEF Buildings Solid {
+  children [
+    RandomBuilding {
+      translation -25.0 -34.98 0
+      rotation 0.0 0.0 1.0 3.141592653589793
+      corners [
+        20.0 20.0
+        -20.0 20.0
+        -20.0 -20.0
+        20.0 -20.0
+      ]
+    }
+    RandomBuilding {
+      translation -94.95 -35.07 0
+      rotation 0.0 0.0 1.0 3.141592653589793
+      name "building(2)"
+      corners [
+        20.0 20.0
+        -20.0 20.0
+        -20.0 -20.0
+        20.0 -20.0
+      ]
+    }
+    RandomBuilding {
+      translation -25.0 35.05 0
+      rotation 0.0 0.0 1.0 3.141592653589793
+      name "building(1)"
+      corners [
+        20.0 20.0
+        -20.0 20.0
+        -20.0 -25.0
+        20.0 -25.0
+      ]
+    }
+    RandomBuilding {
+      translation -94.86 35.05 0
+      rotation 0.0 0.0 1.0 3.141592653589793
+      name "building(3)"
+      corners [
+        20.0 20.0
+        -20.0 20.0
+        -20.0 -25.0
+        20.0 -25.0
+      ]
+    }
+  ]
+  name "solid(1)"
+}
+GenericTrafficLight {
+  translation -70.24 10.13 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(1)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -140.35 10.28 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(21)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -140.45 -59.33 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(22)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -0.670001 10.31 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(12)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -0.549771 -59.45 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(13)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -70.34 -59.59 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(7)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -119.64 -59.69 0
+  rotation 0 0 1 1.5708
+  name "generic traffic light(8)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -49.63 10.22 0
+  name "generic traffic light(4)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -49.46 -59.24 0
+  name "generic traffic light(14)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -119.5 10.4 0
+  name "generic traffic light(9)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -70.34 -10.32 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(2)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -0.43 -10.42 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(18)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -0.529833 64.51 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(19)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -70.6398 64.41 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(20)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -70.44 -80.38 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(15)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -0.43 -80.48 0
+  rotation 0 0 1 3.14159
+  name "generic traffic light(16)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -49.67 -10.24 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(3)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -119.52 -10.34 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(10)"
+  state "green"
+}
+GenericTrafficLight {
+  translation 20.36 -10.34 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(11)"
+  state "green"
+}
+GenericTrafficLight {
+  translation 20.26 64.6 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(17)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -49.62 64.78 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(5)"
+  state "green"
+}
+GenericTrafficLight {
+  translation -119.6 64.68 0
+  rotation 0 0 1 -1.5707953071795862
+  name "generic traffic light(6)"
+  state "green"
+}

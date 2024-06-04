@@ -1,0 +1,10 @@
+fastseg
+prometheus_client
+cameratransform
+cherrypy
+pyyaml
+ultralytics
+pyserial
+json-rpc
+shapely
+pyproj
