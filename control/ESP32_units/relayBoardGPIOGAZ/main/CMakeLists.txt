@@ -1,0 +1,2 @@
+idf_component_register(SRCS "nvstorage.cpp" "Storage.cpp" "Relays.cpp" "main.cpp" "VPIO.cpp" "Network.cpp" "webserver.cpp" "Can.cpp" "Relays.cpp" "nvstorage.cpp" "Storage.cpp" "udp_server.cpp"
+                    INCLUDE_DIRS "." "include")
