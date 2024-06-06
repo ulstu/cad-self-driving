@@ -276,9 +276,9 @@ document.getElementById('loadmap').addEventListener('click', function () {
   load_map(mapSelect.value);
 });
 
-document.getElementById('savesegment').addEventListener('click', function () {
-  $.get('/save_segment', function(data){comsole.log('path segment saved')});
-});
+// document.getElementById('savesegment').addEventListener('click', function () {
+//   $.get('/save_segment', function(data){comsole.log('path segment saved')});
+// });
 
 let selected = null;
 let isPointsMoveMode = false;
@@ -366,6 +366,8 @@ map.on('click', function(event) {
   }
 });
 
+alert("Image interval code")
+
 // Загрузка карт и установка периодического обновления позиции маркера
 load_maps();
 if (current_map_file != null) {
@@ -418,7 +420,6 @@ setInterval(
   }),
   1000,
 );
-
 
 setInterval(
   () => {
