@@ -366,8 +366,6 @@ map.on('click', function(event) {
   }
 });
 
-alert("Image interval code")
-
 // Загрузка карт и установка периодического обновления позиции маркера
 load_maps();
 if (current_map_file != null) {
