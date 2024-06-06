@@ -1,0 +1,28 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+
+EXTERNPROTO "webots://projects/appearances/protos/GlossyPaint.proto"
+
+PROTO BmwX5Mesh [
+  field     SFColor  color                    0.43 0.11 0.1
+  field SFFloat      outerWindowTransparency  0
+]
+{
+  Group {
+    children [
+      DEF Uaz Pose {
+        translation 0 0.65 1.41
+        rotation 0 0 0 0
+        children [
+          CadShape {
+            url [
+              "../../../../blender-3.6.4-linux-x64/Models/Uaz stok/uaz_mesh.dae"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

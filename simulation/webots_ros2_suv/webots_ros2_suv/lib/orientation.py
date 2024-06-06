@@ -1,9 +1,9 @@
 import math
 import numpy as np
 import cv2
+from geometry_msgs.msg import Quaternion
 
-
-def quaternion_from_euler(roll, pitch, yaw):
+def quaternion_from_euler(roll, pitch, yaw, ros_quaternion=False):
     """
     Converts euler roll, pitch, yaw to quaternion (w in last place)
     quat = [x, y, z, w]
@@ -16,12 +16,14 @@ def quaternion_from_euler(roll, pitch, yaw):
     cr = math.cos(roll * 0.5)
     sr = math.sin(roll * 0.5)
 
-    q = [0] * 4
-    q[0] = cy * cp * cr + sy * sp * sr
-    q[1] = cy * cp * sr - sy * sp * cr
-    q[2] = sy * cp * sr + cy * sp * cr
-    q[3] = sy * cp * cr - cy * sp * sr
-
+    if not ros_quaternion:
+        q = [0] * 4
+    else:
+        q = Quaternion()
+    q.w = cy * cp * cr + sy * sp * sr
+    q.x = cy * cp * sr - sy * sp * cr
+    q.y = sy * cp * sr + cy * sp * cr
+    q.z = sy * cp * cr - cy * sp * sr
     return q
 
 def euler_from_quaternion(x, y, z, w):

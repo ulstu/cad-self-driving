@@ -10,3 +10,4 @@ shapely
 pyproj
 geopy
 open3d
+pyserial

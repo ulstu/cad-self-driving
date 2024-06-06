@@ -4,3 +4,11 @@ orientation: 1.7
 scale_x: 20
 scale_y: 5
 bev_orientation: 0.25
+
+
+# lat: 0.0
+# lon: 0.0
+# orientation: 0.0
+# scale_x: 20
+# scale_y: 5
+# bev_orientation: 0.25

@@ -1,0 +1,14 @@
+.layout {
+  justify-content: center;
+
+  .login-card {
+    align-self: center;
+    justify-self: center;
+    width: 300px;
+    min-height: fit-content;
+  }
+
+  .auth-btn {
+    width: 100%;
+  }
+}

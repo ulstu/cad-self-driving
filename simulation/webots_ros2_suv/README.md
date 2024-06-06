@@ -1,8 +1,15 @@
-# cредства симуляции на основе Webots и ROS 
+# Средства симуляции на основе Webots и ROS 
+
 ## ПО для запуска
 * Linux Ubuntu 22.04
-* ROS2 Humble
+* ROS2 Humble [Инструкция по установке](https://docs.ros.org/en/humble/Installation.html)
 * Webots 2023b
+
+## Минимальные требования к оборудованию
+* процессор Intel не ниже i5
+* GPU Nvidia не ниже 1060
+* ОЗУ 8Гб
+* Накопитель не менее 128Гб
 
 ## Установка пакетов Linux после установки ROS Humble по стандартной инструкции
 ```
@@ -24,25 +31,31 @@ pip install shapely
 pip install pyproj
 pip install geopy
 pip install open3d
+pip install pyserial
 ```
 
 ## Установка решения
 * Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros2_ws/src
 ```
-ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/pcl_maps
-ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/robot_interfaces
-ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/webots_ros2_suv
+ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/src/pcl_maps
+ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/src/robot_interfaces
+ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
+```
+
+* Необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
+```
+https://drive.google.com/drive/folders/1g0zeD9U5zDlcSzxGUSaNpjHt7rWFJAjv?usp=drive_link
 ```
 
 Для установки драйвера лидара 
 ```
-ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_msgs/ lslidar_msgs
-ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_driver/ lslidar_driver
+ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_msgs/ ~/ros2_ws/src/lslidar_msgs
+ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_driver/ ~/ros2_ws/src/lslidar_driver
 ```
 
 Для установки драйвера ZED
 ```
-ln -s ~/repositories/cad-self-driving/drivers/zed-ros2-wrapper zed-ros2-wrapper
+ln -s ~/repositories/cad-self-driving/drivers/zed-ros2-wrapper ~/ros2_ws/src/zed-ros2-wrapper
 rosdep install --from-paths src --ignore-src -r -y
 ```
 
@@ -53,18 +66,13 @@ source /home/user/ros2_ws/install/setup.bash
 export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
-* Также необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
-```
-https://drive.google.com/drive/folders/1g0zeD9U5zDlcSzxGUSaNpjHt7rWFJAjv?usp=drive_link
-```
+
 * Компиляция командой 'colcon build' из папки ~/ros2_ws 
 * Запуск командой 'ros2 launch webots_ros2_suv robot_launch.py'
+* После добавления новых файлов из папки ~/ros2_ws необходимо выполнить команду source install/setup.bash
 * Если стоит conda/miniconda, необходимо ее деактивировать 'conda deactivate'
 
-Image segmentation: fastseg
-
 Camera and rangeFinder resolution: 840x480
-
 
 
 # Запуск из-под виртуальной машины в MacOS
@@ -87,7 +95,8 @@ export WEBOTS_IP=10.211.55.2
 ```
 
 
-# Полезные статьи для обзора
+# Прочие заметки
+## Полезные статьи для обзора
 Bird's-Eye-View Panoptic Segmentation Using Monocular Frontal View Images
 https://arxiv.org/abs/2108.03227
 
@@ -101,7 +110,7 @@ Visualization of Obstacles on Bird’s-eye View Using Depth Sensor for Remote Co
 http://www.robot.t.u-tokyo.ac.jp/~yamashita/paper/B/B172Final.pdf
 
 
-# Неявные ошибки
+## Неявные ошибки
 1. Если при импорте torch возникает ошибка "name 'sympy' is not defined", то выполнить команду 
 ```bash
 pip install mpmath --upgrade

@@ -1,0 +1,19 @@
+export WEBOTS_HOME=/usr/local/webots
+export WEBOTS_OFFSCREEN=1
+export USERNAME=default
+
+if uname -v | grep -qi 'ubuntu'; then
+    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+fi
+
+alias cb='colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug'
+alias rr='rm -rf /ulstu/ros2_ws/build /ulstu/ros2_ws/install'
+
+test -f /opt/ros/humble/local_setup.bash && \
+    source /opt/ros/humble/local_setup.bash
+test -f /ulstu/ros2_ws/install/local_setup.bash && \
+    source /ulstu/ros2_ws/install/local_setup.bash
+test -f /ulstu/ros2_ws/install/setup.bash && \
+    source /ulstu/ros2_ws/install/setup.bash
+test -f /ulstu/.host/.Xauthority && \
+    cp -p /ulstu/.host/.Xauthority /ulstu/.Xauthority

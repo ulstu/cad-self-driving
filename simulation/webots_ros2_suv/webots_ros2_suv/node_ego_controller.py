@@ -53,17 +53,17 @@ class NodeEgoController(Node):
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
             param = ParamLoader()
-            self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos)
-            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image"), self.__on_image_message, qos)
-            self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar"), self.__on_lidar_message, qos)
-            self._logger.info(f'Lidar {param.get_param("lidar")}')
-            self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image"), self.__on_range_image_message, qos)
+            self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
+            self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
+            self._logger.info(f'Lidar {param.get_param("lidar_topicname")}')
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             
             self.start_web_server()
 
-            self.__fsm = FiniteStateMachine(f'{package_dir}/config/ego_states/robocross.yaml', self)
+            self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
             self.__fsm.on_event(None)
@@ -90,6 +90,7 @@ class NodeEgoController(Node):
 
     def drive(self):
         if self.__world_model:
+            # self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
             self.__ackermann_publisher.publish(self.__world_model.command_message)
 
     #@timeit
@@ -98,13 +99,13 @@ class NodeEgoController(Node):
             image = data.data
             image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
             analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
-
             self.__world_model.rgb_image = np.asarray(analyze_image)
             # вызов текущих обработчиков данных
             self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
             # вызов обработки состояний с текущими данными
             self.__fsm.on_event(None, self.__world_model)
             self.drive()
+            self._logger.info(f'$$$$$  yaw: {self.__world_model.get_current_position()}')
             if self.__ws != None:
                 self.__ws.update_model(self.__world_model)
 
@@ -112,10 +113,11 @@ class NodeEgoController(Node):
         if self.__world_model:
             roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
             lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            # self._logger.info(f'### pos {lat} {lon} {yaw}')
             self.__world_model.update_car_pos(lat, lon, orientation)
             if self.__ws != None:
                 self.__ws.update_model(self.__world_model)
-        #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
+            #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
 
 def main(args=None):
     try:

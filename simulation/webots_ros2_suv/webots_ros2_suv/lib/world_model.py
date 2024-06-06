@@ -79,14 +79,14 @@ class WorldModel(object):
         fontScale = 1
         color = (255, 255, 0) 
         thickness = 2
-        for i, p in enumerate(points):
-            x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
-            cv2.circle(colorized, (x, y), 8, (0, 0, 255), 2)
-            image = cv2.putText(colorized, f'{i}', (x + 20, y), font,  fontScale, color, thickness, cv2.LINE_AA)
-
-        colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
-
-
+        try:
+            for i, p in enumerate(points):
+                x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
+                cv2.circle(colorized, (int(x), int(y)), 8, (0, 0, 255), 2)
+                image = cv2.putText(colorized, f'{i}', (int(x + 20), int(y)), font,  fontScale, color, thickness, cv2.LINE_AA)
+            colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
+        except:
+            pass
         # cv2.imshow("colorized seg", colorized)
         # cv2.imshow("yolo drawing", self.img_front_objects)
 
