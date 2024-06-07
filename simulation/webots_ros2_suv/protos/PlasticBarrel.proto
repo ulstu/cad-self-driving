@@ -1,0 +1,61 @@
+#VRML_SIM R2023a utf8
+
+PROTO PlasticBarrel [
+  field SFVec3f    translation       0 0 0
+  field SFRotation rotation          0 0 1 0
+  field SFString   name              "PlasticBarrel"
+  field SFBool     castShadows       TRUE
+  field SFBool     isPickable        TRUE
+  field SFString   contactMaterial   "default"
+  field MFString   modelPath            ["models/plastic_barrel/plastic_barrel.dae"]
+  field MFString   baseColorTexturePath ["models/plastic_barrel/textures/base_map.jpg"]
+  field MFString   roughnessTexturePath ["models/plastic_barrel/textures/roughness_map.jpg"]
+  field MFString   metallicTexturePath  ["models/plastic_barrel/textures/metallic_map.jpg"]
+  field MFString   normalTexturePath    ["models/plastic_barrel/textures/normal_map.png"]
+  field SFFloat    translationStep   0.01
+  field SFFloat    rotationStep      0.262
+  field SFFloat    mass              10.0        # Масса объекта в кг
+] {
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColorMap ImageTexture {
+            url IS baseColorTexturePath
+          }
+      
+          roughnessMap ImageTexture {
+            url IS roughnessTexturePath
+          }
+      
+          metalnessMap ImageTexture {
+            url IS metallicTexturePath
+          }
+      
+          normalMap ImageTexture {
+            url IS normalTexturePath
+          }
+        }
+        geometry Mesh {
+          url IS modelPath
+        }
+        castShadows IS castShadows
+        isPickable IS isPickable
+      }
+    ]
+    name IS name
+    contactMaterial IS contactMaterial
+    physics NULL
+    boundingObject NULL
+    locked FALSE
+    radarCrossSection 0
+    recognitionColors [
+      # Добавить цвета распознавания при необходимости
+    ]
+    immersionProperties NULL
+    translationStep IS translationStep
+    rotationStep IS rotationStep
+  }
+}

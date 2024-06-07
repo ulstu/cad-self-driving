@@ -26,7 +26,9 @@ from PIL import Image
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
 
-BASE_PATH = '/home/hiber/ros2_ws/src/webots_ros2_suv/'
+HOME_DIR = os.path.expanduser('~')
+
+BASE_PATH = os.path.join(HOME_DIR, 'ros2_ws/src/webots_ros2_suv/')
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
 YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
@@ -131,19 +133,34 @@ class MapWebServer(object):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
             return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
 
+
+    @cherrypy.expose
+    def get_sign_label(self):
+        if self.world_model.found_sign is None:
+            return json.dumps({"detected": False, "sign": "знак не обнаружен"})
+        return json.dumps({"detected": True, "sign": self.world_model.found_sign[1]})
+
     @cherrypy.expose
     def get_image(self, img_type, tm):
         if img_type == "obj_detector":
-            if self.world_model.img_front_objects is None:
+            if self.world_model.img_front_objects_lines_signs is None:
                 return None
-            data = self.world_model.img_front_objects
+            data = self.world_model.img_front_objects_lines_signs
         elif img_type == "seg":
             self.world_model.draw_scene()
-            if self.world_model.ipm_colorized is None:
+            if self.world_model.ipm_colorized_lines is None:
                 return None
-            data = self.world_model.ipm_colorized
-            data = np.array(data)
-
+            data = self.world_model.ipm_colorized_lines
+        elif img_type == "sign":
+            if self.world_model.found_sign is None:
+                return None
+            data = self.world_model.found_sign[2]
+            # use StringIO to stream the image out to the browser direct from RAM
+            # output = StringIO.StringIO()
+            # format = 'PNG' # JPEG and other formats are available
+            # data.save(output, format)
+            # contents = output.getvalue()
+            # output.close()
         cherrypy.response.headers['Content-Type'] = "image/png"
         contents = cv2.imencode('.png', data)[1].tostring()
         return contents

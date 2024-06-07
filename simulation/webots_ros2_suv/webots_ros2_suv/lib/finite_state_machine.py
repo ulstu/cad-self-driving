@@ -65,6 +65,7 @@ class FiniteStateMachine:
     def on_event(self, event, world_model=None):
         new_states = {}
         for key, state in self.current_states.items():
+            print("#" * 30 + type(state).__name__)
             new_event = state.on_event(event, world_model)
             if new_event:
                 event = new_event
@@ -87,7 +88,16 @@ class FiniteStateMachine:
             self.node._logger.info(f'Current states: {str(self.current_states)}')
 
     def on_data(self, world_model, source="general"):
-        for key, worker in self.current_workers.items():
+        for idx, (key, worker) in enumerate(self.current_workers.items()):
             #self.node._logger.info(f'Invoking on_data event from {source} on worker {str(worker)} ')
+            print(f"{'T' * 250}  id: {idx}   worker name: {type(worker).__name__}")
             world_model = worker.on_data(world_model)
+            #worker.test()
         return world_model
+
+
+    def find_worker(self, worker_state):
+        for state_key, state in self.current_states.items():
+            if worker_state in self.workerstates[state_key]: 
+                return self.workerstates[state_key][worker_state]
+        return None

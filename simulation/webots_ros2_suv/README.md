@@ -42,6 +42,11 @@ ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/src/robot_inter
 ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
 ```
 
+* Необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
+```
+https://drive.google.com/drive/folders/1g0zeD9U5zDlcSzxGUSaNpjHt7rWFJAjv?usp=drive_link
+```
+
 Для установки драйвера лидара 
 ```
 ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_msgs/ ~/ros2_ws/src/lslidar_msgs

@@ -86,7 +86,9 @@ class DatasetTrain():
         # batch_y = enc.transform(np.array(batch_y).reshape(-1, 1)).toarray()
         self.last_data_index = stop
         return batch_x, batch_y
-
+    
+    def get_num_classes(self):
+        return self.data_y[0].shape[0]
 
 
 

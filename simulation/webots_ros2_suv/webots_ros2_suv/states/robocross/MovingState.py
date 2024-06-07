@@ -63,6 +63,9 @@ class MovingState(AbstractState):
         return (x, y)
 
     def on_event(self, event, world_model=None):
+        if world_model.traffic_light_state == "red":
+            return "stop"
+
         lat, lon, o = world_model.get_current_position()
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
         world_model.goal_point = self.find_next_goal_point(world_model)

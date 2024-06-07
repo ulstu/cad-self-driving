@@ -276,9 +276,9 @@ document.getElementById('loadmap').addEventListener('click', function () {
   load_map(mapSelect.value);
 });
 
-document.getElementById('savesegment').addEventListener('click', function () {
-  $.get('/save_segment', function(data){comsole.log('path segment saved')});
-});
+// document.getElementById('savesegment').addEventListener('click', function () {
+//   $.get('/save_segment', function(data){comsole.log('path segment saved')});
+// });
 
 let selected = null;
 let isPointsMoveMode = false;
@@ -419,7 +419,6 @@ setInterval(
   1000,
 );
 
-
 setInterval(
   () => {
     console.log('image obj changed');
@@ -434,6 +433,28 @@ setInterval(
     console.log('image seg changed');
     var unique = $.now();
     $('#img_seg').attr('src', '/get_image?img_type=seg&tm=' + unique);
+  },
+  700,
+);
+
+setInterval(
+  () => {
+    console.log('image seg changed');
+    var unique = $.now();
+    $('#img_sign').attr('src', '/get_image?img_type=sign&tm=' + unique);
+    $.ajax({
+      url: '/get_sign_label',
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          $('#img_sign').attr('hidden', !data['detected'])
+          if (data['detected'])
+            $('#sign_text').text(data['sign']);
+      },
+      error: function() {
+        console.error('Не удалось сделать запрос на текст знака.')
+      }
+    });
   },
   700,
 );

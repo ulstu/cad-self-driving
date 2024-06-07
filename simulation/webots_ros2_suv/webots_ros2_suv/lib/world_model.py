@@ -8,6 +8,9 @@ import math
 from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 from .coords_transformer import CoordsTransformer
+from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask
+from ackermann_msgs.msg import AckermannDrive
+
 
 class WorldModel(object):
     '''
@@ -24,18 +27,29 @@ class WorldModel(object):
         self.point_cloud = None     # облако точек от лидара
         self.seg_image = None       # сегментированное изображение во фронтальной проекции
         self.seg_colorized = None   # раскрашенное сегментированное изображение во фронтальной проекции
-        self.seg_composited = None   # раскрашенное сегментированное изображение во фронтальной проекции
+        self.seg_composited = None  # раскрашенное сегментированное изображение во фронтальной проекции
+        self.lane_contours = None   # контуры линий дорожной разметки на изображении во фронтальной проекции
+        self.lane_lines = None      # линии дорожной разметки на изображении во фронтальной проекции
+        self.lane_contours_bev = None # контуры линий дорожной разметки на изображении в BEV проекции
+        self.lane_lines_bev = None  # линии дорожной разметки на изображении во BEV проекции
         self.img_front_objects = None # изображение с камеры с детектированными объектами
+        self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
+        self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
         self.objects = None         # объекты во фронтальной проекции   
         self.ipm_image = None       # BEV сегментированное изображение 
         self.ipm_colorized = None   # раскрашенное BEV сегментированное изображение
+        self.ipm_colorized_lines = None   # раскрашенное BEV сегментированное изображение + линии дорожной разметки
+        self.map_builder = None     # класс, хранящий BEV матрицу
         self.pov_point = None       # Точка в BEV, соответствующая арсположению авто
         self.goal_point = None      # Точка в BEV, соответствующая цели
         self.global_map = None      # текущие загруженные координаты точек глобальной карты
         self.cur_path_segment = 0   # Текущий сегмент пути, заданный в редакторе карт
         self.cur_turn_polygon = None# Текущий полигон для разворота
-        self.command_message = None # Сообщение типа AckermanDrive для движения автомобиля
-
+        self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
+        self.traffic_light_state = "red" # Текущее состояние светофора
+        self.found_sign = None # Найденный знак
+    
+    
 
     def load_map(self, mapyaml):
         self.global_map = []
@@ -50,7 +64,7 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def draw_scene(self):
-        colorized = self.ipm_colorized
+        colorized = self.ipm_colorized_lines
         prev_point = None
         if self.path:
             for n in self.path:
@@ -68,8 +82,8 @@ class WorldModel(object):
         try:
             for i, p in enumerate(points):
                 x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
-                cv2.circle(colorized, (x, y), 8, (0, 0, 255), 2)
-                image = cv2.putText(colorized, f'{i}', (x + 20, y), font,  fontScale, color, thickness, cv2.LINE_AA)
+                cv2.circle(colorized, (int(x), int(y)), 8, (0, 0, 255), 2)
+                image = cv2.putText(colorized, f'{i}', (int(x + 20), int(y)), font,  fontScale, color, thickness, cv2.LINE_AA)
             colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
         except:
             pass
