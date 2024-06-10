@@ -9,7 +9,7 @@ from PIL import ImageTk as itk
 import numpy as np
 from PIL import Image, ImageTk
 
-from perception.seg_bev.ipm_transformer import IPMTransformer
+from ipm_transformer import IPMTransformer
 
 
 class ImageApp:
