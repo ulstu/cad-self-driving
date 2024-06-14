@@ -32,6 +32,7 @@ ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/src/pcl_maps
 ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/src/robot_interfaces
 ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
 ```
+* Для загрузки весов нейронных сетей необходимо установить https://git-lfs.com/
 
 * Необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
 ```
