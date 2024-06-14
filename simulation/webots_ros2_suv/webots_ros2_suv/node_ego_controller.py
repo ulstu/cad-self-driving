@@ -4,6 +4,7 @@ import traceback
 import cv2
 import os
 import math
+import time
 import yaml
 import matplotlib.pyplot as plt
 import sensor_msgs.msg
@@ -92,22 +93,21 @@ class NodeEgoController(Node):
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
 
+        cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
+
         self.__world_model.rgb_image = np.asarray(analyze_image)
         # вызов текущих обработчиков данных
         self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
         self.drive()
-        self._logger.info(f'$$$$$  yaw: {self.__world_model.get_current_position()}')
         self.__ws.update_model(self.__world_model)
 
     def __on_gps_message(self, data):
         roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
         lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-        # self._logger.info(f'### pos {lat} {lon} {yaw}')
         self.__world_model.update_car_pos(lat, lon, orientation)
         self.__ws.update_model(self.__world_model)
-        #self._logger.info(f'transformed lat: {lat}; lon: {lon}; orientation: {orientation}')
 
 def main(args=None):
     try:

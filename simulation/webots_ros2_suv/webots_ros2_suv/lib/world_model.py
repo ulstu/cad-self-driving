@@ -43,23 +43,26 @@ class WorldModel(object):
             self.global_map.append({
                 'name': f['properties']['id'].replace('_point', ''),
                 'type': f['geometry']['type'],
-                'coordinates': f['geometry']['coordinates']
+                'coordinates': f['geometry']['coordinates'],
+                'seg_num': f['properties'].get('seg_num', 0)
             })
 
     def get_current_position(self):
         return self.__car_model.get_position()
 
-    def draw_scene(self):
+    def draw_scene(self, log=None):
         colorized = self.ipm_colorized
         prev_point = None
         if self.path:
             for n in self.path:
                 if prev_point:
                     cv2.line(colorized, prev_point, n, (0, 255, 255), 2)
-                prev_point = n
+                prev_point = (int(n[0]), int(n[1]))
+                if log:
+                    log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
         cv2.circle(colorized, self.goal_point, 9, (255, 0, 0), 5)
-        points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving'][self.cur_path_segment]
+        points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
 
         font = cv2.FONT_HERSHEY_SIMPLEX 
         fontScale = 1

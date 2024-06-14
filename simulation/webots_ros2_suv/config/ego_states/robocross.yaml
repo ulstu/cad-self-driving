@@ -23,7 +23,7 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["gps_follow"]
+    start_move: ["moving"]
     stop: ["stopped"]
   gps_follow:
     stop: ["stopped", "emergency"]
@@ -32,11 +32,11 @@ transitions:
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   stopped:
-    start_move: ["gps_follow"]
+    start_move: ["moving"]
   emergency:
     reset: ["start"]
   turn:
-    start_move: ["gps_follow"]
+    start_move: ["moving"]
     stop: ["stopped", "emergency"]
 map-elements:
   - element:

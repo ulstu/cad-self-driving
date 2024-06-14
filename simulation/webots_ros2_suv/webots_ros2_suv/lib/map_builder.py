@@ -117,13 +117,15 @@ class MapBuilder(object):
 
     def put_objects(self, ipm_image, tbs, widths, results):
         excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
+        h = ipm_image.shape[0]
         for i in range(len(tbs)):
             label_num = int(results[0].boxes.data[i][-1]) + 1
             if label_num in excluded_classes:
                 continue
             l = self.get_labels()[label_num]
-            p1 = (int(tbs[i][0] - widths[i] / 0.45), int(tbs[i][1] - widths[i] / 0.8))
-            p2 = (int(tbs[i][0] + widths[i] / 0.45), int(tbs[i][1]))
+            w =  widths[i] * h / (tbs[i][1] * 4)
+            p1 = (int(tbs[i][0] - w), int(tbs[i][1] - w))
+            p2 = (int(tbs[i][0] + w), int(tbs[i][1]))
             ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num
         return ipm_image
 

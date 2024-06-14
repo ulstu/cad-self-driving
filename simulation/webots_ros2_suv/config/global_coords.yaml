@@ -1,9 +1,22 @@
-lat: 43.639341192451475
-lon: 56.33519768405111
-orientation: 1.7
-scale_x: 20
+lat: 43.63939225773861
+lon: 56.33517639374398
+orientation: 1.5
+scale_x: 30
 scale_y: 5
-bev_orientation: 0.25
+bev_orientation: 0.0
+
+kalman_path_planning_noise_scale: 0.05
+robot_radius: 10
+a_star_step_size: 10
+dubins_sample_size: 5
+dubins_turning_radius: 10
+min_path_points_dist: 10
+
+ackerman_angle_correction: 0.0
+ackerman_proportional_coef: 1.2
+change_point_dist: 0.3
+turn_angle_num_path_points: 5
+default_speed: 15
 
 
 # lat: 0.0

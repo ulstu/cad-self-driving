@@ -18,6 +18,7 @@ sudo apt install ros-humble-webots-ros2
 sudo apt-get install ros-$ROS_DISTRO-pcl-ros ros-$ROS_DISTRO-pluginlib  ros-$ROS_DISTRO-pcl-conversions
 sudo apt-get install libpcap-dev
 sudo apt-get install libboost${BOOST_VERSION}-dev 
+pip install git+https://github.com/rdesc/pydubins.git
 ```
 ## Установка пакетов python
 ```
@@ -32,6 +33,7 @@ pip install pyproj
 pip install geopy
 pip install open3d
 pip install pyserial
+pip install filterpy
 ```
 
 ## Установка решения

@@ -62,7 +62,7 @@ class IPMWorker(AbstractWorker):
             
             world_model.ipm_image = self.__map_builder.put_objects(world_model.ipm_image, tbs, widths, results)
             world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))[:world_model.pov_point[1], :]
-            world_model.ipm_image = world_model.ipm_image[:world_model.pov_point[1], :]
+            world_model.ipm_image = world_model.ipm_image[:world_model.pov_point[1] + 1, :]
             world_model.img_front_objects = results[0].plot()
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model

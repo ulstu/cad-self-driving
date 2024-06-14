@@ -35,9 +35,9 @@ class GPSFollowState(AbstractState):
         #self.log(f"{world_model.get_coord_corrections()}")
         if not world_model.global_map:
             return (0, 0)
-        points_seg = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving']
+        points_seg = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving'  and e['seg_num'] == world_model.cur_path_segment]
         self.log(f'PATH SEGMENT: {world_model.cur_path_segment} {len(points_seg)}')
-        points = points_seg[world_model.cur_path_segment]
+        points = points_seg[0]
         #self.log(f"POINTS: {points}")
 
         dists = []

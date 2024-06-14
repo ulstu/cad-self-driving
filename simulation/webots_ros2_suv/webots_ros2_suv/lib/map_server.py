@@ -128,7 +128,7 @@ class MapWebServer(object):
                 j = json.load(f)
                 return {'status': 'ok', 'features' : j} 
         except Exception as err:        
-            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
+            self.log(''.join(traceback.TracebackException.from_exception(err).format()))
             return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
 
     @cherrypy.expose
@@ -163,7 +163,9 @@ class MapWebServer(object):
 
 def start_web_server(map_server):
     try:
-
+        cherrypy.config.update({'log.screen': False,
+                        'log.access_file': '',
+                        'log.error_file': ''})
         cherrypy.quickstart(map_server, '/', {'global':
                                                    {'server.socket_host': '0.0.0.0',
                                                     'server.socket_port': 8008,
