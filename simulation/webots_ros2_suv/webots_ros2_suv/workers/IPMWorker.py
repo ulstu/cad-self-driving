@@ -16,7 +16,7 @@ class IPMWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
 
-        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l.pt',
+        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
 
     def __save_image_files(self, labels, composited, source):
@@ -49,6 +49,7 @@ class IPMWorker(AbstractWorker):
 
             results = self.__map_builder.detect_objects(image)
             cboxes = results[0].boxes.data.cpu()
+            print(results[0].boxes.cls)
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
@@ -61,9 +62,14 @@ class IPMWorker(AbstractWorker):
             world_model.pov_point = (world_model.pov_point[0], world_model.pov_point[1] - 15)
             
             world_model.ipm_image = self.__map_builder.put_objects(world_model.ipm_image, tbs, widths, results)
-            world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))[:world_model.pov_point[1], :]
-            world_model.ipm_image = world_model.ipm_image[:world_model.pov_point[1] + 1, :]
+
+            ipm_image_height = self.__map_builder.calc_bev_point((0, image_seg.shape[0]))[1]
+
+            world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))[:ipm_image_height, :]
+            world_model.ipm_image = world_model.ipm_image[:ipm_image_height + 1, :]
             world_model.img_front_objects = results[0].plot()
+            world_model.map_builder = self.__map_builder
+            
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model
 

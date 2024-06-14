@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>784155</id>
+      <size>2</size>
+      <mode>annotation</mode>
+      <overlap>0</overlap>
+      <bugtracker></bugtracker>
+      <created>2024-04-28 17:26:17.426362+00:00</created>
+      <updated>2024-04-28 17:28:36.927794+00:00</updated>
+      <subset>default</subset>
+      <start_frame>0</start_frame>
+      <stop_frame>1</stop_frame>
+      <frame_filter></frame_filter>
+      <segments>
+        <segment>
+          <id>785767</id>
+          <start>0</start>
+          <stop>1</stop>
+          <url>https://app.cvat.ai/api/jobs/784155</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>spectre</username>
+        <email>emailgax8@gmail.com</email>
+      </owner>
+      <assignee></assignee>
+      <labels>
+        <label>
+          <name>Stop</name>
+          <color>#fb0b00</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Main road</name>
+          <color>#fafa37</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+      </labels>
+    </job>
+    <dumped>2024-04-28 17:31:18.931558+00:00</dumped>
+  </meta>
+  <image id="0" name="Screenshot 2024-04-28 212510.png" width="1773" height="793">
+    <box label="Stop" source="manual" occluded="0" xtl="1137.83" ytl="270.25" xbr="1202.14" ybr="325.37" z_order="0">
+    </box>
+    <box label="Main road" source="manual" occluded="0" xtl="226.53" ytl="384.17" xbr="259.60" ybr="420.91" z_order="0">
+    </box>
+    <box label="Main road" source="manual" occluded="0" xtl="623.38" ytl="369.47" xbr="652.78" ybr="402.54" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="623.38" ytl="340.07" xbr="650.94" ybr="363.96" z_order="0">
+    </box>
+  </image>
+  <image id="1" name="Screenshot 2024-04-28 212536.png" width="1782" height="802">
+    <box label="Main road" source="manual" occluded="0" xtl="978.39" ytl="144.08" xbr="1044.87" ybr="203.17" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="557.36" ytl="354.60" xbr="583.21" ybr="378.60" z_order="0">
+    </box>
+    <box label="Stop" source="manual" occluded="0" xtl="862.05" ytl="349.06" xbr="889.75" ybr="373.07" z_order="0">
+    </box>
+  </image>
+</annotations>

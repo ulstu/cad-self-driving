@@ -22,18 +22,7 @@ pip install git+https://github.com/rdesc/pydubins.git
 ```
 ## Установка пакетов python
 ```
-pip install opencv-python
-pip install prometheus-client
-pip install fastseg
-pip install cherrypy
-pip install pyyaml
-pip install ultralytics
-pip install shapely
-pip install pyproj
-pip install geopy
-pip install open3d
-pip install pyserial
-pip install filterpy
+pip install -r requirements.txt
 ```
 
 ## Установка решения
@@ -42,6 +31,11 @@ pip install filterpy
 ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/src/pcl_maps
 ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/src/robot_interfaces
 ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
+```
+
+* Необходимо загрузить данные в папку cad-self-driving/simulation/webots_ros2_suv/resource/ по следующей ссылке:
+```
+https://drive.google.com/drive/folders/1g0zeD9U5zDlcSzxGUSaNpjHt7rWFJAjv?usp=drive_link
 ```
 
 Для установки драйвера лидара 

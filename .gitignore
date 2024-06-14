@@ -132,3 +132,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+perception/signs_detector/weights/*
+#simulation/webots_ros2_suv/resource/*
