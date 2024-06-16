@@ -77,6 +77,7 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 from PIL import Image
 import time
+import uuid
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -89,8 +90,8 @@ class ImageAnalyzer:
                  path_to_seg_model,
                  path_to_icons,
                  is_red=False,
-                 traffic_light_queue_length=16,
-                 sign_queue_length=16,
+                 traffic_light_queue_length=5,
+                 sign_queue_length=5,
                  delay=5, 
                  is_viz=True, 
                  is_video=False,
@@ -105,7 +106,7 @@ class ImageAnalyzer:
         self.correct_width = correct_width
         self.use_gpu = use_gpu
         self.sign = 0
-        self.traffic_light_state = "red"
+        self.traffic_light_state = "none"
         self.traffic_light_queue = [self.traffic_light_state] * traffic_light_queue_length
         self.sign_queue = [-1] * sign_queue_length
 
@@ -260,8 +261,8 @@ class ImageAnalyzer:
             if height / width < 0.55 or local_square < square:
                 continue
             square = local_square
-            up = image[:int(height / 2), :, :]
-            down = image[int(height / 2):, :, :]
+            up = image[:int(height / 2), :, 2]
+            down = image[int(height / 2):, :, 1]
             if np.average(up) > np.average(down):
                 lights = 'red'
             else:
@@ -436,8 +437,8 @@ class ImageAnalyzer:
     def draw_traffic_light(self, 
                            image, 
                            count_circles=2, 
-                           circle_states=[True, False],
-                           colors=[(235, 64, 52), (52, 235, 92)],
+                           circle_states=[True, False, False],
+                           colors=[(235, 64, 52), (52, 235, 92), (240, 240, 240)],
                            dark_factor = 0.6,
                            background_color=(25, 25, 25),
                            background_alpha=0.6, 
@@ -493,16 +494,27 @@ class ImageAnalyzer:
         return labels
 
 
-    def predict_traffic_lights(self, image, labels=None):
-        if labels is None:
-            labels = self.predict_labels(image)
+    def predict_traffic_lights(self, image, yolo_detected_objects, labels=None):
+        if yolo_detected_objects:
+            light_rects = []
+            traffic_light_images = []
+            for box, cls in yolo_detected_objects:
+                if cls == 9: # traffic_light
+                    light_rects.append(box)
+                    traffic_light_images.append(image[int(box[0][1]):int(box[1][1] + 1), int(box[0][0]):int(box[1][0] + 1)])
+                    # cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_light_images[-1])
+        
+            return None, traffic_light_images, light_rects
+        else:
+            if labels is None:
+                labels = self.predict_labels(image)
 
-        traffic_light_mask = np.ones_like(labels)
-        traffic_light_mask[labels != 6] = 0
+            traffic_light_mask = np.ones_like(labels)
+            traffic_light_mask[labels != 6] = 0
 
-        traffic_light_images, light_rects = self.cut_image4segments(image, np.array(traffic_light_mask, dtype=np.uint8))
-
-        return traffic_light_mask, traffic_light_images, light_rects
+            traffic_light_images, light_rects = self.cut_image4segments(image, np.array(traffic_light_mask, dtype=np.uint8))
+            
+            return traffic_light_mask, traffic_light_images, light_rects
 
 
     def predict_signs(self, image, labels=None):
@@ -521,7 +533,7 @@ class ImageAnalyzer:
         return traffic_sign_mask, traffic_sign_images, sign_rects, found_signs
 
 
-    def plot_predictions(self, image, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
+    def plot_predictions(self, image, yolo_detected_objects, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         
         if self.use_gpu == False:
@@ -529,11 +541,17 @@ class ImageAnalyzer:
         else:
             labels = self.seg_model.predict_one(np.array(analyze_image))
 
-        traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, labels)
+        traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
         traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
 
-        if update_traffic_light_state and len(traffic_light_images) > 0:
+        # if len(traffic_sign_images) > 0:
+        #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
+
+        traffic_light_state = "none"
+        if len(traffic_light_images) > 0:
             traffic_light_state = self.classify_traffic_light(traffic_light_images)
+        
+        if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
         
         if update_sign_state:
@@ -545,7 +563,9 @@ class ImageAnalyzer:
         # self.draw_mask(image, traffic_light_mask, [255, 0, 0])
         # self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
         self.draw_signs(image, sign_rects, found_signs)
-        self.draw_traffic_light(image, 2, [self.is_red, not self.is_red])
+        self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
+                                           self.traffic_light_state == "green",
+                                           self.traffic_light_state == "none"])
         return image
         
 

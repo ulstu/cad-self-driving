@@ -114,11 +114,12 @@ class NodeEgoController(Node):
             self.__ws.update_model(self.__world_model)
 
     def __on_gps_message(self, data):
-        roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
-        lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-        self.__world_model.update_car_pos(lat, lon, orientation)
-        if self.__ws is not None:
-            self.__ws.update_model(self.__world_model)
+        if self.__world_model is not None:
+            roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
+            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            self.__world_model.update_car_pos(lat, lon, orientation)
+            if self.__ws is not None:
+                self.__ws.update_model(self.__world_model)
 
 def main(args=None):
     try:
