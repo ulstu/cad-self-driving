@@ -12,11 +12,12 @@ from webots_ros2_suv.lib.timeit import timeit
 from webots_ros2_suv.lib.lane_line_model import LaneLineModel
 from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask, default_palette
 from webots_ros2_suv.lib.map_builder import MapBuilder
+from webots_ros2_suv.lib.LinesAnalizator import LinesAnalizator
 import cv2
 import yaml
 
 PACKAGE_NAME = "webots_ros2_suv"
-local_model_path = "resource/lane_line_model/lane_line_detection_yolo8s-seg_model.pt"
+local_model_path = "resource/lane_line_model/LLD-level-5-v2.pt"
 local_model_config_path = "resource/lane_line_model/config.yaml"
 
 class LaneLineDetectionWorker(AbstractWorker):
@@ -29,6 +30,7 @@ class LaneLineDetectionWorker(AbstractWorker):
 
         self.labels = get_label_names(config_path)
         self.lane_line_model = LaneLineModel(model_path, use_curve_line=True)
+        self.lines_analizator = LinesAnalizator()
         
 
     def on_event(self, event, scene=None):
@@ -40,9 +42,18 @@ class LaneLineDetectionWorker(AbstractWorker):
             if world_model:
                 img = np.array(Image.fromarray(world_model.rgb_image))
                 line_batches, mask_batches, results = self.lane_line_model.predict([img])
-
+                
                 world_model.img_front_objects_lines = self.lane_line_model.generate_prediction_plots([world_model.img_front_objects], self.labels, mask_batches, line_batches)[0]
                 world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+
+                count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(world_model.img_front_objects_lines, 
+                                                                                                line_batches, 
+                                                                                                0.45, 1.0, 
+                                                                                                world_model.img_front_objects_lines.shape)
+                
+                self.lines_analizator.draw_labels(world_model.img_front_objects_lines, 
+                                                  label_names=[f"Count of lanes: {count_roads}", f"Car on lane: {car_line_id}"],
+                                                  colors=[(27, 198, 250), (25, 247, 184)])
 
                 lines_bev = []
                 masks_bev = []
