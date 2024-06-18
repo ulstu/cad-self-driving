@@ -24,13 +24,19 @@ from .log_server import set_lidar_hz
 import traceback
 import pathlib
 import pickle
+
+import os
+import time
 from traceback import format_exc
+from .lib.param_loader import ParamLoader
+
 
 SENSOR_DEPTH = 40
-FPS = 0.1
+FPS = 1
 
-DATACAMERA = "/home/max/data/camera"
-DATALIDAR = "/home/max/data/lidar"
+DATACAMERA = f"{os.path.expanduser('~')}/ros2_ws/data/camera/"
+DATALIDAR = f"{os.path.expanduser('~')}/ros2_ws/data/lidar/"
+
 
 
 class NodeVisual(Node):
@@ -40,8 +46,10 @@ class NodeVisual(Node):
             self._logger.info(f'Node Visual Started')
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
-            self.create_subscription(sensor_msgs.msg.Image, '/vehicle/camera/image_color', self.__on_image_message, qos)
-            self.create_subscription(PointCloud2, '/vehicle/range_finder/point_cloud', self.__on_point_cloud, qos)
+            param = ParamLoader()
+
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
+            self.create_subscription(PointCloud2, param.get_param("lidar_topicname"), self.__on_point_cloud, qos)
 
             self.__last_image_time = datetime.now()
             self.__lidar_last_time = datetime.now()
@@ -118,3 +126,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+

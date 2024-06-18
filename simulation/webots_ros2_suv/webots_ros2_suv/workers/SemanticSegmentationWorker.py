@@ -21,7 +21,6 @@ class SemanticSegmentationWorker(AbstractWorker):
         weights_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'mobilev3large-lraspp.pt')))
 
         if torch.cuda.is_available():
-
             self.seg_model = MobileV3Large.from_pretrained(weights_path).cuda().eval()
         else:
             self.seg_model = MobileV3Large.from_pretrained(weights_path).eval()

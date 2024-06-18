@@ -1,0 +1,7 @@
+path: /kaggle/input/yolov8-new-data1-val015-fmasks/yolov8-new-data1-val015-fmasks
+train: images/train
+val: images/train
+
+
+nc: 15
+names: ['unkown', 'white-dash', 'white-solid', 'double-white-dash', 'double-white-solid', 'white-ldash-rsolid', 'white-lsolid-rdash', 'yellow-dash', 'yellow-solid', 'double-yellow-dash', 'double-yellow-solid', 'yellow-ldash-rsolid', 'yellow-lsolid-rdash', 'left-curbside', 'right-curbside']

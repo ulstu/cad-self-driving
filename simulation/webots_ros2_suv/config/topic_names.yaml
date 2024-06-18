@@ -1,5 +1,0 @@
-lidar: "/lidar"
-front_image: "/vehicle/camera/image_color"
-# lidar: "/ch64w/lslidar_point_cloud"
-# front_image: "/zed/zed_node/rgb/image_rect_color"
-range_image: "/vehicle/range_finder/image"

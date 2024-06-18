@@ -26,6 +26,7 @@ data_files += generate_data_files('share/' + package_name + '/resource/', 'resou
 data_files += generate_data_files('share/' + package_name + '/config/', 'config/')
 data_files += generate_data_files('share/' + package_name + '/maps/', 'maps/')
 data_files += generate_data_files('share/' + package_name + '/map-server/', 'map-server/')
+data_files += generate_data_files('share/' + package_name + '/protos/', 'protos/')
 
 setup(
     name=package_name,
@@ -56,7 +57,9 @@ setup(
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
             'node_ego_controller = webots_ros2_suv.node_ego_controller:main',
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
-            'node_visual = webots_ros2_suv.node_visual:main'
+            'node_visual = webots_ros2_suv.node_visual:main',
+            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
+
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

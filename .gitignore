@@ -1,6 +1,7 @@
 !simulation/webots_ros2_suv/webots_ros2_suv/lib/*
 !simulation/webots_ros2_suv/webots_ros2_suv/lib
-
+.idea
+.vscode
 simulation/docker/projects/*
 
 
@@ -131,3 +132,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+perception/signs_detector/weights/*
+#simulation/webots_ros2_suv/resource/*

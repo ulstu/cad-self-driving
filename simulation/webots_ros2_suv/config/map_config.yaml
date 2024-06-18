@@ -1,3 +1,7 @@
-lat: 43.639341192451475
-lon: 56.33519768405111
+lat: 43.638987354236185
+lon: 56.335206573823854
 mapfile: robocross.geojson
+
+# lat: 52.000441437135855
+# lon: 55.81957703977085
+# mapfile: alabuga_test.geojson

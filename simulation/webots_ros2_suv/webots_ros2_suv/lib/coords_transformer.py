@@ -38,9 +38,15 @@ class CoordsTransformer(object):
         return longitude + (meters * m) / math.cos(latitude * (math.pi / 180))
 
     def get_global_coords(self, lat, lon, yaw):
-        latitude = self.__get_latitude(self.__coord_corrections[0], lat)
-        longitude = self.__get_longitude(self.__coord_corrections[1], lon)
-        o = self.__coord_corrections[2] - yaw
+        if self.__coord_corrections[0] > 0.0 and self.__coord_corrections[1] > 0.0:
+            latitude = self.__get_latitude(self.__coord_corrections[0], lat)
+            longitude = self.__get_longitude(self.__coord_corrections[1], lon)
+            o = self.__coord_corrections[2] - yaw
+        else:
+            latitude = lat
+            longitude = lon
+            o = yaw - self.__coord_corrections[2]
+            # o = yaw
         return latitude, longitude, o
 
     def get_relative_coordinates(self, target_lat, target_lon,  pos, pov_point):

@@ -10,3 +10,7 @@ shapely
 pyproj
 geopy
 open3d
+pyserial
+filterpy
+tensorflow
+dill

@@ -3,10 +3,10 @@ from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
 import math
 
 class MovingState(AbstractState):
-    # Реализация методов для StartState
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
+        self.runs = 0
         self.__cur_path_point = 1
 
     def find_goal_point_x(self, arr, val=100):
@@ -30,25 +30,31 @@ class MovingState(AbstractState):
             return max_start + int((max_end - max_start) / 3 * 2)
         else:
             return 0
+    
+    def is_obstacle_near(self, world_model, x, y, obstacle_val, robot_radius):
+        for i in range(x - robot_radius, x + robot_radius):
+            for j in range(y - robot_radius, y + robot_radius):
+                if world_model.ipm_image[j, i] != obstacle_val:
+                    return False
+        return True
+
 
     def find_next_goal_point(self, world_model):
-        #self.log(f"{world_model.get_coord_corrections()}")
         if not world_model.global_map:
             return (0, 0)
-        points_seg = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving']
-        self.log(f'PATH SEGMENT: {world_model.cur_path_segment} {len(points_seg)}')
-        points = points_seg[world_model.cur_path_segment]
-        #self.log(f"POINTS: {points}")
+        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
 
         dists = []
         for p in points:
             dists.append(calc_dist_point(p, world_model.get_current_position()))
 
-        if self.__cur_path_point < len(points) - 2:
+        if self.__cur_path_point < len(points) - 1:
+            x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
             dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
-            self.log(f"DIST: {dist}")
-            if dist < 2:
+            
+            if dist < self.config['change_point_dist'] or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
+            self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
 
@@ -56,13 +62,12 @@ class MovingState(AbstractState):
                                                                        points[self.__cur_path_point][1], 
                                                                        pos=world_model.get_current_position(),
                                                                        pov_point=world_model.pov_point)
-        #self.log(f"CURRENT POS: {world_model.get_current_position()}")
-        # x = int(world_model.pov_point[0] - x) if world_model.pov_point[0] - x >=0 else 0
-        # y = int(world_model.pov_point[1] - y) if world_model.pov_point[1] - y >=0 else 0
-        self.log(f'CUR_POINT: {self.__cur_path_point} GOAL POINT: {x, y} X: {points[self.__cur_path_point][0]} Y:{points[self.__cur_path_point][1]} DISTS: {dists}')
         return (x, y)
 
     def on_event(self, event, world_model=None):
+        self.runs = self.runs + 1
+        if world_model.traffic_light_state == "red":
+            return "stop"
         lat, lon, o = world_model.get_current_position()
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
         world_model.goal_point = self.find_next_goal_point(world_model)
@@ -81,6 +86,6 @@ class MovingState(AbstractState):
         if event:
             world_model.path = None
         world_model.set_speed(30)
-        self.drive(world_model, speed=25)
+        self.drive(world_model, speed=15)
         return event
 

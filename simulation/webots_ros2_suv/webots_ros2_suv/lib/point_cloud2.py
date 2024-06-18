@@ -47,7 +47,6 @@ import ctypes
 import math
 import struct
 
-import roslib.message
 from sensor_msgs.msg import PointCloud2, PointField
 
 _DATATYPES = {}
@@ -134,8 +133,6 @@ def read_points_list(cloud, field_names=None, skip_nans=False, uvs=[]):
     @return: List of namedtuples containing the values for each point
     @rtype: list
     """
-    assert isinstance(cloud,
-                      roslib.message.Message) and cloud._type == 'sensor_msgs/PointCloud2', 'cloud is not a sensor_msgs.msg.PointCloud2'
 
     if field_names is None:
         field_names = [f.name for f in cloud.fields]
