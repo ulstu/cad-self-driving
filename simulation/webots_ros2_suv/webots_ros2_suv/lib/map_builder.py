@@ -5,6 +5,7 @@ import numpy as np
 import os
 import yaml
 import time
+import pathlib
 import traceback
 from fastseg.image import colorize
 from collections import defaultdict
@@ -28,6 +29,13 @@ class MapBuilder(object):
         model_dir = BASE_RESOURCE_PATH + 'resource/'
         self.__behaviour_analyser = BehaviourAnalyser(model_dir=model_dir)
         self.__behaviour_analyser_bev = BehaviourAnalyser()
+        package_dir = get_package_share_directory('webots_ros2_suv')
+        config_path = os.path.join(package_dir,
+                                    pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
+        with open(config_path) as file:
+            config = yaml.full_load(file)
+            self.__bev_obstacle_ratio = config['bev_obstacle_ratio']
+
 
     def detect_objects(self, image):
         #results = self.__model.predict(source=image, save=False, save_txt=False)
@@ -123,7 +131,8 @@ class MapBuilder(object):
             if label_num in excluded_classes:
                 continue
             l = self.get_labels()[label_num]
-            w =  widths[i] * h / (tbs[i][1] * 4)
+            
+            w =  widths[i] * h / (tbs[i][1] * self.__bev_obstacle_ratio)
             p1 = (int(tbs[i][0] - w), int(tbs[i][1] - w))
             p2 = (int(tbs[i][0] + w), int(tbs[i][1]))
             # Метод colorize имеет ограниченный размер палитры, поэтому ипользуется модуляция. Лучше исправить потом

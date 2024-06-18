@@ -67,7 +67,7 @@ class NodeEgoController(Node):
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
-            self.__fsm.on_event(None)
+            self.__fsm.on_event('start_move')
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
 
@@ -108,6 +108,8 @@ class NodeEgoController(Node):
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
         self.drive()
+        self.__world_model.fill_params()
+        self.__world_model.params.append({'states': f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"})
         self.__ws.update_model(self.__world_model)
 
     def __on_gps_message(self, data):

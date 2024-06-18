@@ -2,7 +2,7 @@ from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
 import math
 
-class GPSFollowState(AbstractState):
+class LaneFollowState(AbstractState):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
@@ -47,8 +47,8 @@ class GPSFollowState(AbstractState):
         dists = []
         for p in points:
             dists.append(calc_dist_point(p, world_model.get_current_position()))
-
         self.__cur_path_point = world_model.cur_path_point
+
         if self.__cur_path_point < len(points) - 1:
             x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
             dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
@@ -78,7 +78,7 @@ class GPSFollowState(AbstractState):
         zones = world_model.get_current_zones()
         
         # default speed
-        speed = 10
+        speed = 30
         for z in zones:
             if z['name'] == 'turn':
                 world_model.cur_turn_polygon = z['coordinates'][0]
@@ -89,7 +89,7 @@ class GPSFollowState(AbstractState):
                 event = "stop"
             elif z['name'].startswith("speed"):
                 speed = float(z['name'].split('speed')[1])
-        if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
+        if world_model.is_obstacle_before_path_point():
             event = "start_move"
         if world_model.is_lane_road():
             event = "start_lane_follow"

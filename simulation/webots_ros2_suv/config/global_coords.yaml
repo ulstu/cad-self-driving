@@ -2,7 +2,7 @@ lat: 43.63939225773861
 lon: 56.33517639374398
 orientation: 1.5
 scale_x: 30
-scale_y: 5
+scale_y: 6
 bev_orientation: 0.0
 
 kalman_path_planning_noise_scale: 0.05
@@ -17,6 +17,7 @@ ackerman_proportional_coef: 1.2
 change_point_dist: 0.3
 turn_angle_num_path_points: 5
 default_speed: 15
+bev_obstacle_ratio: 2
 
 
 # lat: 0.0

@@ -3,6 +3,7 @@ import cherrypy
 import traceback
 import yaml
 import os
+import logging
 import pathlib
 import json
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -117,10 +118,17 @@ class MapWebServer(object):
             self.log(f'SAVED MAP DATA: {map_data}')
             with open(f'{MAPS_PATH}/{filename}.geojson', 'w') as f:
                 json.dump(json.loads(map_data), f)
+            with open(f'{MAPS_PATH}/{filename}.geojson') as mapdatafile:            
+                self.world_model.load_map(yaml.safe_load(mapdatafile))
             return {'status': 'ok'} 
         except Exception as err:        
             self.log(''.join(traceback.TracebackException.from_exception(err).format()))
             return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_params(self):
+        return self.world_model.params
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -180,9 +188,17 @@ class MapWebServer(object):
 
 def start_web_server(map_server):
     try:
-        cherrypy.config.update({'log.screen': False,
-                        'log.access_file': '',
-                        'log.error_file': ''})
+
+        cherrypy.config.update({
+            'log.screen': False
+        })
+
+        # Отключение всех логеров CherryPy
+        for log in ('cherrypy.access', 'cherrypy.error'):
+            logger = logging.getLogger(log)
+            logger.propagate = False
+            logger.handlers = []
+            logger.addHandler(logging.NullHandler())
         cherrypy.quickstart(map_server, '/', {'global':
                                                    {'server.socket_host': '0.0.0.0',
                                                     'server.socket_port': 8008,

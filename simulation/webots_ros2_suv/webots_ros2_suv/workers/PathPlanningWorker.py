@@ -27,7 +27,7 @@ class PathPlanningWorker(AbstractWorker):
                                     pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
         self.turning_radius = 0.1
         self.process_noise_scale = 0.05 
-        self.robot_radius=4
+        self.robot_radius=10
         self.step_size=10
         self.sample_size=5
 

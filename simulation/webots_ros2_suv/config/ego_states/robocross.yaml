@@ -2,7 +2,8 @@ states_dir: "robocross/"
 states:
   start: "StartState.py"
   moving: "MovingState.py"
-  gps_follow: "GPSFollowState.py"
+  gpsfollow: "GPSFollowState.py"
+  lanefollow: "LaneFollowState.py"
   stopped: "StoppedState.py"
   emergency: "EmergencyState.py"
   turn: "TurnState.py"
@@ -18,7 +19,8 @@ workers:
 workerstates:
   start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign"]
   moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  gps_follow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   stopped: []
   turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]
   emergency: []
@@ -26,10 +28,19 @@ transitions:
   start:
     start_move: ["moving"]
     stop: ["stopped"]
-  gps_follow:
+  gpsfollow:
+    start_move: ["moving"]
+    start_lane_follow: ["lanefollow"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   moving:
+    start_gps_follow: ["gpsfollow"] 
+    start_lane_follow: ["lanefollow"]
+    stop: ["stopped", "emergency"]
+    turn: ["turn"]
+  lanefollow:
+    start_gps_follow: ["gpsfollow"] 
+    start_move: ["moving"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   stopped:
@@ -46,20 +57,20 @@ map-elements:
     ol-type: !!str Point
     color: !!str 00ff00
   - element:
+    id: "turn"
+    name: !!str Зона разворота
+    ol-type: !!str Polygon
+    color: !!str ffff00
+  - element:
     id: "finish"
     name: !!str Зона  финиша
     ol-type: !!str Polygon
     color: !!str ff0000
   - element:
-    id: "speed20"
-    name: !!str Скорость 20
+    id: "nolanes"
+    name: !!str Зона движения без линий разметки 
     ol-type: !!str Polygon
-    color: !!str fe00f0
-  - element:
-    id: "turn"
-    name: !!str Зона разворота
-    ol-type: !!str Polygon
-    color: !!str ffff00
+    color: !!str 0000ff
   - element:
     id: "moving"
     name: !!str Путь следования
@@ -70,6 +81,23 @@ map-elements:
     name: !!str Зона остановки
     ol-type: !!str Polygon
     color: !!str 800080
-
-
-
+  - element:
+    id: "speed10"
+    name: !!str Зона скорости 10
+    ol-type: !!str Polygon
+    color: !!str fe00f0
+  - element:
+    id: "speed20"
+    name: !!str Зона скорости 20
+    ol-type: !!str Polygon
+    color: !!str fefcba
+  - element:
+    id: "speed30"
+    name: !!str Зона скорости 30
+    ol-type: !!str Polygon
+    color: !!str aef0b0
+  - element:
+    id: "speed40"
+    name: !!str Зона скорости 40
+    ol-type: !!str Polygon
+    color: !!str fe00cf
