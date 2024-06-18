@@ -58,7 +58,16 @@ class ImageApp:
             text='Open a lidar',
             command=self.open_image_dialog
         )
-
+        self.load_config_button = Button(
+            self.left_frame,
+            text='Load config',
+            command=self.load_config_file
+        )
+        self.save_config_button = Button(
+            self.left_frame,
+            text='Save config',
+            command=self.save_config_file
+        )
         self.varh = IntVar()
         self.varh.set(100)
 
@@ -88,6 +97,10 @@ class ImageApp:
         self.configs_frames = []
         self.open_image_button.grid(row=0, column=0, padx=5, pady=5)
         self.load_lidar_button.grid(row=0, column=1, padx=5, pady=5)
+        self.load_config_button.grid(row=0, column=2, padx=5, pady=5)
+        self.save_config_button.grid(row=0, column=3, padx=5, pady=5)
+        self.parameters()
+
         self.root.mainloop()
 
     def parameters(self):
@@ -124,16 +137,16 @@ class ImageApp:
         lx.grid(row=1, column=0, columnspan=2)
 
         for i in range(0, 4):
-            self.src_x_sliders.append(Scale(self.frame_src, from_=0, to=self.__img_prev_width, orient=HORIZONTAL,
+            self.src_x_sliders.append(Scale(self.frame_src, from_=0, to=self.__img_width, orient=HORIZONTAL,
                                             variable=self.src_x_list[i], command=self.my_callback))
-            self.src_y_sliders.append(Scale(self.frame_src, from_=0, to=self.__img_prev_width, orient=HORIZONTAL,
+            self.src_y_sliders.append(Scale(self.frame_src, from_=0, to=self.__img_height, orient=HORIZONTAL,
                                             variable=self.src_y_list[i], command=self.my_callback))
             self.src_x_sliders[i].grid(row=i + 2, column=0)
             self.src_y_sliders[i].grid(row=i + 2, column=1)
 
-            self.dst_x_sliders.append(Scale(self.frame_dst, from_=0, to=self.__img_prev_width, orient=HORIZONTAL,
+            self.dst_x_sliders.append(Scale(self.frame_dst, from_=0, to=self.__img_width, orient=HORIZONTAL,
                                             variable=self.dst_x_list[i], command=self.my_callback))
-            self.dst_y_sliders.append(Scale(self.frame_dst, from_=0, to=self.__img_prev_width, orient=HORIZONTAL,
+            self.dst_y_sliders.append(Scale(self.frame_dst, from_=0, to=self.__img_height, orient=HORIZONTAL,
                                             variable=self.dst_y_list[i], command=self.my_callback))
             self.dst_x_sliders[i].grid(row=i + 2, column=0)
             self.dst_y_sliders[i].grid(row=i + 2, column=1)
@@ -162,11 +175,10 @@ class ImageApp:
         self.limits_container.create_image(0, 0, image=self.__prev_canvas_image, anchor=NW, tags="preview")
         self.limits_container.config(width=1220,
                                      height=1000)
-        self.__cut_line = self.limits_container.create_line(0, self.varh.get() // 2, self.__img_prev_width,
+        self.limits_container.create_line(0, self.varh.get() // 2, self.__img_prev_width,
                                                             self.varh.get() // 2, tags="__cut_line",
                                                             fill="red",
                                                             width=2)
-
         self.lt = self.limits_container.create_rectangle(self.src_x_list[0].get() // 2, self.src_y_list[0].get() // 2,
                                                          self.src_x_list[0].get() // 2 + self.RECT_SIZE,
                                                          self.src_y_list[0].get() // 2 + self.RECT_SIZE, tags="lt",
@@ -212,25 +224,7 @@ class ImageApp:
 
     def fill_pts_from_sliders(self):
         self.__horizont_line_height = self.varh.get()
-        # lt = self.limits_container.coords(self.lt) * 2
-        # lb = self.limits_container.coords(self.lb) * 2
-        # rt = self.limits_container.coords(self.rt) * 2
-        # rb = self.limits_container.coords(self.rb) * 2
-        # lt_dst = self.limits_container.coords(self.lt_dst) * 2
-        # lb_dst = self.limits_container.coords(self.lb_dst) * 2
-        # rt_dst = self.limits_container.coords(self.rt_dst) * 2
-        # rb_dst = self.limits_container.coords(self.rb_dst) * 2
-        #
-        # # поправка на отрезанный горизонт
-        # lt[1] = lt[1] - self.__horizont_line_height
-        # lb[1] = lb[1] - self.__horizont_line_height
-        # rt[1] = rt[1] - self.__horizont_line_height
-        # rb[1] = rb[1] - self.__horizont_line_height
-        # lt_dst[1] = lt_dst[1] - self.__horizont_line_height
-        # lb_dst[1] = lb_dst[1] - self.__horizont_line_height
-        # rt_dst[1] = rt_dst[1] - self.__horizont_line_height
-        # rb_dst[1] = rb_dst[1] - self.__horizont_line_height
-        #
+        
         self.pts_src = np.array([
             [self.src_x_list[0].get(), self.src_y_list[0].get()],
             [self.src_x_list[1].get(), self.src_y_list[1].get()],
@@ -244,12 +238,74 @@ class ImageApp:
             [self.dst_x_list[2].get(), self.dst_y_list[2].get()],
             [self.dst_x_list[3].get(), self.dst_y_list[3].get()],
         ], dtype=np.float32)
-        # self.pts_dst = np.array([[lt_dst[0] + self.RECT_SIZE / 2, lt_dst[1] + self.RECT_SIZE / 2],
-        #                          [lb_dst[0] + self.RECT_SIZE / 2, lb_dst[1] + self.RECT_SIZE / 2],
-        #                          [rt_dst[0] + self.RECT_SIZE / 2, rt_dst[1] + self.RECT_SIZE / 2],
-        #                          [rb_dst[0] + self.RECT_SIZE / 2, rb_dst[1] + self.RECT_SIZE / 2]], dtype=np.float32)
+
+        # поправка на отрезанный горизонт Important Very
+        for i in range(len(self.pts_src)):
+            self.pts_src[i][1] -= self.__horizont_line_height
+            self.pts_dst[i][1] -= self.__horizont_line_height
+    
+    def load_config_file(self):
+        filename = filedialog.askopenfilename(filetypes=[("YAML config", "*.yaml")])
+        self.load_config(filename)
+        self.update_sliders()
+        self.place_elements()
+        self.update_homography()
+
+
+    def save_config_file(self):
+        filename = filedialog.asksaveasfile(filetypes=[("YAML config", "*.yaml")])
+        self.save_config(filename.name)
+
+    def save_config(self, filename):
+        self.fill_pts_from_sliders()
+        src = self.pts_src.copy()
+        src[:, 1] = src[:, 1] + self.__horizont_line_height
+        dst = self.pts_dst.copy()
+        dst[:, 1] = dst[:, 1] + self.__horizont_line_height
+        config = {
+            'homography': self.ipm_transformer.get_homography_matrix().tolist(),
+            'horizont': self.__horizont_line_height,
+            'src_points': src.tolist(),
+            'dst_points': dst.tolist(),
+            'height': self.__img_height,
+            'width': self.__img_width
+        }
+        with open(filename, 'w') as file:
+            documents = yaml.dump(config, file, default_flow_style=False)
+
+    def load_config(self, filename):
+        if not os.path.exists(filename):
+            print('Config file not found. Use default values')
+            return
+        with open(filename) as file:
+            config = yaml.full_load(file)
+        self.ipm_transformer = IPMTransformer(np.array(config['homography']))
+        self.__horizont_line_height = config['horizont']
+        self.pts_src = np.array(config['src_points'])
+        self.pts_dst = np.array(config['dst_points'])
+        self.__img_height = config['height']
+        self.__img_width = config['width']
+
 
     def find_homography(self):
+        # self.fill_pts_from_sliders()
+        # h_img = cv2.resize(self., (homo_data["width"], homo_data["height"]))
+        # ipm_transformer = IPMTransformer(homography_matrix=np.array(homo_data["homography"]))
+        # img_ipm = ipm_transformer.get_ipm(h_img, is_mono=False, horizont=homo_data["horizont"])
+        # pil_img = Image.fromarray(img_ipm)
+        # target_width = 400  # 400
+        # pil_img = pil_img.resize((target_width, int(pil_img.size[1] * target_width / pil_img.size[0])))
+
+        self.fill_pts_from_sliders()
+        self.ipm_transformer.calc_homography(self.pts_src, self.pts_dst)
+        h_img = cv2.resize(self.__src_image, (self.__img_width, self.__img_height))
+        self.__img_ipm = self.ipm_transformer.get_ipm(h_img, is_mono=False,
+                                                      horizont=self.__horizont_line_height) 
+        pil_img = Image.fromarray(self.__img_ipm)
+        target_width = self.__img_width  # 400
+        pil_img = pil_img.resize((target_width, int(pil_img.size[1] * target_width / pil_img.size[0])))
+        return pil_img
+    
         self.fill_pts_from_sliders()
         print(self.pts_src, self.pts_dst)
         self.ipm_transformer.calc_homography(self.pts_src, self.pts_dst)
@@ -287,9 +343,18 @@ class ImageApp:
         self.pts_src, self.pts_dst = self.calc_pts(self.__img_width, self.__img_height)
 
         self.place_elements()
-        self.parameters()
+        self.update_parameters()
         self.update_homography()
         self.wx.config(to=self.__img_height)
+
+    def update_sliders(self):
+        self.varh.set(int(self.__horizont_line_height))
+        for i in range(4):
+            self.src_x_list[i].set(int(self.pts_src[i][0]))
+            self.src_y_list[i].set(int(self.pts_src[i][1]))
+
+            self.dst_x_list[i].set(int(self.pts_dst[i][0]))
+            self.dst_y_list[i].set(int(self.pts_dst[i][1]))
 
     def calc_pts(self, width, height):
 
