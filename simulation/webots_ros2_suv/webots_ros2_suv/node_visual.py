@@ -24,6 +24,7 @@ from .log_server import set_lidar_hz
 import traceback
 import pathlib
 import pickle
+
 import os
 import time
 from traceback import format_exc
@@ -35,6 +36,7 @@ FPS = 1
 
 DATACAMERA = f"{os.path.expanduser('~')}/ros2_ws/data/camera/"
 DATALIDAR = f"{os.path.expanduser('~')}/ros2_ws/data/lidar/"
+
 
 
 class NodeVisual(Node):
@@ -124,3 +126,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
