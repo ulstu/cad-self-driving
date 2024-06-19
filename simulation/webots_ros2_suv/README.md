@@ -28,9 +28,9 @@ pip install -r requirements.txt
 ## Установка решения
 * Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros2_ws/src
 ```
-ln -s ~/repositories/cad-self-driving/pcl_maps ~/ros2_ws/src/pcl_maps
-ln -s ~/repositories/cad-self-driving/robot_interfaces ~/ros2_ws/src/robot_interfaces
-ln -s ~/repositories/cad-self-driving/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
+ln -s ~/repositories/cad-self-driving/simulation/pcl_maps ~/ros2_ws/src/pcl_maps
+ln -s ~/repositories/cad-self-driving/simulation/robot_interfaces ~/ros2_ws/src/robot_interfaces
+ln -s ~/repositories/cad-self-driving/simulation/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
 ```
 * Для загрузки весов нейронных сетей необходимо установить https://git-lfs.com/
 
@@ -52,6 +52,13 @@ source /opt/ros/humble/setup.bash
 source /home/user/ros2_ws/install/setup.bash
 export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
+```
+
+Для скачивания и установки весов нейронных сетей скачать в папку ~/ros2_ws/src/webots_ros2_suv/resource файл по ссылке https://disk.yandex.ru/d/SiHdbj_grmqD4A, затем:
+
+```
+cd ~/ros2_ws/src/webots_ros2_suv/resource
+unzip resource.zip
 ```
 
 * Компиляция командой 'colcon build' из папки ~/ros2_ws 
