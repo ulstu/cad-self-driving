@@ -55,7 +55,7 @@ class ImageApp:
         )
         self.load_lidar_button = Button(
             self.left_frame,
-            text='Open a lidar',
+            text='Open a obstacles',
             command=self.open_image_dialog
         )
         self.load_config_button = Button(

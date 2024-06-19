@@ -52,14 +52,16 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'lane_follower = webots_ros2_suv.lane_follower:main',
+            # 'lane_follower = webots_ros2_suv.lane_follower:main',
             'field_follower = webots_ros2_suv.field_follower:main',
             'node_sensors_webots = webots_ros2_suv.node_sensors_webots:main',
             'node_ego_controller = webots_ros2_suv.node_ego_controller:main',
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
             'node_visual = webots_ros2_suv.node_visual:main',
-            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
 
+            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
+            'node_bev_builder = webots_ros2_suv.node_bev_builder:main',
+            'node_point_obstacles = webots_ros2_suv.node_point_obstacles:main',
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

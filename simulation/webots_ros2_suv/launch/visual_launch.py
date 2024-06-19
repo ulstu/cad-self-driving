@@ -73,6 +73,22 @@ def get_ros2_nodes(*args):
         output='screen',
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
+    node_point_obstacles = Node(
+        package=PACKAGE_NAME,
+        executable='node_point_obstacles',
+        name='node_point_obstacles',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
+    node_bev_builder = Node(
+        package=PACKAGE_NAME,
+        executable='node_bev_builder',
+        name='node_bev_builder',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
 
     package_dir = get_package_share_directory(PACKAGE_NAME)
     urdf = os.path.join(
@@ -139,9 +155,11 @@ def get_ros2_nodes(*args):
         node_ego_controller,
         node_visual,
         #depth_to_laserscan,
-        # pcl_map_node,
+        pcl_map_node,
+        node_bev_builder,
         #rviz2_node,
         #lane_follower,
+        node_point_obstacles,
     ] + static_transform_nodes
 
 
