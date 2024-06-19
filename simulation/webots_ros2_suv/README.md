@@ -54,7 +54,7 @@ export WEBOTS_HOME=/usr/local/webots
 export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 
-Для скачивания и установки весов нейронных сетей скачать в папку ~/ros2_ws/src/webots_ros2_suv/resource файл по ссылке https://disk.yandex.ru/d/SiHdbj_grmqD4A, затем:
+Для скачивания и установки весов нейронных сетей скачать в папку ~/ros2_ws/src/webots_ros2_suv/resource файл по ссылке https://disk.yandex.ru/d/SiHdbj_grmqD4A (альтернативная ссылка: https://drive.google.com/drive/folders/1OCcuewvbdDOLtX6npBMKlyta16Tf6_cM), затем:
 
 ```
 cd ~/ros2_ws/src/webots_ros2_suv/resource
