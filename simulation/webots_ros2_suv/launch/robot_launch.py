@@ -15,17 +15,8 @@ from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLau
 from webots_ros2_driver.webots_controller import WebotsController
 from nav2_common.launch import RewrittenYaml
 
-
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
-
-package_dir = get_package_share_directory(PACKAGE_NAME)
-project_settings_config_path = os.path.join(package_dir, "config/project_settings.yaml")
-with open(project_settings_config_path, "r") as file:
-    project_settings_config = yaml.safe_load(file)
-if project_settings_config['use_gpu'] == False:
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
 
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
@@ -155,7 +146,7 @@ def get_ros2_nodes(*args):
         #node_globalmap,
         node_ego_controller,
         # node_point_obstacles,
-        node_visual,
+        # node_visual,``
         #depth_to_laserscan,
         pcl_map_node,
         #rviz2_node,
