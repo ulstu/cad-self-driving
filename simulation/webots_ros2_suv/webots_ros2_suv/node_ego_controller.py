@@ -50,10 +50,19 @@ class NodeEgoController(Node):
                 with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
                     self.__world_model.load_map(yaml.safe_load(mapdatafile))
 
+
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
             param = ParamLoader()
+
+            self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
+
+            # Примеры событий
+            self.__fsm.on_event(None)
+            # self.__fsm.on_event("stop")
+            # self.__fsm.on_event("reset")
+
             self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
@@ -108,15 +117,19 @@ class NodeEgoController(Node):
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
         self.drive()
+
         self.__world_model.fill_params()
         self.__world_model.params.append({'states': f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"})
-        self.__ws.update_model(self.__world_model)
+        if self.__ws is not None:
+            self.__ws.update_model(self.__world_model)
 
     def __on_gps_message(self, data):
-        roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
-        lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-        self.__world_model.update_car_pos(lat, lon, orientation)
-        self.__ws.update_model(self.__world_model)
+        if self.__world_model is not None:
+            roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
+            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            self.__world_model.update_car_pos(lat, lon, orientation)
+            if self.__ws is not None:
+                self.__ws.update_model(self.__world_model)
 
 def main(args=None):
     try:

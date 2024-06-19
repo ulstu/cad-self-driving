@@ -21,7 +21,7 @@ workerstates:
   moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
   gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  stopped: []
+  stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign"]
   turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]
   emergency: []
 transitions:
