@@ -47,9 +47,13 @@ class IPMWorker(AbstractWorker):
             image_seg = self.__map_builder.resize_img(image_seg.astype('float32'))
             #image_depth = self.__map_builder.resize_img(image_depth.astype('float32'))
 
+
             results = self.__map_builder.detect_objects(image)
             cboxes = results[0].boxes.data.cpu()
-            print(results[0].boxes.cls)
+            # resized_boxes = np.reshape(np.array(cboxes)[:, :4], (-1, 2, 2)) / np.array(image.shape[:2])[::-1] * np.array(world_model.rgb_image.shape[:2])[::-1]
+            resized_boxes = np.reshape(np.array(cboxes)[:, :4], (-1, 2, 2))
+            world_model.yolo_detected_objects = zip(resized_boxes, results[0].boxes.cls)
+            
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
