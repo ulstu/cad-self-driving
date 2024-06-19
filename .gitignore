@@ -3,6 +3,19 @@
 .idea
 .vscode
 simulation/docker/projects/*
+perception/signs_detector/weights/*
+perception/signs_detector/tf_mobilenetv3_large_100.pt
+perception/signs_detector/mobilev3large-lraspp.pt
+perception/seg_bev/yolov8l.pt
+simulation/webots_ros2_suv/resource/yolov8l.pt
+simulation/webots_ros2_suv/resource/lane_line_model/LLD-level-5-v2.pt
+simulation/webots_ros2_suv/resource/lane_line_model/lane_line_detection_yolo8s-seg_model.pt
+simulation/webots_ros2_suv/resource/tf_mobilenetv3_large_100.pt
+simulation/webots_ros2_suv/resource/yolov8l_old.pt
+simulation/webots_ros2_suv/resource/mobilev3large-lraspp-sign.pt
+simulation/webots_ros2_suv/resource/mobilev3large-lraspp.pt
+simulation/webots_ros2_suv/resource/yolov8l_barrels.pt
+simulation/webots_ros2_suv/resource/weights/model-ep50-signs16/model.h5
 
 
 # Byte-compiled / optimized / DLL files
@@ -133,17 +146,3 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-perception/signs_detector/weights/*
-#simulation/webots_ros2_suv/resource/*
-perception/signs_detector/tf_mobilenetv3_large_100.pt
-perception/signs_detector/mobilev3large-lraspp.pt
-perception/seg_bev/yolov8l.pt
-simulation/webots_ros2_suv/resource/yolov8l.pt
-simulation/webots_ros2_suv/resource/lane_line_model/LLD-level-5-v2.pt
-simulation/webots_ros2_suv/resource/lane_line_model/lane_line_detection_yolo8s-seg_model.pt
-simulation/webots_ros2_suv/resource/tf_mobilenetv3_large_100.pt
-simulation/webots_ros2_suv/resource/yolov8l_old.pt
-simulation/webots_ros2_suv/resource/mobilev3large-lraspp-sign.pt
-simulation/webots_ros2_suv/resource/mobilev3large-lraspp.pt
-simulation/webots_ros2_suv/resource/yolov8l_barrels.pt
-simulation/webots_ros2_suv/resource/weights/model-ep50-signs16/model.h5
