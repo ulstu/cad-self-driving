@@ -16,3 +16,4 @@ tensorflow
 dill
 geopy
 dubins
+segmentation-models-pytorch

@@ -109,11 +109,20 @@ class NodeEgoController(Node):
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
 
-        cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
+        # cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
 
         self.__world_model.rgb_image = np.asarray(analyze_image)
+
+        t1 = time.time()
         # вызов текущих обработчиков данных
         self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
+
+        t2 = time.time()
+        
+        delta = t2 - t1
+        fps = 1 / delta
+        self._logger.info(f"Current FPS: {fps}")
+
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
         self.drive()
