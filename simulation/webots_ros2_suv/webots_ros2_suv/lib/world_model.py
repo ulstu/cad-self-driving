@@ -77,6 +77,8 @@ class WorldModel(object):
 
 
     def draw_scene(self, log=None):
+        if self.ipm_colorized_lines is None:
+            return
         colorized = self.ipm_colorized_lines
         prev_point = None
         if self.path:

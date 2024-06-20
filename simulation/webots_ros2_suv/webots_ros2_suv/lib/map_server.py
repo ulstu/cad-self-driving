@@ -150,6 +150,8 @@ class MapWebServer(object):
 
     @cherrypy.expose
     def get_image(self, img_type, tm):
+        if self.world_model is None:
+            return None
         if img_type == "obj_detector":
             if self.world_model.img_front_objects_lines_signs is None:
                 return None
