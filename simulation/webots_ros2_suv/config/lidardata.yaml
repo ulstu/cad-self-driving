@@ -1,4 +1,4 @@
-visualize: True
+visualize: False 
 build_gps: True
 visual_scale: 15
 front_lidar_x: 0.0

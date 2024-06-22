@@ -44,6 +44,7 @@ class LaneLineDetectionWorker(AbstractWorker):
                 line_batches, mask_batches, results = self.lane_line_model.predict([img])
                 
                 world_model.img_front_objects_lines = self.lane_line_model.generate_prediction_plots([world_model.img_front_objects], self.labels, mask_batches, line_batches)[0]
+
                 world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
 
                 count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(world_model.img_front_objects_lines, 

@@ -58,8 +58,7 @@ setup(
             'node_ego_controller = webots_ros2_suv.node_ego_controller:main',
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
             'node_visual = webots_ros2_suv.node_visual:main',
-
-            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
+            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main',
             'node_bev_builder = webots_ros2_suv.node_bev_builder:main',
             'node_point_obstacles = webots_ros2_suv.node_point_obstacles:main',
         ],

@@ -31,14 +31,14 @@
             #region_of_interest: '[[0.5,0.25],[0.75,0.5],[0.5,0.75],[0.25,0.5]]' # A polygon defining the ROI where the ZED SDK perform the processing ignoring the rest. Coordinates must be normalized to '1.0' to be resolution independent.
 
         video:
-            brightness: 4 # [DYNAMIC] Not available for ZED X/ZED X Mini
-            contrast: 4 # [DYNAMIC] Not available for ZED X/ZED X Mini
+            brightness: 4 # 4 [DYNAMIC] Not available for ZED X/ZED X Mini
+            contrast: 8 # 4 [DYNAMIC] Not available for ZED X/ZED X Mini
             hue: 0 # [DYNAMIC] Not available for ZED X/ZED X Mini
             saturation: 4 # [DYNAMIC]
             sharpness: 4 # [DYNAMIC]
             gamma: 8 # [DYNAMIC]
             auto_exposure_gain: true # [DYNAMIC]
-            exposure: 80 # [DYNAMIC]
+            exposure: 100 # [DYNAMIC] 80
             gain: 80 # [DYNAMIC]
             auto_whitebalance: true # [DYNAMIC]
             whitebalance_temperature: 42 # [DYNAMIC] - [28,65] works only if `auto_whitebalance` is false

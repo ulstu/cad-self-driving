@@ -75,7 +75,8 @@ class NodeSensorsGazelle(Node):
             self.__odom_publisher.publish(odom)
             set_location(self.__gps.velocity, self.__gps.lat_dec, self.__gps.lon_dec, self.__gps.altitude, yaw)
         except Exception as err:
-            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
+            pass
+            # self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
 
 def main(args=None):

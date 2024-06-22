@@ -55,8 +55,10 @@ class MovingState(AbstractState):
             x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
             dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
             world_model.params.append({"point_dist": dist})
-            if dist < self.config['change_point_dist'] or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
+            if dist < self.config['change_point_dist']:
+                # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
+            world_model.params.append({'dist_point': dist})
             self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
@@ -74,6 +76,7 @@ class MovingState(AbstractState):
         lat, lon, o = world_model.get_current_position()
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
         world_model.goal_point = self.find_next_goal_point(world_model)
+        self.log(f'CUR POS: {lat} {lon} {world_model.goal_point}')
 
         event = None
         zones = world_model.get_current_zones()
@@ -90,10 +93,10 @@ class MovingState(AbstractState):
                 event = "stop"
             elif z['name'].startswith("speed"):
                 speed = float(z['name'].split('speed')[1])
-        if not world_model.is_obstacle_before_path_point(filter_num=10, log=self.log):
-            event = "start_gps_follow"
-        if world_model.is_lane_road():
-            event = "start_lane_follow"
+        # if not world_model.is_obstacle_before_path_point(filter_num=10, log=self.log):
+        #     event = "start_gps_follow"
+        # if world_model.is_lane_road():
+        #     event = "start_lane_follow"
 
         if event:
             world_model.path = None

@@ -54,6 +54,30 @@ def get_ros2_nodes(*args):
         output='screen',
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
+    node_point_obstacles = Node(
+        package=PACKAGE_NAME,
+        executable='node_point_obstacles',
+        name='node_point_obstacles',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
+    node_bev_builder = Node(
+        package=PACKAGE_NAME,
+        executable='node_bev_builder',
+        name='node_bev_builder',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+    
+    pcl_map_node = Node(
+        package="pcl_maps",
+        executable='pcl_map_node',
+        name='pcl_map_node',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+    
     driver_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'params', 'lslidar_ch64w.yaml')
     rviz_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'rviz_cfg', 'lslidar_ch64w.rviz')
 
@@ -112,10 +136,12 @@ def get_ros2_nodes(*args):
         node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
-        #node_visual,
-        rviz_node,
+        # node_visual,
+        # rviz_node,
+        # node_bev_builder,
+        # node_point_obstacles,
+        # pcl_map_node
     ] + static_transform_nodes
-
 
 def generate_launch_description():
     zed_wrapper_launch = IncludeLaunchDescription(

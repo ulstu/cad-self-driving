@@ -91,6 +91,13 @@ def get_ros2_nodes(*args):
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
+    node_visual = Node(
+        package=PACKAGE_NAME,
+        executable='node_visual',
+        name='node_visual',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
 
     package_dir = get_package_share_directory(PACKAGE_NAME)
     urdf = os.path.join(
@@ -159,6 +166,7 @@ def get_ros2_nodes(*args):
         node_bev_builder,
         #depth_to_laserscan,
         pcl_map_node,
+        node_visual,
         #rviz2_node,
         #lane_follower,
     ] + static_transform_nodes
