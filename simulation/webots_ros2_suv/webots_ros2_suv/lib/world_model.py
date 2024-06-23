@@ -33,7 +33,8 @@ class WorldModel(object):
         self.lane_lines = None              # линии дорожной разметки на изображении во фронтальной проекции
         self.lane_contours_bev = None       # контуры линий дорожной разметки на изображении в BEV проекции
         self.lane_lines_bev = None          # линии дорожной разметки на изображении во BEV проекции
-        self.count_roads
+        self.count_roads = 1                # Количество полос на дороге
+        self.car_line_id = 1                # Номер полосы, на которой едет машина (правая полоса имеет id 1)
         self.img_front_objects = None       # изображение с камеры с детектированными объектами
         self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
         self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
