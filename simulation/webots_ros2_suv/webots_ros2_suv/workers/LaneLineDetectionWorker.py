@@ -58,6 +58,9 @@ class LaneLineDetectionWorker(AbstractWorker):
                                                                                                     0.45, 1.0, 
                                                                                                     world_model.img_front_objects_lines.shape)
                     
+                    world_model.count_roads = count_roads
+                    world_model.car_line_id = car_line_id
+                    
                     self.lines_analizator.draw_labels(world_model.img_front_objects_lines, 
                                                     label_names=[f"Count of lanes: {count_roads}", f"Car on lane: {car_line_id}"],
                                                     colors=[(27, 198, 250), (25, 247, 184)])
