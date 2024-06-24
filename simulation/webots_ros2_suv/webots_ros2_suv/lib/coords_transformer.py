@@ -5,7 +5,7 @@ import yaml
 import numpy as np
 import math
 from ament_index_python.packages import get_package_share_directory
-
+from webots_ros2_suv.lib.config_loader import ConfigLoader
 
 class CoordsTransformer(object):
     def __init__(self) -> None:
@@ -17,14 +17,7 @@ class CoordsTransformer(object):
 
 
     def __load_config(self):
-        package_dir = get_package_share_directory('webots_ros2_suv')
-        config_path = os.path.join(package_dir,
-                                    pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
-        if not os.path.exists(config_path):
-            print('Global map coords config file file not found. Use default values')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
+        config = ConfigLoader("global_coords").data
         self.__coord_corrections = (config['lat'], config['lon'], config['orientation'],  config['scale_x'], config['scale_y'], config['bev_orientation'])
         print('Translation coordinates: ', self.__coord_corrections)
 

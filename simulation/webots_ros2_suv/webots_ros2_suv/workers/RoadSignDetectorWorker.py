@@ -7,12 +7,12 @@ import numpy as np
 from PIL import Image
 import yaml
 from webots_ros2_suv.lib.map_builder import MapBuilder
+from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
 
 PACKAGE_NAME = 'webots_ros2_suv'
 local_path_to_cnn_model = "resource/weights/model-ep50-signs16/"
 local_path_to_seg_model = "resource/mobilev3large-lraspp-sign.pt"
 local_path_to_icons = "resource/signs_icon/"
-local_project_settings_config_path = "config/project_settings.yaml"
 package_dir = get_package_share_directory(PACKAGE_NAME)
 
 
@@ -23,11 +23,8 @@ class RoadSignDetectorWorker(AbstractWorker):
         path_to_cnn_model = os.path.join(package_dir, local_path_to_cnn_model)
         path_to_seg_model = os.path.join(package_dir, local_path_to_seg_model)
         path_to_icons = os.path.join(package_dir, local_path_to_icons)
-        project_settings_config_path = os.path.join(package_dir, local_project_settings_config_path)
-
-        with open(project_settings_config_path, "r") as file:
-            project_settings_config = yaml.safe_load(file)
-
+        project_settings_config = GlobalConfigLoader("project_settings").data
+    
         self.detector = ImageAnalyzer(path_to_cnn_model,
                         path_to_seg_model,
                         path_to_icons,

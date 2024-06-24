@@ -1,0 +1,8 @@
+current: simulator
+
+available:
+- simulator
+- real
+- alabuga_GPS
+- alabuga_circles
+- alabuga_trace
