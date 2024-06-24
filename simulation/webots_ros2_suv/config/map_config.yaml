@@ -1,10 +1,10 @@
-lat: 48.38775588062464
-lon: 54.35425921845902
-mapfile: ulstu.geojson
+# lat: 48.38775588062464
+# lon: 54.35425921845902
+# mapfile: ulstu.geojson
 
-# lat: 43.638987354236185
-# lon: 56.335206573823854
-# mapfile: robocross.geojson
+lat: 43.638987354236185
+lon: 56.335206573823854
+mapfile: robocross.geojson
 
 # lat: 52.000441437135855
 # lon: 55.81957703977085
