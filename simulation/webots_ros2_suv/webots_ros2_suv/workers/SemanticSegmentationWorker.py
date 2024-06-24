@@ -13,7 +13,7 @@ import cv2
 from ultralytics import YOLO
 
 PACKAGE_NAME = 'webots_ros2_suv'
-local_seg_model_path = "resource/lane_line_model/LLD-level-5-v2.pt"
+local_seg_model_path = "resource/RCm/model.pt"
 
 
 class SemanticSegmentationWorker(AbstractWorker):
@@ -44,16 +44,17 @@ class SemanticSegmentationWorker(AbstractWorker):
 
             results = self.model.predict(np.array(img))
 
-            world_model.seg_image = np.ones(world_model.rgb_image.shape[:2] + (1,), dtype=np.uint8)
+            # world_model.seg_image = np.ones(world_model.rgb_image.shape[:2] + (1,), dtype=np.uint8)
+            world_model.seg_image = np.ones(world_model.rgb_image.shape[:2], dtype=np.uint8)
+            # world_model.test_rcm_image = results[0].plot()
 
+            world_model.seg_image_before_plotting = world_model.seg_image.copy()
+            print(world_model.seg_image_before_plotting.shape)
             for xy in results[0].masks.xy:
                 cv2.drawContours(world_model.seg_image, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
 
+            world_model.seg_image = world_model.seg_image
 
-
-            world_model.seg_image = Image.fromarray(world_model.seg_image)
-
-            #world_model.seg_image = self.seg_model.predict_one(img)
             world_model.seg_colorized = colorize(world_model.seg_image)
             world_model.seg_composited = blend(img, world_model.seg_colorized)
 

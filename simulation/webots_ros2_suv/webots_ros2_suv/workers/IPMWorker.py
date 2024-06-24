@@ -57,7 +57,8 @@ class IPMWorker(AbstractWorker):
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
-            image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes)
+            # image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes) # THIS FUNCTION MIGHT BE NEEDED, SO DON'T REMOVE IT FROM HERE
+            image_seg[image_seg == 0] = 100
             world_model.ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
 
 

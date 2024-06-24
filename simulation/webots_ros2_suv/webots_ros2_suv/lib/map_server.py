@@ -154,8 +154,10 @@ class MapWebServer(object):
             return None
         if img_type == "obj_detector":
             if self.world_model.img_front_objects_lines_signs is None:
+            # if self.world_model.seg_colorized is None:
                 return None
             data = self.world_model.img_front_objects_lines_signs
+            # data = self.world_model.seg_colorized
         elif img_type == "seg":
             self.world_model.draw_scene()
             if self.world_model.ipm_colorized_lines is None:
@@ -165,6 +167,8 @@ class MapWebServer(object):
             if self.world_model.found_sign is None:
                 return None
             data = self.world_model.found_sign[2]
+
+
             # use StringIO to stream the image out to the browser direct from RAM
             # output = StringIO.StringIO()
             # format = 'PNG' # JPEG and other formats are available
