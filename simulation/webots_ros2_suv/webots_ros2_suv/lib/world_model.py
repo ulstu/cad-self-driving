@@ -52,6 +52,7 @@ class WorldModel(object):
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
         self.params = []                    # Параметры для визуализации в системе управления
+        self.lidar_bounding_boxes = []      # Найденные лидаром квадраты (не отфильтрованные по классам)
     
         self.__obstacles_lookup_num = 0
 
