@@ -128,6 +128,12 @@ BmwX5 {
       height 160
     }
   ]
+
+  sensorsSlotRear [
+    VelodyneVLP-16 {
+      name "Velodyne VLP-16_rear"
+    }
+  ]
 }
 Solid {
   children [

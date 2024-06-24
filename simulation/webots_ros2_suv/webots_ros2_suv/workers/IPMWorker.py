@@ -70,7 +70,50 @@ class IPMWorker(AbstractWorker):
             world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))
             world_model.img_front_objects = results[0].plot()
             world_model.map_builder = self.__map_builder
-            self.log(f'$***end*****$: {world_model.ipm_image.shape}')
+            
+            for box in world_model.lidar_bounding_boxes:
+                xmin, xmax = box[0]
+                ymin, ymax = box[1]
+                zmin, zmax = box[2]
+
+                p = []
+                for z in [zmin, zmax]:
+                    for x in [xmin, xmax]:
+                        for y in [ymin, ymax]:
+                            p.append(np.array([x, y, z]))
+                
+                print(box[0])
+                
+                p_front = []
+                for point in p:
+                    image_shape = np.array(world_model.img_front_objects_lines_signs.shape[:2])[::-1]
+
+                    _z = 1
+                    point_front = (point[:2] * _z) / point[2]
+                    point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_lines_signs.shape[1])
+                    point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_lines_signs.shape[0])
+
+                    point_front = point_front * (image_shape / 2)   
+
+                    p_front.append(point_front)
+                
+                front_edge  = [p_front[0], p_front[1], p_front[2], p_front[3]]
+                right_edge  = [p_front[2], p_front[6], p_front[7], p_front[3]]
+                top_edge    = [p_front[5], p_front[6], p_front[2], p_front[1]]
+                left_edge   = [p_front[1], p_front[5], p_front[4], p_front[0]]
+                bottom_edge = [p_front[0], p_front[3], p_front[7], p_front[4]]
+                back_edge   = [p_front[5], p_front[6], p_front[7], p_front[4]]
+                
+
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(front_edge).astype(int)], contourIdx=-1, color=(0, 255, 0), thickness=-1)
+                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(right_edge).astype(int)], contourIdx=-1, color=(255, 0, 0), thickness=-1)
+                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(top_edge).astype(int)], contourIdx=-1, color=(0, 0, 255), thickness=-1)
+
+                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(left_edge).astype(int)], contourIdx=-1, color=(255, 0, 255), thickness=-1)
+                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(0, 255, 255), thickness=-1)
+                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(back_edge).astype(int)], contourIdx=-1, color=(255, 255, 0), thickness=-1)
+            
+
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model
 
