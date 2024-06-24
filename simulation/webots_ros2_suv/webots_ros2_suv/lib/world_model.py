@@ -51,7 +51,7 @@ class WorldModel(object):
         self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
-        self.params = []                    # Параметры для визуализации в системе управления
+        self.params = {}                    # Параметры для визуализации в системе управления
     
         self.__obstacles_lookup_num = 0
 
@@ -69,11 +69,10 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def fill_params(self):
-        self.params.clear()
-        self.params.append({'speed': self.__car_model.get_speed()})
-        self.params.append({'angle': self.__car_model.get_position()[2]})
-        self.params.append({'path_segm': self.cur_path_segment})
-        self.params.append({'path_point': self.cur_path_point})
+        self.params['speed'] =  self.__car_model.get_speed()
+        self.params['angle'] =  self.__car_model.get_position()[2]
+        self.params['path_segm'] =  self.cur_path_segment
+        self.params['path_point'] =  self.cur_path_point
 
 
     def draw_scene(self, log=print):
@@ -87,8 +86,8 @@ class WorldModel(object):
                     except:
                         pass
                 prev_point = (int(n[0]), int(n[1]))
-                if log:
-                    log(f'prev_point: {prev_point}')
+                # if log:
+                    # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
         cv2.circle(colorized, self.goal_point, 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]

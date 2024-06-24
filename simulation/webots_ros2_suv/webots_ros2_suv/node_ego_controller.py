@@ -119,7 +119,7 @@ class NodeEgoController(Node):
         self.drive()
 
         self.__world_model.fill_params()
-        self.__world_model.params.append({'states': f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"})
+        self.__world_model.params['states'] = f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"
         if self.__ws is not None:
             self.__ws.update_model(self.__world_model)
 

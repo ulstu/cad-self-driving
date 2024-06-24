@@ -54,11 +54,11 @@ class MovingState(AbstractState):
         if self.__cur_path_point < len(points) - 1:
             x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
             dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
-            world_model.params.append({"point_dist": dist})
+            world_model.params["point_dist"] = dist
             if dist < self.config['change_point_dist']:
                 # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
-            world_model.params.append({'dist_point': dist})
+            world_model.params['dist_point'] = dist
             self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
