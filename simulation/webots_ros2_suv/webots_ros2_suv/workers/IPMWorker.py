@@ -7,6 +7,9 @@ import numpy as np
 from fastseg.image import colorize, blend
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_suv.lib.timeit import timeit
+from scipy.spatial.transform import Rotation as R
+import os
+import yaml
 
 
 PACKAGE_NAME = 'webots_ros2_suv'
@@ -16,6 +19,11 @@ class IPMWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
 
+        lidardata_path = os.path.join(package_dir, "config/lidardata.yaml")
+        with open(lidardata_path, "r") as file:
+            lidardata_config = yaml.safe_load(file)
+    
+        self.zed_pos = np.array([lidardata_config["zed_x"], lidardata_config["zed_y"], lidardata_config["zed_z"]])
         self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
 
@@ -80,39 +88,58 @@ class IPMWorker(AbstractWorker):
                 for z in [zmin, zmax]:
                     for x in [xmin, xmax]:
                         for y in [ymin, ymax]:
-                            p.append(np.array([x, y, z]))
-                
+                            point = np.array([x, y, z]) - self.zed_pos       
+                            p.append(point)
+                # 7.16  -5.88   1.13
+                # 5.07  -6.00   2.06
+                # -2.09 -0.12   0.93
                 print(box[0])
                 
+                to_next = False
                 p_front = []
                 for point in p:
                     image_shape = np.array(world_model.img_front_objects_lines_signs.shape[:2])[::-1]
-
-                    _z = 1
+                    size = np.array([image_shape[0] + 300, image_shape[0] + 300])
+                    
+                    if point[2] <= 0:
+                        to_next = True
+                        break
+                    
+                    fov_angle = 90
+                    _z = 1 / np.tan(fov_angle / 2)
                     point_front = (point[:2] * _z) / point[2]
+
+                    point_front = point_front * (size / 2) + image_shape / 2
+                    #point_front[1] = image_shape[1] - point_front[1]
+
                     point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_lines_signs.shape[1])
                     point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_lines_signs.shape[0])
 
-                    point_front = point_front * (image_shape / 2)   
-
-                    p_front.append(point_front)
+                    p_front.append(np.array(point_front, dtype=np.int32))
                 
-                front_edge  = [p_front[0], p_front[1], p_front[2], p_front[3]]
+                if to_next:
+                    continue
+                
+                front_edge  = [p_front[1], p_front[0], p_front[2], p_front[3]]
                 right_edge  = [p_front[2], p_front[6], p_front[7], p_front[3]]
                 top_edge    = [p_front[5], p_front[6], p_front[2], p_front[1]]
                 left_edge   = [p_front[1], p_front[5], p_front[4], p_front[0]]
                 bottom_edge = [p_front[0], p_front[3], p_front[7], p_front[4]]
-                back_edge   = [p_front[5], p_front[6], p_front[7], p_front[4]]
+                back_edge   = [p_front[6], p_front[5], p_front[7], p_front[4]]
                 
+                cv2.line(world_model.img_front_objects_lines_signs, p_front[0], p_front[1], color=(255, 0, 0), thickness=2)
+                # cv2.line(world_model.img_front_objects_lines_signs, p_front[1], p_front[2], color=(255, 0, 0), thickness=2)
+                # cv2.line(world_model.img_front_objects_lines_signs, p_front[2], p_front[3], color=(255, 0, 0), thickness=2)
+                # cv2.line(world_model.img_front_objects_lines_signs, p_front[3], p_front[4], color=(255, 0, 0), thickness=2)
 
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(back_edge).astype(int)], contourIdx=-1, color=(255, 255, 0), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(0, 255, 255), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(left_edge).astype(int)], contourIdx=-1, color=(255, 0, 255), thickness=-1)
+                
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(top_edge).astype(int)], contourIdx=-1, color=(0, 0, 255), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(right_edge).astype(int)], contourIdx=-1, color=(255, 0, 0), thickness=-1)
                 cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(front_edge).astype(int)], contourIdx=-1, color=(0, 255, 0), thickness=-1)
-                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(right_edge).astype(int)], contourIdx=-1, color=(255, 0, 0), thickness=-1)
-                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(top_edge).astype(int)], contourIdx=-1, color=(0, 0, 255), thickness=-1)
-
-                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(left_edge).astype(int)], contourIdx=-1, color=(255, 0, 255), thickness=-1)
-                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(0, 255, 255), thickness=-1)
-                # cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(back_edge).astype(int)], contourIdx=-1, color=(255, 255, 0), thickness=-1)
-            
+                
 
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model

@@ -26,4 +26,6 @@ max_hmin: 10.0
 max_distance: 20.0
 gps_shift_x: 0.0
 gps_shift_y: 0.0
-
+zed_x: 0.0
+zed_y: 1.7
+zed_z: -2.0
