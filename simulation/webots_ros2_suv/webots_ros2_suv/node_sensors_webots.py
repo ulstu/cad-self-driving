@@ -34,10 +34,12 @@ class NodeSensorsWebots(Node):
             self.__gps_publisher = self.create_publisher(NavSatFix, "/vehicle/gps_nav", qos)
             self.__odom_publisher = self.create_publisher(Odometry, "/odom", qos)
             self.__pc_publisher = self.create_publisher(PointCloud2, '/lidar', qos)
+            self.__pc_publisher_rear = self.create_publisher(PointCloud2, '/lidar_rear', qos)
             self.create_subscription(PointStamped, '/vehicle/gps', self.__on_gps_message, qos)
             self.create_subscription(Image, '/vehicle/range_finder', self.__on_range_message, qos)
             self.create_subscription(Float32, '/vehicle/gps/speed', self.__on_speed, qos)
             self.create_subscription(PointCloud2, '/vehicle/Velodyne_VLP_16/point_cloud', self.__on_point_cloud, qos)
+            self.create_subscription(PointCloud2, '/vehicle/Velodyne_VLP_16_rear/point_cloud', self.__on_point_cloud2, qos)
             #self.create_subscription(PointCloud2, '/vehicle/range_finder/point_cloud', self.__on_point_cloud, qos)
             self.create_subscription(Imu, '/imu', self.__on_imu, qos)
             self.__cur_imu_data = None
@@ -93,7 +95,17 @@ class NodeSensorsWebots(Node):
             print(f'{str(err)}')
             
 
-    
+    def __on_point_cloud2(self, data):
+        try:
+            self.__lidar_last_time = self.set_last_time(self.__lidar_last_time, set_lidar_hz)
+            p = data
+            p.header.stamp = self.get_clock().now().to_msg()
+            p.header.frame_id = 'base_link'
+            self.__pc_publisher_rear.publish(p)
+        except  Exception as err:
+            print(f'{str(err)}')
+        
+
     def __on_gps_message(self, data):
         try:
             if not self.__cur_imu_data:

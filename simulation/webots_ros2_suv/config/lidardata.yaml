@@ -1,5 +1,4 @@
-visualize: False 
-build_gps: True
+visualize: True
 visual_scale: 15
 front_lidar_x: 0.0
 front_lidar_y: 0.0
@@ -8,7 +7,23 @@ rear_lidar_x: 0.0
 rear_lidar_y: 0.0
 rear_lidar_z: 0.0
 filter_leaf_size: 0.2
-segmentation_threshould: 0.5
+segmentation_threshould: 0.3
 cluster_tolerance: 0.3
 min_cluster_size: 5
 max_cluster_size: 10000
+file_record: False
+file_record_frameinterval: 5
+vehicle_corner1_x: 0.5
+vehicle_corner1_y: -0.5
+vehicle_corner2_x: 0.5
+vehicle_corner2_y: 0.5
+vehicle_corner3_x: -2.0
+vehicle_corner3_y: 0.5
+vehicle_corner4_x: -2.0
+vehicle_corner4_y: 0.5
+min_hmax: 0.1
+max_hmin: 10.0
+max_distance: 20.0
+gps_shift_x: 0.0
+gps_shift_y: 0.0
+
