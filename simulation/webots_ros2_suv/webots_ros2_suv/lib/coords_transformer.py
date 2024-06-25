@@ -4,6 +4,7 @@ import pathlib
 import yaml
 import numpy as np
 import math
+from geopy.distance import geodesic
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_suv.lib.config_loader import ConfigLoader
 
@@ -42,47 +43,67 @@ class CoordsTransformer(object):
             # o = yaw
         return latitude, longitude, o
 
-    def get_relative_coordinates_(self, lat_goal, lon_goal, pos, pov_point):
-        x, y, lat, lon, angle = pov_point[0], pov_point[1], pos[0], pos[1], pos[2]
+    def calc_bearing(self, pointA, pointB):
+        """
+        Вычисляет азимут между двумя точками по формуле
+            θ = atan2(sin(Δlong).cos(lat2),
+                    cos(lat1).sin(lat2) − sin(lat1).cos(lat2).cos(Δlong))
+        Параметры:
+        pointA: кортеж чисел с плавающей запятой: (широта, долгота) начальной точки
+        pointB: кортеж с плавающей запятой: (широта, долгота) точки назначения
+        Возвращаемое значение:
+        float: азимут в градусах от севера
+        """
+        lat1 = math.radians(pointA[0])
+        lat2 = math.radians(pointB[0])
+        diffLong = math.radians(pointB[1] - pointA[1])
+
+        x = math.sin(diffLong) * math.cos(lat2)
+        y = math.cos(lat1) * math.sin(lat2) - (math.sin(lat1) * math.cos(lat2) * math.cos(diffLong))
+
+        initial_bearing = math.atan2(x, y)
+
+        # Convert from radians to degrees and normalize to 0-360
+        initial_bearing = math.degrees(initial_bearing)
+        compass_bearing = (initial_bearing + 360) % 360
+
+        return compass_bearing
+
+    def get_relative_coordinates(self, lat_goal, lon_goal, pos, pov_point):
+        x, y, lat, lon, angle = pov_point[0], pov_point[1], pos[1], pos[0], pos[2]
         # Константа для перевода метров в пиксели
         meters_to_pixels = 15
-        
-        # Константа для перевода градусов в радианы
-        degrees_to_radians = math.pi / 180
-        
-        # Расчет расстояния в метрах между текущей позицией и целью
-        R = 6371000  # Радиус Земли в метрах
-        dlat = (lat_goal - lat) * degrees_to_radians
-        dlon = (lon_goal - lon) * degrees_to_radians
-        a = math.sin(dlat / 2) ** 2 + math.cos(lat * degrees_to_radians) * math.cos(lat_goal * degrees_to_radians) * math.sin(dlon / 2) ** 2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance_meters = R * c
-        
+
+        # Вычисление расстояния в метрах с помощью geopy
+        start_coords = (lat, lon)
+        goal_coords = (lon_goal, lat_goal)
+        distance_meters = geodesic(start_coords, goal_coords).meters
+        # print(f'angle: {angle} angledeg: {math.degrees(angle)} x: {x} y: {y} distance: {distance_meters} pos: {pos} goal: {goal_coords}')
+
         # Определение направления движения к целевой точке в глобальной системе координат
-        bearing = math.atan2(
-            math.sin(dlon) * math.cos(lat_goal * degrees_to_radians),
-            math.cos(lat * degrees_to_radians) * math.sin(lat_goal * degrees_to_radians) -
-            math.sin(lat * degrees_to_radians) * math.cos(lat_goal * degrees_to_radians) * math.cos(dlon)
-        )
-        
+        bearing = self.calc_bearing(start_coords, goal_coords)
+        bearing_radians = math.radians(bearing)
+
         # Учитываем угол поворота автомобиля
-        relative_bearing = bearing - angle
-        
+        relative_bearing = bearing_radians - angle
+
         # Перевод расстояния в пиксели
         distance_pixels = distance_meters * meters_to_pixels
-        
+        # print(f'bearing_radians: {bearing_radians} {math.degrees(bearing_radians)} relative_bearing: {relative_bearing} {math.degrees(relative_bearing)} distance_pixels: {distance_pixels}')
+
         # Вычисляем смещение в координатах изображения
         delta_x = distance_pixels * math.sin(relative_bearing)
         delta_y = distance_pixels * math.cos(relative_bearing)
-        
+
         # Вычисляем новые координаты на изображении
         goal_x = x + delta_x
-        goal_y = y + delta_y  # Смещение вниз по оси Y увеличивает координату
+        goal_y = y - delta_y  # Смещение вниз по оси Y уменьшает координату
 
-        return (goal_x, goal_y)
+        # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
+        return (int(goal_x), int(goal_y))
 
 
-    def get_relative_coordinates(self, target_lat, target_lon,  pos, pov_point):
+    def get_relative_coordinates__(self, target_lat, target_lon,  pos, pov_point):
         # Разбиваем кортеж на составляющие
         start_lat, start_lon, start_angle, scale_x, scale_y = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4]
         start_angle = start_angle - self.__coord_corrections[5]
