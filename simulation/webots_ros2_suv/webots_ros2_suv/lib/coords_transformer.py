@@ -1,12 +1,15 @@
-import os
-import cv2
-import pathlib
-import yaml
-import numpy as np
 import math
+import os
+import pathlib
 from geopy.distance import geodesic
+
+import cv2
+import numpy as np
+import yaml
+import math
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_suv.lib.config_loader import ConfigLoader
+
 
 class CoordsTransformer(object):
     def __init__(self) -> None:
@@ -118,29 +121,9 @@ class CoordsTransformer(object):
         scaled_x = rotated_x * scale_x
         scaled_y = rotated_y * scale_y
 
-        res_scaled_x = int(pov_point[0] + scaled_x) if (pov_point[0] + scaled_x) >=0 else 0
-        res_scaled_y = int(pov_point[1] - scaled_y) if (pov_point[1] - scaled_y) >=0 else 0
 
-        return (int(res_scaled_x), int(res_scaled_y))
-
-    def __delta_latitude_in_meters(self, target_lat, start_lat):
-        """
-        Вычисляет разницу в метрах между двумя широтами.
-        """
-        delta_degrees = target_lat - start_lat
-        delta_meters = delta_degrees * (2 * math.pi * self.__EARTH_RADIUS_KM * 1000) / 360
-        return delta_meters
-
-
-    def __delta_longitude_in_meters(self, target_lon, start_lon, start_lat):
-        """
-        Вычисляет разницу в метрах между двумя долготами, учитывая широту.
-        """
-        delta_degrees = target_lon - start_lon
-        # Рассчитываем длину дуги одного градуса долготы в метрах на данной широте
-        arc_length_per_degree = math.cos(start_lat * math.pi / 180) * (2 * math.pi * self.__EARTH_RADIUS_KM * 1000) / 360
-        delta_meters = delta_degrees * arc_length_per_degree
-        return delta_meters
+        # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
+        return (int(goal_x), int(goal_y))
 
     def __rotate_coordinates(self, x, y, angle):
         # Поворот координат на угол angle

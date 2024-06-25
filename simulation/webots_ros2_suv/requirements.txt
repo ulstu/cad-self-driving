@@ -14,6 +14,6 @@ pyserial
 filterpy
 tensorflow
 dill
-geopy
 dubins
+geopy
 segmentation-models-pytorch
