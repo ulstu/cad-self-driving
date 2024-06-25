@@ -76,6 +76,8 @@ class WorldModel(object):
 
 
     def draw_scene(self, log=print):
+        if self.ipm_colorized_lines is None:
+            return
         colorized = self.ipm_colorized_lines
         prev_point = None
         if self.path:
@@ -89,7 +91,8 @@ class WorldModel(object):
                 # if log:
                     # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
-        cv2.circle(colorized, self.goal_point, 9, (255, 0, 0), 5)
+        log(f'GOAL_POINT: {self.goal_point}')
+        cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
         # if log:
         #     log(f'DRAW PATH: {points}')
