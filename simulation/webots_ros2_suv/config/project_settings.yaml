@@ -1,2 +1,2 @@
-use_gpu: True
+use_gpu: False
 use_line_detection: True
