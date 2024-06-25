@@ -146,3 +146,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+simulation/webots_ros2_suv/resource/config.yaml
+simulation/webots_ros2_suv/resource/labels.txt
+simulation/webots_ros2_suv/resource/lane_line_detection_yolo8s-seg_model.pt
+simulation/webots_ros2_suv/resource/LLD-level-5-v2.pt
+simulation/webots_ros2_suv/resource/mobilev3large-lraspp-sign.pt
+simulation/webots_ros2_suv/resource/mobilev3large-lraspp.pt
+simulation/webots_ros2_suv/resource/model.h5
+simulation/webots_ros2_suv/resource/tf_mobilenetv3_large_100.pt
+simulation/webots_ros2_suv/resource/yolov8l_barrels.pt
+simulation/webots_ros2_suv/resource/yolov8l_old.pt
+simulation/webots_ros2_suv/resource/yolov8l.pt
