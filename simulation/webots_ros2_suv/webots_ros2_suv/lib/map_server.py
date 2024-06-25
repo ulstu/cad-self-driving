@@ -32,6 +32,7 @@ HOME_DIR = os.path.expanduser('~')
 BASE_PATH = os.path.join(HOME_DIR, 'ros2_ws/src/webots_ros2_suv/')
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
+LIBS_PATH = BASE_PATH + 'map-server/libs/'
 YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
 MAPS_PATH = BASE_PATH + 'config/global_maps/'
 ASSETS_PATH = STATIC_PATH + 'assets/'
@@ -215,6 +216,11 @@ def start_web_server(map_server):
                                                '/assets': {
                                                    'tools.staticdir.on': True,
                                                    'tools.staticdir.dir': ASSETS_PATH,
+                                                   'tools.staticdir.index': 'index.html'
+                                               },
+                                               '/libs': {
+                                                   'tools.staticdir.on': True,
+                                                   'tools.staticdir.dir': LIBS_PATH,
                                                    'tools.staticdir.index': 'index.html'
                                                }
                                                })

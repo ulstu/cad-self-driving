@@ -33,7 +33,7 @@ class WorldModel(object):
         self.lane_lines = None              # линии дорожной разметки на изображении во фронтальной проекции
         self.lane_contours_bev = None       # контуры линий дорожной разметки на изображении в BEV проекции
         self.lane_lines_bev = None          # линии дорожной разметки на изображении во BEV проекции
-        self.count_roads
+        self.count_roads = None
         self.img_front_objects = None       # изображение с камеры с детектированными объектами
         self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
         self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
@@ -70,10 +70,12 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def fill_params(self):
-        self.params['speed'] =  self.__car_model.get_speed()
-        self.params['angle'] =  self.__car_model.get_position()[2]
-        self.params['path_segm'] =  self.cur_path_segment
-        self.params['path_point'] =  self.cur_path_point
+        pos = self.__car_model.get_position()
+        self.params["cur_point"] = self.cur_path_point
+        self.params["cur_path_segment"] = self.cur_path_segment
+        self.params['lat'] = pos[0]
+        self.params['lon'] = pos[1]
+        self.params['angle'] = pos[2]
 
 
     def draw_scene(self, log=print):

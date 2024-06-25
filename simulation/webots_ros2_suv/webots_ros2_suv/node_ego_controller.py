@@ -27,6 +27,7 @@ from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
 from .lib.param_loader import ParamLoader
 from .lib.config_loader import ConfigLoader
+from .lib.external_data_sender import ExternalDataSender
 import threading
 
 from robot_interfaces.srv import PoseService
@@ -55,6 +56,7 @@ class NodeEgoController(Node):
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
             param = ParamLoader()
+            self.data_sender = ExternalDataSender()
 
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
@@ -124,10 +126,12 @@ class NodeEgoController(Node):
 
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
+        self.__world_model.fill_params()
+        self.__world_model.params['states'] = f"{' '.join([s for s in self.__fsm.current_states])}"
+        pos = self.__world_model.get_current_position()
+        self.data_sender.send_data(self.__world_model.params)
         self.drive()
 
-        self.__world_model.fill_params()
-        self.__world_model.params['states'] = f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"
         if self.__ws is not None:
             self.__ws.update_model(self.__world_model)
 
