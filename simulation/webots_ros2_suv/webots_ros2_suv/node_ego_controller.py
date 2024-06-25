@@ -157,7 +157,7 @@ class NodeEgoController(Node):
             # p[11] - ymax
             if 'obstacles' in obstacles_dict:
                 xmin, xmax = -p[10], -p[11]
-                ymin, ymax = p[2], p[3]
+                ymin, ymax = -p[2], -p[3]
                 zmin, zmax = p[8], p[9]
                 box_edges = [[xmin, xmax], [ymin, ymax], [zmin, zmax]]
                 self.__world_model.lidar_bounding_boxes.append(box_edges)

@@ -19,11 +19,11 @@ class IPMWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
 
-        lidardata_path = os.path.join(package_dir, "config/lidardata.yaml")
-        with open(lidardata_path, "r") as file:
-            lidardata_config = yaml.safe_load(file)
+        self.lidardata_path = os.path.join(package_dir, "config/lidardata.yaml")
+        # with open(self.lidardata_path, "r") as file:
+        #     lidardata_config = yaml.safe_load(file)
     
-        self.zed_pos = np.array([lidardata_config["zed_x"], lidardata_config["zed_y"], lidardata_config["zed_z"]])
+        # self.zed_pos = np.array([lidardata_config["zed_x"], lidardata_config["zed_y"], lidardata_config["zed_z"]])
         self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
 
@@ -79,6 +79,13 @@ class IPMWorker(AbstractWorker):
             world_model.img_front_objects = results[0].plot()
             world_model.map_builder = self.__map_builder
             
+            world_model.img_front_objects_lines_signs_prj = np.copy(world_model.img_front_objects_lines_signs)
+
+            with open(self.lidardata_path, "r") as file:
+                lidardata_config = yaml.safe_load(file)
+    
+            self.zed_pos = np.array([lidardata_config["zed_x"], -lidardata_config["zed_y"], lidardata_config["zed_z"]])
+
             for box in world_model.lidar_bounding_boxes:
                 xmin, xmax = box[0]
                 ymin, ymax = box[1]
@@ -86,8 +93,8 @@ class IPMWorker(AbstractWorker):
 
                 p = []
                 for z in [zmin, zmax]:
-                    for x in [xmin, xmax]:
-                        for y in [ymin, ymax]:
+                    for (x, dir) in [[xmin, 1], [xmax, -1]]:
+                        for y in [ymin, ymax][::dir]:
                             point = np.array([x, y, z]) - self.zed_pos       
                             p.append(point)
                 # 7.16  -5.88   1.13
@@ -98,8 +105,8 @@ class IPMWorker(AbstractWorker):
                 to_next = False
                 p_front = []
                 for point in p:
-                    image_shape = np.array(world_model.img_front_objects_lines_signs.shape[:2])[::-1]
-                    size = np.array([image_shape[0] + 300, image_shape[0] + 300])
+                    image_shape = np.array(world_model.img_front_objects_lines_signs_prj.shape[:2])[::-1]
+                    size = np.array([lidardata_config["projection_size"], lidardata_config["projection_size"]])
                     
                     if point[2] <= 0:
                         to_next = True
@@ -112,33 +119,35 @@ class IPMWorker(AbstractWorker):
                     point_front = point_front * (size / 2) + image_shape / 2
                     #point_front[1] = image_shape[1] - point_front[1]
 
-                    point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_lines_signs.shape[1])
-                    point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_lines_signs.shape[0])
+                    point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_lines_signs_prj.shape[1])
+                    point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_lines_signs_prj.shape[0])
 
                     p_front.append(np.array(point_front, dtype=np.int32))
                 
                 if to_next:
                     continue
                 
-                front_edge  = [p_front[1], p_front[0], p_front[2], p_front[3]]
-                right_edge  = [p_front[2], p_front[6], p_front[7], p_front[3]]
-                top_edge    = [p_front[5], p_front[6], p_front[2], p_front[1]]
-                left_edge   = [p_front[1], p_front[5], p_front[4], p_front[0]]
-                bottom_edge = [p_front[0], p_front[3], p_front[7], p_front[4]]
-                back_edge   = [p_front[6], p_front[5], p_front[7], p_front[4]]
-                
-                cv2.line(world_model.img_front_objects_lines_signs, p_front[0], p_front[1], color=(255, 0, 0), thickness=2)
-                # cv2.line(world_model.img_front_objects_lines_signs, p_front[1], p_front[2], color=(255, 0, 0), thickness=2)
-                # cv2.line(world_model.img_front_objects_lines_signs, p_front[2], p_front[3], color=(255, 0, 0), thickness=2)
-                # cv2.line(world_model.img_front_objects_lines_signs, p_front[3], p_front[4], color=(255, 0, 0), thickness=2)
+                # front_edge  = [p_front[1], p_front[0], p_front[2], p_front[3]]
+                # right_edge  = [p_front[2], p_front[6], p_front[7], p_front[3]]
+                # top_edge    = [p_front[6], p_front[5], p_front[2], p_front[1]]
+                # left_edge   = [p_front[1], p_front[5], p_front[4], p_front[0]]
+                # bottom_edge = [p_front[0], p_front[3], p_front[7], p_front[4]]
+                # back_edge   = [p_front[7], p_front[5], p_front[4], p_front[6]]
 
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(back_edge).astype(int)], contourIdx=-1, color=(255, 255, 0), thickness=-1)
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(0, 255, 255), thickness=-1)
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(left_edge).astype(int)], contourIdx=-1, color=(255, 0, 255), thickness=-1)
+                front_edge  = [p_front[0], p_front[1], p_front[2], p_front[3]]
+                right_edge  = [p_front[3], p_front[2], p_front[6], p_front[7]]
+                top_edge    = [p_front[1], p_front[5], p_front[6], p_front[2]]
+                left_edge   = [p_front[0], p_front[1], p_front[5], p_front[4]]
+                bottom_edge = [p_front[0], p_front[4], p_front[7], p_front[3]]
+                back_edge   = [p_front[4], p_front[5], p_front[6], p_front[7]]
+
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(back_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(left_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
                 
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(top_edge).astype(int)], contourIdx=-1, color=(0, 0, 255), thickness=-1)
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(right_edge).astype(int)], contourIdx=-1, color=(255, 0, 0), thickness=-1)
-                cv2.drawContours(world_model.img_front_objects_lines_signs, [np.array(front_edge).astype(int)], contourIdx=-1, color=(0, 255, 0), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(top_edge).astype(int)], contourIdx=-1, color=(170, 170, 170), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(right_edge).astype(int)], contourIdx=-1, color=(190, 190, 190), thickness=-1)
+                cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(front_edge).astype(int)], contourIdx=-1, color=(220, 220, 220), thickness=-1)
                 
 
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
