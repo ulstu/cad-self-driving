@@ -1,9 +1,11 @@
 import os
-import struct
 from datetime import datetime
 
 import yaml
+import json
+
 import sensor_msgs.msg
+from std_msgs.msg import String
 from ament_index_python.packages import get_package_share_directory
 from PIL import Image
 
@@ -11,6 +13,7 @@ from .lib import point_cloud2
 from .lib.world_model import WorldModel
 from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
+from .lib.param_loader import ParamLoader
 import threading
 import rclpy
 import numpy as np
@@ -32,11 +35,11 @@ from .lib.param_loader import ParamLoader
 
 
 SENSOR_DEPTH = 40
-FPS = 1
+FPS = 20
 
-DATACAMERA = f"{os.path.expanduser('~')}/ros2_ws/data/camera/"
-DATALIDAR = f"{os.path.expanduser('~')}/ros2_ws/data/lidar/"
-
+DATACAMERA = "/home/hiber/ros2_ws/data/camera"
+DATALIDAR = "/home/hiber/ros2_ws/data/lidar"
+DATAOBSTACLE = "/home/hiber/ros2_ws/data/obstacles"
 
 
 class NodeVisual(Node):
@@ -49,18 +52,21 @@ class NodeVisual(Node):
             param = ParamLoader()
 
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
-            self.create_subscription(PointCloud2, param.get_param("lidar_topicname"), self.__on_point_cloud, qos)
+            # self.create_subscription(PointCloud2, param.get_param("lidar"), self.__on_point_cloud, qos)
+            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
+            # with open("src/webots_ros2_suv/config/lidardata.yaml", "r") as file:
+                # self.lidardata = yaml.safe_load(file)
 
+            # self.MAP_SCALE = self.lidardata['visual_scale']
             self.__last_image_time = datetime.now()
-            self.__lidar_last_time = datetime.now()
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     # @timeit
     def __on_image_message(self, data):
-        if (datetime.now() - self.__last_image_time).total_seconds() < 1 / FPS:
-            return
+        # if (datetime.now() - self.__last_image_time).total_seconds() < 1 / FPS:
+        #     return
         self.__last_image_time = datetime.now()
         image = data.data
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
@@ -108,6 +114,20 @@ class NodeVisual(Node):
             # self.__pc_publisher.publish(p)
         except  Exception as err:
             print(f'{str(err)}')
+
+     # Функция вызывается, когда прилетает JSON от pcl_map_node
+    # Функция вызывается, когда прилетает JSON от pcl_map_node
+    def __on_obstacles_message(self, data):
+        # в data.data находится наша строка, парсим её
+        obstacles_dict = json.loads(data.data);
+        filename = datetime.now().strftime("%Y%m%d-%H%M%S") + ".json"
+        with open(os.path.join(DATAOBSTACLE, filename), 'w') as fp:
+            # Преобразование объектов Python в данные 
+            # JSON формата, а так же запись в файл 'data.json'
+            json.dump({"data": obstacles_dict.get("obstacles", []) + obstacles_dict.get("rear_obstacles", [])}, fp)
+            self._logger.info(f'saved: {os.path.join(DATALIDAR, filename)}')
+
+
 
 
 def main(args=None):

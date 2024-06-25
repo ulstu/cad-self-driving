@@ -15,13 +15,13 @@ find_package(pcl_conversions REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(Eigen3 REQUIRED) 
-
+find_package(yaml-cpp REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common io)
 
 find_package(PCL 1.1 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
+include_directories(${YAML_CPP_INCLUDE_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 
@@ -40,9 +40,11 @@ ament_target_dependencies(pcl_map_node
   pcl_conversions
   geometry_msgs
   visualization_msgs
+  yaml-cpp
 )
 
 target_link_libraries(pcl_map_node ${PCL_LIBRARIES})
+target_link_libraries(pcl_map_node ${YAML_CPP_LIBRARIES})
 
 
 target_compile_features(pcl_map_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17

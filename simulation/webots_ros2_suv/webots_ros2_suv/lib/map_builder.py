@@ -15,7 +15,7 @@ from ament_index_python.packages import get_package_share_directory
 # from ipm_transformer import IPMTransformer
 from .orientation import local_to_global
 from .behavioral_analysis import BehaviourAnalyser
-from .ipm_transformer import IPMTransformer
+from webots_ros2_suv.lib.ipm_transformer import IPMTransformer
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 
@@ -32,6 +32,7 @@ class MapBuilder(object):
         package_dir = get_package_share_directory('webots_ros2_suv')
         config_path = os.path.join(package_dir,
                                     pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
+        self.__h_coef = 1
         with open(config_path) as file:
             config = yaml.full_load(file)
             self.__bev_obstacle_ratio = config['bev_obstacle_ratio']
@@ -56,10 +57,19 @@ class MapBuilder(object):
     def get_horizont_line(self):
         return self.__horizont_line_height
 
-    def generate_ipm(self, image, is_mono = False, need_cut=True):
+    def generate_ipm(self, image, is_mono = False, need_cut=True, log=print):
         ipm_transformer = IPMTransformer(homography_matrix=self.__homograpthy_matrix)
-        img_ipm = ipm_transformer.get_ipm(image, is_mono=is_mono, horizont=self.__horizont_line_height, need_cut=need_cut)
+        img_ipm = ipm_transformer.get_ipm(image, is_mono=is_mono, horizont=self.__horizont_line_height, need_cut=need_cut, log=log)
         return img_ipm
+
+    def crop_ipm(self, img_ipm, log=print):
+        self.__h_coef = 1
+        ipm_image_height = self.calc_bev_point((0, img_ipm.shape[1]))[1]
+        self.__h_coef = img_ipm.shape[1] / ipm_image_height
+        img_ipm = img_ipm[:ipm_image_height + 1, :]
+        img_ipm = cv2.resize(img_ipm, (img_ipm.shape[1], img_ipm.shape[1]), interpolation=cv2.INTER_AREA)
+        return img_ipm
+
 
     def get_labels(self):
         labels = {0: u'__background__', 1: u'person', 2: u'bicycle', 3: u'car', 4: u'motorcycle', 5: u'airplane',
@@ -90,10 +100,15 @@ class MapBuilder(object):
             box_depths.append(np.percentile(depths, 90))
         return box_depths
 
-    def calc_bev_point(self, p):
+    def calc_bev_point(self, p, log=None):
         m = self.__homograpthy_matrix
         px = ((m[0][0] * p[0] + m[0][1] * p[1] + m[0][2]) / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
         py = ((m[1][0] * p[0] + m[1][1] * p[1] + m[1][2]) / ((m[2][0] * p[0] + m[2][1] * p[1] + m[2][2])))
+        if log:
+            log(f'&*&*&*&*&* BEFORE: {py} {self.__h_coef}')
+        py = py * self.__h_coef
+        if log:    
+            log(f'&*&*&*&*&* AFTER: {py} {self.__h_coef}')
         return (int(px), int(py))
 
     def transform_boxes(self, cboxes):
@@ -124,19 +139,22 @@ class MapBuilder(object):
 
 
     def put_objects(self, ipm_image, tbs, widths, results):
-        excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
-        h = ipm_image.shape[0]
-        for i in range(len(tbs)):
-            label_num = int(results[0].boxes.data[i][-1]) + 1
-            if label_num in excluded_classes:
-                continue
-            l = self.get_labels()[label_num]
-            
-            w =  widths[i] * h / (tbs[i][1] * self.__bev_obstacle_ratio)
-            p1 = (int(tbs[i][0] - w), int(tbs[i][1] - w))
-            p2 = (int(tbs[i][0] + w), int(tbs[i][1]))
-            # Метод colorize имеет ограниченный размер палитры, поэтому ипользуется модуляция. Лучше исправить потом
-            ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num % 18 
+        try:
+            excluded_classes = [7, 14]     # !!!!!! этот код здесь из-за ошибочного определения поезда вместо отбойника 
+            h = ipm_image.shape[0]
+            for i in range(len(tbs)):
+                label_num = int(results[0].boxes.data[i][-1]) + 1
+                if label_num in excluded_classes:
+                    continue
+                l = self.get_labels()[label_num]
+                
+                w =  widths[i] * h / (tbs[i][1] * self.__bev_obstacle_ratio)
+                p1 = (int(tbs[i][0] - w), int(tbs[i][1] - w))
+                p2 = (int(tbs[i][0] + w), int(tbs[i][1]))
+                # Метод colorize имеет ограниченный размер палитры, поэтому ипользуется модуляция. Лучше исправить потом
+                ipm_image[p1[1]:p2[1],p1[0]:p2[0]] = label_num % 18 
+        except:
+            pass
         return ipm_image
 
     def track_objects(self, results, ipm_image, pos=(0, 0, 0), only_train=False):

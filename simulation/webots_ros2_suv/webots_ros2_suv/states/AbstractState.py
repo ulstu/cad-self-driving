@@ -23,7 +23,7 @@ class AbstractState:
     def on_event(self, event, scene=None):
         raise NotImplementedError
 
-    def drive(self, world_model, angle_points_count=7, speed=None):
+    def drive(self, world_model, angle_points_count=12, speed=None):
         if not speed:
             speed = self.default_speed
         angle_points_count = self.turn_angle_num_path_points

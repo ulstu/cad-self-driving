@@ -25,7 +25,7 @@ def astar(start, goal, obstacles, robot_radius, step_size=1, log=print):
     g_score = {start: 0}
     f_score = {start: heuristic(start, goal)}
 
-    directions = [(step_size, 0), (0, step_size), (-step_size, 0), (0, -step_size)]
+    directions = [(-step_size, 0), (0, -step_size), (step_size, 0), (0, step_size)]
 
     while open_set:
         _, current = heapq.heappop(open_set)

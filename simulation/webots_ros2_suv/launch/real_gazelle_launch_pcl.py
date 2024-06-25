@@ -139,8 +139,8 @@ def get_ros2_nodes(*args):
         # node_visual,
         # rviz_node,
         # node_bev_builder,
-        # node_point_obstacles,
-        # pcl_map_node
+        node_point_obstacles,
+        pcl_map_node
     ] + static_transform_nodes
 
 def generate_launch_description():

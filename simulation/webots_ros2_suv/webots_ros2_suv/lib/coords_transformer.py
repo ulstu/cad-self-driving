@@ -5,7 +5,7 @@ import yaml
 import numpy as np
 import math
 from ament_index_python.packages import get_package_share_directory
-
+from webots_ros2_suv.lib.config_loader import ConfigLoader
 
 class CoordsTransformer(object):
     def __init__(self) -> None:
@@ -17,14 +17,7 @@ class CoordsTransformer(object):
 
 
     def __load_config(self):
-        package_dir = get_package_share_directory('webots_ros2_suv')
-        config_path = os.path.join(package_dir,
-                                    pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
-        if not os.path.exists(config_path):
-            print('Global map coords config file file not found. Use default values')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
+        config = ConfigLoader("global_coords").data
         self.__coord_corrections = (config['lat'], config['lon'], config['orientation'],  config['scale_x'], config['scale_y'], config['bev_orientation'])
         print('Translation coordinates: ', self.__coord_corrections)
 
@@ -48,6 +41,46 @@ class CoordsTransformer(object):
             o = yaw - self.__coord_corrections[2]
             # o = yaw
         return latitude, longitude, o
+
+    def get_relative_coordinates_(self, lat_goal, lon_goal, pos, pov_point):
+        x, y, lat, lon, angle = pov_point[0], pov_point[1], pos[0], pos[1], pos[2]
+        # Константа для перевода метров в пиксели
+        meters_to_pixels = 15
+        
+        # Константа для перевода градусов в радианы
+        degrees_to_radians = math.pi / 180
+        
+        # Расчет расстояния в метрах между текущей позицией и целью
+        R = 6371000  # Радиус Земли в метрах
+        dlat = (lat_goal - lat) * degrees_to_radians
+        dlon = (lon_goal - lon) * degrees_to_radians
+        a = math.sin(dlat / 2) ** 2 + math.cos(lat * degrees_to_radians) * math.cos(lat_goal * degrees_to_radians) * math.sin(dlon / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        distance_meters = R * c
+        
+        # Определение направления движения к целевой точке в глобальной системе координат
+        bearing = math.atan2(
+            math.sin(dlon) * math.cos(lat_goal * degrees_to_radians),
+            math.cos(lat * degrees_to_radians) * math.sin(lat_goal * degrees_to_radians) -
+            math.sin(lat * degrees_to_radians) * math.cos(lat_goal * degrees_to_radians) * math.cos(dlon)
+        )
+        
+        # Учитываем угол поворота автомобиля
+        relative_bearing = bearing - angle
+        
+        # Перевод расстояния в пиксели
+        distance_pixels = distance_meters * meters_to_pixels
+        
+        # Вычисляем смещение в координатах изображения
+        delta_x = distance_pixels * math.sin(relative_bearing)
+        delta_y = distance_pixels * math.cos(relative_bearing)
+        
+        # Вычисляем новые координаты на изображении
+        goal_x = x + delta_x
+        goal_y = y + delta_y  # Смещение вниз по оси Y увеличивает координату
+
+        return (goal_x, goal_y)
+
 
     def get_relative_coordinates(self, target_lat, target_lon,  pos, pov_point):
         # Разбиваем кортеж на составляющие

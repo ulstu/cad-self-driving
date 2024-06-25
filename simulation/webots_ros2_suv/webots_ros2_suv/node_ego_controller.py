@@ -26,6 +26,7 @@ from .lib.orientation import euler_from_quaternion
 from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
 from .lib.param_loader import ParamLoader
+from .lib.config_loader import ConfigLoader
 import threading
 
 from robot_interfaces.srv import PoseService
@@ -43,12 +44,11 @@ class NodeEgoController(Node):
             self.__ws = None
 
             self.__world_model = WorldModel()
+            
             package_dir = get_package_share_directory("webots_ros2_suv")
-
-            # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
-            with open(f'{package_dir}/config/map_config.yaml') as file:
-                with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
-                    self.__world_model.load_map(yaml.safe_load(mapdatafile))
+            config = ConfigLoader("map_config").data
+            with open(f'{package_dir}/config/global_maps/{config["mapfile"]}') as mapdatafile:
+                self.__world_model.load_map(yaml.safe_load(mapdatafile))
 
 
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
@@ -66,7 +66,6 @@ class NodeEgoController(Node):
             self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
-            self._logger.info(f'Lidar {param.get_param("lidar_topicname")}')
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
@@ -119,7 +118,7 @@ class NodeEgoController(Node):
         self.drive()
 
         self.__world_model.fill_params()
-        self.__world_model.params.append({'states': f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"})
+        self.__world_model.params['states'] = f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"
         if self.__ws is not None:
             self.__ws.update_model(self.__world_model)
 

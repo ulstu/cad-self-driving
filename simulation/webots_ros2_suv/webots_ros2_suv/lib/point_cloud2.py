@@ -75,8 +75,6 @@ def read_points(cloud, field_names=None, skip_nans=False, uvs=[]):
     @return: Generator which yields a list of values for each point.
     @rtype:  generator
     """
-    # assert isinstance(cloud,
-    #                   roslib.message.Message), 'cloud is not a sensor_msgs.msg.PointCloud2'
     fmt = _get_struct_fmt(cloud.is_bigendian, cloud.fields, field_names)
     width, height, point_step, row_step, data, isnan = cloud.width, cloud.height, cloud.point_step, cloud.row_step, cloud.data, math.isnan
     unpack_from = struct.Struct(fmt).unpack_from
@@ -133,7 +131,6 @@ def read_points_list(cloud, field_names=None, skip_nans=False, uvs=[]):
     @return: List of namedtuples containing the values for each point
     @rtype: list
     """
-
     if field_names is None:
         field_names = [f.name for f in cloud.fields]
 

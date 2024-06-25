@@ -1,0 +1,11 @@
+lidar_topicname: "/lidar"
+lidar2_topicname: "/lidar_rear"
+front_image_topicname: "/vehicle/camera/image_color"
+
+range_image_topicname: "/vehicle/range_finder/image"
+navsatfix_topicname: "/vehicle/gps_nav"
+odom_topicname: "/odom"
+fsm_config: "/config/ego_states/robocross.yaml"
+
+gnss_port: "/dev/ttyUSB0"
+gnss_baudrate: 3000000
