@@ -162,7 +162,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'world',
-            default_value='robocross.wbt',
+            default_value='alabuga1.wbt',
             description='Robocross simulation world'
         ),
         webots,

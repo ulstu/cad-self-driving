@@ -153,10 +153,10 @@ class MapWebServer(object):
         if self.world_model is None:
             return None
         if img_type == "obj_detector":
-            if self.world_model.img_front_objects_lines_signs is None:
+            if self.world_model.img_front_objects_lines_signs_markings is None:
             # if self.world_model.seg_colorized is None:
                 return None
-            data = self.world_model.img_front_objects_lines_signs
+            data = self.world_model.img_front_objects_lines_signs_markings
             # data = self.world_model.seg_colorized
         elif img_type == "seg":
             self.world_model.draw_scene()
