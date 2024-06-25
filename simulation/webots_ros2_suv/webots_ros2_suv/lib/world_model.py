@@ -12,6 +12,8 @@ from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_line
 from webots_ros2_suv.lib.map_utils import is_path_clear
 from ackermann_msgs.msg import AckermannDrive
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
+from typing import List
+from webots_ros2_suv.lib.lidar_yolo_box import LidarYoloBox
 
 class WorldModel(object):
     '''
@@ -53,7 +55,8 @@ class WorldModel(object):
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
         self.params = []                    # Параметры для визуализации в системе управления
-        self.lidar_bounding_boxes = []      # Найденные лидаром квадраты (не отфильтрованные по классам)
+        self.lidar_bounding_boxes = []      # Найденные лидаром параллепипеды (не отфильтрованные по классам)
+        self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
     
         self.__obstacles_lookup_num = 0
 
