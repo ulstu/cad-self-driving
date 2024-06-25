@@ -172,7 +172,7 @@ class IPMWorker(AbstractWorker):
                         ymin, ymax = [np.min(p[:, 1]), np.max(p[:, 1])]
                         zmin, zmax = [np.min(p[:, 2]), np.max(p[:, 2])]
                         edges = np.array([[xmin, xmax], [ymin, ymax], [zmin, zmax]])
-                        lidar_yolo_box = LidarYoloBox("test", box, p, edges)
+                        lidar_yolo_box = LidarYoloBox(labels[int(box_cls)], box, p, edges)
                         world_model.lidar_yolo_boxes.append(lidar_yolo_box)
                         
                         to_next = False
