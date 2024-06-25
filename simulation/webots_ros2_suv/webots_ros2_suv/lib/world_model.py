@@ -52,7 +52,7 @@ class WorldModel(object):
         self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
-        self.params = []                    # Параметры для визуализации в системе управления
+        self.params = {}                    # Параметры для визуализации в системе управления
     
         self.__obstacles_lookup_num = 0
 
@@ -70,14 +70,13 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def fill_params(self):
-        self.params.clear()
-        self.params.append({'speed': self.__car_model.get_speed()})
-        self.params.append({'angle': self.__car_model.get_position()[2]})
-        self.params.append({'path_segm': self.cur_path_segment})
-        self.params.append({'path_point': self.cur_path_point})
+        self.params['speed'] =  self.__car_model.get_speed()
+        self.params['angle'] =  self.__car_model.get_position()[2]
+        self.params['path_segm'] =  self.cur_path_segment
+        self.params['path_point'] =  self.cur_path_point
 
 
-    def draw_scene(self, log=None):
+    def draw_scene(self, log=print):
         if self.ipm_colorized_lines is None:
             return
         colorized = self.ipm_colorized_lines
@@ -85,14 +84,19 @@ class WorldModel(object):
         if self.path:
             for n in self.path:
                 if prev_point:
-                    cv2.line(colorized, prev_point, n, (0, 255, 255), 2)
+                    try:
+                        cv2.line(colorized, prev_point, n, (0, 255, 255), 2)
+                    except:
+                        pass
                 prev_point = (int(n[0]), int(n[1]))
-                if log:
-                    log(f'prev_point: {prev_point}')
+                # if log:
+                    # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
-        cv2.circle(colorized, self.goal_point, 9, (255, 0, 0), 5)
+        log(f'GOAL_POINT: {self.goal_point}')
+        cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
-
+        # if log:
+        #     log(f'DRAW PATH: {points}')
         font = cv2.FONT_HERSHEY_SIMPLEX 
         fontScale = 1
         color = (255, 255, 0) 
@@ -102,7 +106,7 @@ class WorldModel(object):
                 x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
                 cv2.circle(colorized, (int(x), int(y)), 8, (0, 0, 255), 2)
                 image = cv2.putText(colorized, f'{i}', (int(x + 20), int(y)), font,  fontScale, color, thickness, cv2.LINE_AA)
-            colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
+            # colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
         except:
             pass
         # cv2.imshow("colorized seg", colorized)

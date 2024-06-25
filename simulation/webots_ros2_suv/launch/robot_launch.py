@@ -15,17 +15,8 @@ from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLau
 from webots_ros2_driver.webots_controller import WebotsController
 from nav2_common.launch import RewrittenYaml
 
-
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
-
-package_dir = get_package_share_directory(PACKAGE_NAME)
-project_settings_config_path = os.path.join(package_dir, "config/project_settings.yaml")
-with open(project_settings_config_path, "r") as file:
-    project_settings_config = yaml.safe_load(file)
-if project_settings_config['use_gpu'] == False:
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
 
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
@@ -72,6 +63,21 @@ def get_ros2_nodes(*args):
         package=PACKAGE_NAME,
         executable='node_ego_controller',
         name='node_ego_controller',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
+    node_visual = Node(
+        package=PACKAGE_NAME,
+        executable='node_visual',
+        name='node_visual',
+        output='screen' ,
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+    node_point_obstacles = Node(
+        package=PACKAGE_NAME,
+        executable='node_point_obstacles',
+        name='node_point_obstacles',
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
@@ -139,8 +145,10 @@ def get_ros2_nodes(*args):
         #node_localmap,
         #node_globalmap,
         node_ego_controller,
-        #depth_to_laserscan,
-        # pcl_map_node,
+        node_point_obstacles,
+        # node_visual,
+        # depth_to_laserscan,
+        pcl_map_node,
         #rviz2_node,
         #lane_follower,
     ] + static_transform_nodes
@@ -159,6 +167,9 @@ def generate_launch_description():
         ],
         respawn=True
     )
+
+    
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'world',

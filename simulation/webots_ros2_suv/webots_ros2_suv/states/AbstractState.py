@@ -23,7 +23,7 @@ class AbstractState:
     def on_event(self, event, scene=None):
         raise NotImplementedError
 
-    def drive(self, world_model, angle_points_count=7, speed=None):
+    def drive(self, world_model, angle_points_count=5, speed=None):
         if not speed:
             speed = self.default_speed
         angle_points_count = self.turn_angle_num_path_points
@@ -47,6 +47,7 @@ class AbstractState:
             command_message.steering_angle = error / math.pi * self.ackerman_proportional_coef
         
         world_model.command_message= command_message
+        self.log(f'command message: {command_message}')
         # with open('/home/hiber/angle.csv','a') as fd:
         #     fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
         #command_message.steering_angle = 0.0

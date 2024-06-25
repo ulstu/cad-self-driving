@@ -21,7 +21,7 @@ from rclpy.qos import qos_profile_sensor_data, QoSReliabilityPolicy
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_driver.utils import controller_url_prefix
-from PIL import Image
+from PIL import Image as PImage
 from .lib.timeit import timeit
 from .lib.world_model import WorldModel
 from .lib.orientation import euler_from_quaternion
@@ -32,6 +32,8 @@ from sensor_msgs.msg import Image, NavSatFix, NavSatStatus, PointCloud2, PointFi
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 from geographiclib.geodesic import Geodesic
+from .lib.param_loader import ParamLoader
+from .lib.config_loader import GlobalConfigLoader
 
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y):
@@ -72,18 +74,34 @@ class NodePointObstacles(Node):
 
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
-    
+            param = ParamLoader()
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
-            with open("src/webots_ros2_suv/config/lidardata.yaml", "r") as file:
-                self.lidardata = yaml.safe_load(file)
+            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
+            
+            self.lidardata = GlobalConfigLoader("lidardata").data
+
             self.MAP_SCALE = self.lidardata['visual_scale']
+            self.GPS_SHIFT_X = self.lidardata['gps_shift_x']
+            self.GPS_SHIFT_Y = self.lidardata['gps_shift_y']
             self.geocoords = []
             self.rear_figures = []
             self.front_figures = []
+            self.lat = 53.0
+            self.lon = 48.0
+            self.ang = 0
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
         
+
+    def __on_image_message(self, data):
+        image = data.data
+        self.backimage = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
+        self.backimage = cv2.cvtColor(self.backimage, cv2.COLOR_RGBA2RGB)
+        
+    
+
+
 
     # Функция вызывается, когда прилетает JSON от pcl_map_node
     def __on_obstacles_message(self, data):
@@ -97,33 +115,58 @@ class NodePointObstacles(Node):
         if 'obstacles_rear' in obstacles_dict:
             self.rear_figures = []
             obst_list = obstacles_dict['obstacles_rear'];
-
+        p1 = [0, 0]
+        p2 = [0, 0]
+        p3 = [0, 0]
+        p4 = [0, 0]
         # Обходим все обнаруженные препятствия
+        self.geocoords = []
         for p in obst_list:
+            # Геокоординаты 4-х точек - углов препятствия
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[4][1],  p[4][0])
+            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[5][1],  p[4][0])
+            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[6][1],  p[4][0])
+            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[7][1],  p[4][0])
+            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+            # Геокоординаты середины диагонали препятствия
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (p[4][1] + p[7][1]) / 2,  (p[4][0] + p[7][0]) / 2) 
+            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+
+
+
+
             if self.lidardata['visualize']:
                 # здесь будут координаты углов препятствий
-                p1 = [0, 0]
-                p2 = [0, 0]
-                p3 = [0, 0]
-                p4 = [0, 0]
+
             
                 # p[0] - номер препятствия
                 # p[1] - расстояние до ближайшей точки препятствия
                 # p[2] - высота самой нижней точки препятствия относительно датчика
                 # p[3] - высота самой верхней точки препятствия относительно датчика
                 # p[4], p[5], p[6], p[7] - списки из двух чисел - координаты углов препятствия
+                # p[8] - xmin
+                # p[9] - xmax
+                # p[10] - ymin
+                # p[11] - ymax
                 if 'obstacles' in obstacles_dict:
-                    self.front_figures.append([p[4], p[5], p[6], p[7]])
+                    self.front_figures.append([p[4], p[5], p[6], p[7], True, p[0], p[1], p[2], p[3]])
                 else:
-                    self.rear_figures.append([p[4], p[5], p[6], p[7]])
+                    self.rear_figures.append([p[4], p[5], p[6], p[7], False, p[0], p[1], p[2], p[3]])
 
-        
+        self.all_figures = self.front_figures + self.rear_figures
+        # self._logger.info(str(self.geocoords))
 
         if self.lidardata['visualize']:
-            self.all_figures = self.front_figures + self.rear_figures
+            
 
             # Создаём черный фон
             self.img = np.zeros(shape=(1024, 1024, 3), dtype=np.uint8)
+            x_offset=y_offset=50
+            if hasattr(self, "backimage"):
+                self.img[y_offset:y_offset+self.backimage.shape[0], x_offset:x_offset+self.backimage.shape[1]] = self.backimage
             # Вычисляем координаты для отрисовки. В JSON координата X направлена от нас вдаль. Чем X больше, тем точка от нас дальше
             # Поэтому x становится на отображении координатой Y. Чем она больше, тем точка должна быть выше. Поэтому отнимаем её от 800
             # Координата y в JSON - смещение перпендикулярно нашей оси взгляда. Чем эта y бо(льше, тем точка от нас левее. Поэтому в отрисовке
@@ -142,16 +185,17 @@ class NodePointObstacles(Node):
                 p2[1] = int(512.0 - figure[2][0] * scale)
                 p3[0] = int(512.0 - figure[3][1] * scale)
                 p3[1] = int(512.0 - figure[3][0] * scale)
+
                 # Рисуем текст - номер препятствия
-                cv2.putText(self.img, "Fig #" + str(p[0]), (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0))
+                cv2.putText(self.img, "Fig #" + str(figure[5]) + ", d = " + str(figure[6]) + ", hmin = " + str(figure[7]) + ", hmax = " + str(figure[8]), (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0))
                 # Рисуем рамку препятствия
                 cv2.line(self.img, (p1[0], p1[1]), (p2[0], p2[1]), (255,255,255), 1);
                 cv2.line(self.img, (p2[0], p2[1]), (p3[0], p3[1]), (255,255,255), 1);
                 cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255), 1);
                 cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255), 1);
         
-            cv2.imshow('NPO', self.img)  # Отображаем окно
-            cv2.waitKey(1) # Нужно для работы окна
+            # cv2.imshow('NPO', self.img)  # Отображаем окно
+            # cv2.waitKey(1) # Нужно для работы окна
 
 
         

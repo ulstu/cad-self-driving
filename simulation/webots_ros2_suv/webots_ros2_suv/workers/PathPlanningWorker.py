@@ -30,7 +30,7 @@ class PathPlanningWorker(AbstractWorker):
         self.robot_radius=10
         self.step_size=10
         self.sample_size=5
-
+        self.buffer = None
         with open(config_path) as file:
             config = yaml.full_load(file)
             self.turning_radius = config['dubins_turning_radius']
@@ -39,6 +39,7 @@ class PathPlanningWorker(AbstractWorker):
             self.step_size = config['a_star_step_size']
             self.sample_size = config['dubins_sample_size']
             self.min_path_points_dist = config['min_path_points_dist']
+            self.bezier_num_points = config['bezier_num_points']
 
 
     def plan_a_star(self, world_model):
@@ -48,14 +49,42 @@ class PathPlanningWorker(AbstractWorker):
                                  self.robot_radius, 
                                  self.step_size,
                                  super().log)
-        if not world_model.path:
-            super().log('A* path not found')
+        # if not world_model.path and self.buffer:
+            # world_model.path = self.buffer
+            # world_model.params['final_path_len'] = len(world_model.path)
+        #     # world_model.path = self.linear(world_model.pov_point, world_model.goal_point, 8)
+        #     # world_model.path = bezier_curve(world_model.path, 20)
+        #     world_model.params['init_path_len'] = "-"
+        #     # if world_model.path:
+        #         # world_model.params['linear_path_len'] = len(world_model.path)
+                
+        #         # world_model.params['final_path_len'] = len(world_model.path)
+        #     # else:
+        #     world_model.path = self.linear(world_model.pov_point, world_model.goal_point, 8)
+        #     world_model.params['linear_path_len'] = len(world_model.path)
+        #     world_model.path = bezier_curve(world_model.path, 20)
+        #     world_model.params['final_path_len'] = len(world_model.path)
         if world_model.path:
-            world_model.path = kalman_filter_path(world_model.path, self.process_noise_scale)
+        # if world_model.path:
+            world_model.params['linear_path_len'] = '-'
+            world_model.params['init_path_len'] = len(world_model.path)
+            # world_model.path = kalman_filter_path(world_model.path, self.process_noise_scale)
             world_model.path = self.filter_coordinates(world_model.path, self.min_path_points_dist, 10)
             # world_model.path = smooth_path_with_dubins(world_model.path, self.turning_radius, world_model.ipm_image, self.sample_size, super().log)
-            world_model.path = bezier_curve(world_model.path, 20)
+            world_model.path = bezier_curve(world_model.path, self.bezier_num_points)
+            self.buffer = world_model.path
+        else:
+            world_model.path = self.linear(world_model.pov_point, world_model.goal_point, 8)
+            world_model.params['linear_path_len'] = len(world_model.path)
 
+            world_model.path = bezier_curve(world_model.path, 20)
+            world_model.params['init_path_len'] = "-"
+            world_model.params['final_path_len'] = len(world_model.path)
+        
+
+    def linear(self, p1, p2, n):
+        return [p1, p2]
+    
     def calculate_angle(self, p1, p2, p3):
         """Calculate the angle between the line segments (p1p2) and (p2p3)."""
         v1 = (p1[0] - p2[0], p1[1] - p2[1])

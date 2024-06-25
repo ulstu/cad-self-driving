@@ -38,7 +38,7 @@ class IPMTransformer(object):
         """
         return self.__h
 
-    def get_ipm(self, im_src, dst_size=(1200, 800), horizont=0, is_mono=False, need_cut=True):
+    def get_ipm(self, im_src, dst_size=(800, 800), horizont=0, is_mono=False, need_cut=True, log=print):
         """
         Метод для выполнения обратного преобразования перспективы (Inverse Perspective Mapping) на исходном изображении im_src.
 
@@ -67,5 +67,10 @@ class IPMTransformer(object):
         nonzero_cols = len(cols[np.nonzero(cols)])  # Находим ненулевые столбцы
         im_dst = im_dst[:nonzero_rows, :nonzero_cols]  # Обрезаем изображение до ненулевых строк и столбцов
         im_dst = cv2.resize(im_dst, (im_dst.shape[1], im_dst.shape[1]), interpolation=cv2.INTER_AREA)  # Изменяем размер
+        cv2.imshow('ipm', im_dst)
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            return
+        # target_width = self.__img_width  # 800
+        # pil_img = pil_img.resize((target_width, int(pil_img.size[1] * target_width / pil_img.size[0])))
         return im_dst
 

@@ -45,10 +45,36 @@ class LaneLineDetectionWorker(AbstractWorker):
 
     def on_data(self, world_model):
         try:
-            if world_model:
-                if project_settings_config["use_line_detection"] == True:
-                    img = np.array(Image.fromarray(world_model.rgb_image))
-                    line_batches, mask_batches, results = self.lane_line_model.predict([img])
+            if world_model and project_settings_config["use_line_detection"] == True:
+
+                img = np.array(Image.fromarray(world_model.rgb_image))
+                line_batches, mask_batches, results = self.lane_line_model.predict([img])
+                
+                world_model.img_front_objects_lines = self.lane_line_model.generate_prediction_plots([world_model.img_front_objects], self.labels, mask_batches, line_batches)[0]
+
+                world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+
+                count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(world_model.img_front_objects_lines, 
+                                                                                                line_batches, 
+                                                                                                0.45, 1.0, 
+                                                                                                world_model.img_front_objects_lines.shape)
+                
+                self.lines_analizator.draw_labels(world_model.img_front_objects_lines, 
+                                                  label_names=[f"Count of lanes: {count_roads}", f"Car on lane: {car_line_id}"],
+                                                  colors=[(27, 198, 250), (25, 247, 184)])
+
+                lines_bev = []
+                masks_bev = []
+
+                line_batches_bev = []
+                mask_batches_bev = []
+                
+                
+                for line in line_batches[0]:
+                    points_bev = []
+                    for point in line.points:
+                        x, y = world_model.map_builder.calc_bev_point([point[0], point[1] - world_model.map_builder.get_horizont_line()])
+                        points_bev.append([x, y])
                     
                     world_model.img_front_objects_lines = self.lane_line_model.generate_prediction_plots([world_model.img_front_objects], self.labels, mask_batches, line_batches)[0]
                     world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)

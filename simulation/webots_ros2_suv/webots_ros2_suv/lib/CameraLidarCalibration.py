@@ -12,6 +12,8 @@ from PIL import Image, ImageTk
 
 from ipm_transformer import IPMTransformer
 
+DATACAMERA = "/home/hiber/ros2_ws/data/camera/buffer.png"
+DATALIDAR = "/home/hiber/ros2_ws/data/lidar/buffer.json"
 
 class ImageApp:
     ipm_transformer: IPMTransformer
@@ -70,11 +72,13 @@ class ImageApp:
         self.limits_container.bind("<B1-Motion>", self.drag)
         self.limits_container.bind("<ButtonRelease-1>", self.my_callback)
         self.limits_container.grid(row=0, column=0)
-
-        self.open_image_button = Button(
+        self.freeze = IntVar()
+        self.freeze.set(0)
+        self.check_update = Checkbutton(
             self.left_frame,
-            text='Open an image',
-            command=self.open_image_dialog
+            text='Freeze',
+            variable=self.freeze,
+            command=self.update_freeze
         )
         self.load_lidar_button = Button(
             self.left_frame,
@@ -132,13 +136,31 @@ class ImageApp:
             self.dst_y_list.append(vary_dst)
 
         self.configs_frames = []
-        self.open_image_button.grid(row=0, column=0, padx=5, pady=5)
+        self.check_update.grid(row=0, column=0, padx=5, pady=5)
         self.load_lidar_button.grid(row=0, column=1, padx=5, pady=5)
         self.load_config_button.grid(row=0, column=2, padx=5, pady=5)
         self.save_config_button.grid(row=0, column=3, padx=5, pady=5)
-        self.parameters()
 
+        self.pts_src, self.pts_dst = self.calc_pts(self.__img_width, self.__img_height)
+
+
+        self.parameters()
+        self.root.after(0, self.load_data)
         self.root.mainloop()
+    
+    def update_freeze(self):
+        if self.freeze.get() == 0:
+            self.root.after(0, self.load_data)
+    def load_data(self):
+        if (self.freeze.get() == 0):
+            try:
+                self.load_image(DATACAMERA)
+                self.load_obstacles(DATALIDAR)
+                self.update_homography()
+            except:
+                pass
+            self.root.after(500, self.load_data)
+
 
     def parameters(self):
         self.frame_config = Frame(self.root, borderwidth=1, relief=SOLID)
@@ -422,15 +444,15 @@ class ImageApp:
         self.__img_ipm = self.ipm_transformer.get_ipm(h_img, is_mono=False,
                                                       horizont=self.__horizont_line_height) 
         pil_img = Image.fromarray(self.__img_ipm)
-        target_width = self.__img_width  # 400
+        target_width = self.__img_width  # 800
         pil_img = pil_img.resize((target_width, int(pil_img.size[1] * target_width / pil_img.size[0])))
         return pil_img
 
-    def open_image_dialog(self):
-        # Позволяет пользователю выбрать файл, поддерживаются форматы изображений
-        file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png *.gif *.bmp")])
-        if file_path:
-            self.load_image(file_path)
+    # def open_image_dialog(self):
+    #     # Позволяет пользователю выбрать файл, поддерживаются форматы изображений
+    #     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png *.gif *.bmp")])
+    #     if file_path:
+    #         self.load_image(file_path)
 
     def open_lidar_dialog(self):
         # Позволяет пользователю выбрать файл, поддерживаются форматы изображений
@@ -468,16 +490,17 @@ class ImageApp:
             # Рисуем текст - номер препятствия
             # cv2.putText(self.img, "Fig #" + str(p[0]), (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0, 255))
             # Рисуем рамку препятствия
-            cv2.line(self.img, (p1[0], p1[1]), (p2[0], p2[1]), (255,255,255, 255), 1);
-            cv2.line(self.img, (p2[0], p2[1]), (p3[0], p3[1]), (255,255,255, 255), 1);
-            cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255, 255), 1);
-            cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255, 255), 1);
+            cv2.line(self.img, (p1[0], p1[1]), (p2[0], p2[1]), (255,0,0, 255), 1);
+            cv2.line(self.img, (p2[0], p2[1]), (p3[0], p3[1]), (255,0,0, 255), 1);
+            cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,0,0, 255), 1);
+            cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,0,0, 255), 1);
         
-        # self.img = cv2.flip(cv2.transpose(self.img), 1)
+        self.img = cv2.flip(self.img, 1)
         self.__obstacle_image = Image.fromarray(self.img)
         self.obstacle_photo = ImageTk.PhotoImage(self.__obstacle_image)
         self.limits_container.create_image(self.__img_prev_width + 20, 0, image=self.obstacle_photo, anchor=NW,
                                            tags="imageO")
+    
         
     def load_image(self, image_path):
         # Устанавливаем изображение из файла
@@ -486,6 +509,7 @@ class ImageApp:
         pil_img = pil_img.resize((self.__img_width, self.__img_height))
         self.__src_image = np.array(pil_img)
 
+
         # Устанавливаем изображение для preview
         self.image_scale_coef = self.__img_prev_width / pil_img.size[0]
         pil_img = pil_img.resize((self.__img_prev_width, int(pil_img.size[1] * self.image_scale_coef)))
@@ -493,11 +517,11 @@ class ImageApp:
         self.__img_prev_height = self.__prev_canvas_image.height()
         self.__img_prev_width = self.__prev_canvas_image.width()
         print(self.__img_width, self.__img_height)
-        self.pts_src, self.pts_dst = self.calc_pts(self.__img_width, self.__img_height)
+        # self.pts_src, self.pts_dst = self.calc_pts(self.__img_width, self.__img_height)
 
         self.place_elements()
         self.update_parameters()
-        self.update_homography()
+        # self.update_homography()
         self.wx.config(to=self.__img_height)
 
     def update_sliders(self):

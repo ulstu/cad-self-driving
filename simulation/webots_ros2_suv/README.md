@@ -20,10 +20,16 @@ sudo apt-get install libpcap-dev
 sudo apt-get install libboost${BOOST_VERSION}-dev 
 pip install git+https://github.com/rdesc/pydubins.git
 ```
-## Установка пакетов python
+
+## Скачивание репозитория
 ```
-pip install -r requirements.txt
+mkdir ~/repositories
+cd ~/repositories
+git clone git@github.com:ulstu/cad-self-driving.git
+mkdir ~/ros2_ws
+mkdir ~/ros2_ws/src
 ```
+
 
 ## Установка решения
 * Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros2_ws/src
@@ -32,15 +38,21 @@ ln -s ~/repositories/cad-self-driving/simulation/pcl_maps ~/ros2_ws/src/pcl_maps
 ln -s ~/repositories/cad-self-driving/simulation/robot_interfaces ~/ros2_ws/src/robot_interfaces
 ln -s ~/repositories/cad-self-driving/simulation/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
 ```
-* Для загрузки весов нейронных сетей необходимо установить https://git-lfs.com/
 
-Для установки драйвера лидара 
+## Установка пакетов python
+```
+cd ~/ros2_ws/src/webots_ros2_suv
+pip install -r requirements.txt
+```
+
+
+## Для установки драйвера лидара (на реальном автомобиле)
 ```
 ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_msgs/ ~/ros2_ws/src/lslidar_msgs
 ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_driver/ ~/ros2_ws/src/lslidar_driver
 ```
 
-Для установки драйвера ZED
+## Для установки драйвера камеры ZED (на реальном автомобиле)
 ```
 ln -s ~/repositories/cad-self-driving/drivers/zed-ros2-wrapper ~/ros2_ws/src/zed-ros2-wrapper
 rosdep install --from-paths src --ignore-src -r -y
@@ -60,13 +72,14 @@ export ROS2_WEBOTS_HOME=/usr/local/webots
 cd ~/ros2_ws/src/webots_ros2_suv/resource
 unzip resource.zip
 ```
+При этом содержимое папки resource (отдельные файлы и папки) должно быть скопировано в папку resource
 
+## Запуск
+* Перед первым запуском необходимо скомпилировать web-панель по [инструкции](simulation/webots_ros2_suv/map-server) 
 * Компиляция командой 'colcon build' из папки ~/ros2_ws 
 * Запуск командой 'ros2 launch webots_ros2_suv robot_launch.py'
 * После добавления новых файлов из папки ~/ros2_ws необходимо выполнить команду source install/setup.bash
 * Если стоит conda/miniconda, необходимо ее деактивировать 'conda deactivate'
-
-Camera and rangeFinder resolution: 840x480
 
 
 # Запуск из-под виртуальной машины в MacOS

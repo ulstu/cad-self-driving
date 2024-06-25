@@ -157,7 +157,7 @@ class MapWebServer(object):
                 return None
             data = self.world_model.img_front_objects_lines_signs
         elif img_type == "seg":
-            self.world_model.draw_scene()
+            self.world_model.draw_scene(log=self.log)
             if self.world_model.ipm_colorized_lines is None:
                 return None
             data = self.world_model.ipm_colorized_lines
