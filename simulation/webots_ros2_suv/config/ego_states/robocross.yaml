@@ -26,15 +26,16 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["moving"]
+    start_move: ["gpsfollow"] # "moving"
     stop: ["stopped"]
   gpsfollow:
-    start_move: ["moving"]
-    start_lane_follow: ["lanefollow"]
+    # start_move: ["moving"]
+    start_gps_follow: ["gpsfollow"] 
+    # start_lane_follow: ["lanefollow"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   moving:
-    start_gps_follow: ["gpsfollow"] 
+    start_gps_follow: ["gpsfollow"]
     start_lane_follow: ["lanefollow"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]

@@ -53,7 +53,8 @@ class WorldModel(object):
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
         self.params = {}                    # Параметры для визуализации в системе управления
-    
+        self.gps_car_turn_angle = 0.0
+
         self.__obstacles_lookup_num = 0
 
     def load_map(self, mapyaml):
@@ -144,7 +145,6 @@ class WorldModel(object):
             local_points.append([x, y])
         is_clear = is_path_clear(local_points, radius=10, obstacles=self.ipm_image)
         self.__obstacles_lookup_num = self.__obstacles_lookup_num + 1 if not is_clear else 0
-        log(f'OBSTACLE num: {self.__obstacles_lookup_num} {is_clear} {points}')
         return self.__obstacles_lookup_num >= filter_num
 
     def is_lane_road(self):
