@@ -33,6 +33,7 @@ from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 from geographiclib.geodesic import Geodesic
 from .lib.param_loader import ParamLoader
+from .lib.config_loader import GlobalConfigLoader
 
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y):
@@ -77,9 +78,8 @@ class NodePointObstacles(Node):
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
-
-            with open("src/webots_ros2_suv/config/lidardata.yaml", "r") as file:
-                self.lidardata = yaml.safe_load(file)
+            
+            self.lidardata = GlobalConfigLoader("lidardata").data
             self.MAP_SCALE = self.lidardata['visual_scale']
             self.GPS_SHIFT_X = self.lidardata['gps_shift_x']
             self.GPS_SHIFT_Y = self.lidardata['gps_shift_y']
@@ -193,8 +193,8 @@ class NodePointObstacles(Node):
                 cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255), 1);
                 cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255), 1);
         
-            cv2.imshow('NPO', self.img)  # Отображаем окно
-            cv2.waitKey(1) # Нужно для работы окна
+            # cv2.imshow('NPO', self.img)  # Отображаем окно
+            # cv2.waitKey(1) # Нужно для работы окна
 
 
         

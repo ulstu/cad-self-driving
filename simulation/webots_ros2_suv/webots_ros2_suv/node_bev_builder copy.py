@@ -35,6 +35,7 @@ from sensor_msgs.msg import Image, NavSatFix, NavSatStatus, PointCloud2, PointFi
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 from .lib.param_loader import ParamLoader
+from .lib.config_loader import ConfigLoader
 import tkinter as tk
 from tkinter import *
 
@@ -56,7 +57,7 @@ class NodeBEVBuilder1(Node):
 
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
-            self.load_ipm_config(f'{PACKAGE_NAME}/config/ipm_config.yaml')
+            self.load_ipm_config()
 
             self.calc_points()
             self.__ipm.calc_homography(self.pts_src, self.pts_dst)
@@ -154,25 +155,21 @@ class NodeBEVBuilder1(Node):
         self.pts_src[:, 1] = self.pts_src[:, 1] - self.__horizont_line_height
         self.pts_dst[:, 1] = self.pts_dst[:, 1] - self.__horizont_line_height
         
-    def load_ipm_config(self, config_path):
-        if not os.path.exists(config_path):
-            self._logger.info(f'Config file not found. Use default values. Path: {config_path}')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
-            self.__horizont_line_height = config['horizont']
-            self.__img_height = config['height']
-            self.__img_width = config['width']  
-            self.pts_src = np.array(config['src_points'])
-            self.pts_dst = np.array(config['dst_points'])
-            try:
-                self.posx = config['posx']
-                self.posy = config['posy']
-                self.scale = config['scale']
-            except:
-                self._logger.info(f'Position not loaded')
-            self.__ipm = ipm_transformer.IPMTransformer(np.array(config['homography']))
-            self._logger.info(f'Loaded')
+    def load_ipm_config(self):
+        config = ConfigLoader("ipm_config").data
+        self.__horizont_line_height = config['horizont']
+        self.__img_height = config['height']
+        self.__img_width = config['width']  
+        self.pts_src = np.array(config['src_points'])
+        self.pts_dst = np.array(config['dst_points'])
+        try:
+            self.posx = config['posx']
+            self.posy = config['posy']
+            self.scale = config['scale']
+        except:
+            self._logger.info(f'Position not loaded')
+        self.__ipm = ipm_transformer.IPMTransformer(np.array(config['homography']))
+        self._logger.info(f'Loaded')
 
     
     def get_ipm(self, image):

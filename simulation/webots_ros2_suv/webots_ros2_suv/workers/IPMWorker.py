@@ -199,7 +199,6 @@ class IPMWorker(AbstractWorker):
 
                     cv2.rectangle(world_model.img_front_objects_lines_signs_prj, front_p1, front_p2, color=(255, 0, 0), thickness=2)
                 
-
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model
 

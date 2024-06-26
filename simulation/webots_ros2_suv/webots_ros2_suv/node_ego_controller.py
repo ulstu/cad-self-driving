@@ -26,6 +26,8 @@ from .lib.orientation import euler_from_quaternion
 from .lib.finite_state_machine import FiniteStateMachine
 from .lib.map_server import start_web_server, MapWebServer
 from .lib.param_loader import ParamLoader
+from .lib.config_loader import ConfigLoader
+from .lib.external_data_sender import ExternalDataSender
 import threading
 
 from robot_interfaces.srv import PoseService
@@ -44,18 +46,18 @@ class NodeEgoController(Node):
             self.__ws = None
 
             self.__world_model = WorldModel()
+            
             package_dir = get_package_share_directory("webots_ros2_suv")
-
-            # загружаем размеченную глобальную карту, имя файла которой берем из конфига map_config.yaml
-            with open(f'{package_dir}/config/map_config.yaml') as file:
-                with open(f'{package_dir}/config/global_maps/{yaml.full_load(file)["mapfile"]}') as mapdatafile:
-                    self.__world_model.load_map(yaml.safe_load(mapdatafile))
+            config = ConfigLoader("map_config").data
+            with open(f'{package_dir}/config/global_maps/{config["mapfile"]}') as mapdatafile:
+                self.__world_model.load_map(yaml.safe_load(mapdatafile))
 
 
             # callback_group_pos = MutuallyExclusiveCallbackGroup()
             # callback_group_img = MutuallyExclusiveCallbackGroup()
             # self.create_subscription(Odometry, '/odom', self.__on_gps_message, qos, callback_group=callback_group_pos)
             param = ParamLoader()
+            self.data_sender = ExternalDataSender()
 
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
@@ -67,7 +69,6 @@ class NodeEgoController(Node):
             self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
-            self._logger.info(f'Lidar {param.get_param("lidar_topicname")}')
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
 
@@ -111,17 +112,28 @@ class NodeEgoController(Node):
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
 
-        cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
+        # cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
 
         self.__world_model.rgb_image = np.asarray(analyze_image)
+
+        t1 = time.time()
         # вызов текущих обработчиков данных
         self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
+
+        t2 = time.time()
+        
+        delta = t2 - t1
+        fps = 1 / delta
+        self._logger.info(f"Current FPS: {fps}")
+
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)
+        self.__world_model.fill_params()
+        self.__world_model.params['states'] = f"{' '.join([s for s in self.__fsm.current_states])}"
+        pos = self.__world_model.get_current_position()
+        self.data_sender.send_data(self.__world_model.params)
         self.drive()
 
-        self.__world_model.fill_params()
-        self.__world_model.params.append({'states': f"{' '.join([type(s).__name__ for s in self.__fsm.current_states])}"})
         if self.__ws is not None:
             self.__ws.update_model(self.__world_model)
 

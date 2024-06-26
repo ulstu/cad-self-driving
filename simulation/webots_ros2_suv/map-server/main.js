@@ -493,18 +493,16 @@ setInterval(
     $.getJSON('/get_params' , function(data) {
       var tbl_body = document.createElement("tbody");
       var odd_even = false;
-      $.each(data, function() {
-          var tbl_row = tbl_body.insertRow();
-          tbl_row.className = odd_even ? "odd" : "even";
-          $.each(this, function(k , v) {
-            var k_cell = tbl_row.insertCell();
-            k_cell.appendChild(document.createTextNode(k.toString()));
-            k_cell.className = "fw-bold";
-            var v_cell = tbl_row.insertCell();
-              v_cell.appendChild(document.createTextNode(v.toString()));
-          });        
-          odd_even = !odd_even;               
-      });
+      for (var key in data){
+        var tbl_row = tbl_body.insertRow();
+        tbl_row.className = odd_even ? "odd" : "even";
+        var k_cell = tbl_row.insertCell();
+        k_cell.appendChild(document.createTextNode(key.toString()));
+        k_cell.className = "fw-bold";
+        var v_cell = tbl_row.insertCell();
+        v_cell.appendChild(document.createTextNode(data[key].toString()));   
+        odd_even = !odd_even; 
+      }
       $("#params").empty();
       $("#params").append(tbl_body);
     });    

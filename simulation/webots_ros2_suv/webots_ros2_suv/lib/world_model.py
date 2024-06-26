@@ -35,6 +35,7 @@ class WorldModel(object):
         self.lane_lines = None              # линии дорожной разметки на изображении во фронтальной проекции
         self.lane_contours_bev = None       # контуры линий дорожной разметки на изображении в BEV проекции
         self.lane_lines_bev = None          # линии дорожной разметки на изображении во BEV проекции
+        self.count_roads = None
         self.img_front_objects = None       # изображение с камеры с детектированными объектами
         self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
         self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
@@ -54,10 +55,10 @@ class WorldModel(object):
         self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
-        self.params = []                    # Параметры для визуализации в системе управления
         self.lidar_bounding_boxes = []      # Найденные лидаром параллепипеды (не отфильтрованные по классам)
         self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
-    
+        self.params = {}                    # Параметры для визуализации в системе управления
+        self.gps_car_turn_angle = 0.0
         self.__obstacles_lookup_num = 0
 
     def load_map(self, mapyaml):
@@ -74,14 +75,17 @@ class WorldModel(object):
         return self.__car_model.get_position()
 
     def fill_params(self):
-        self.params.clear()
-        self.params.append({'speed': self.__car_model.get_speed()})
-        self.params.append({'angle': self.__car_model.get_position()[2]})
-        self.params.append({'path_segm': self.cur_path_segment})
-        self.params.append({'path_point': self.cur_path_point})
+        pos = self.__car_model.get_position()
+        self.params["cur_point"] = self.cur_path_point
+        self.params["cur_path_segment"] = self.cur_path_segment
+        self.params['lat'] = pos[0]
+        self.params['lon'] = pos[1]
+        self.params['angle'] = pos[2]
 
 
     def draw_scene(self, log=print):
+        if self.ipm_colorized_lines is None:
+            return
         colorized = self.ipm_colorized_lines
         prev_point = None
         if self.path:
@@ -92,10 +96,11 @@ class WorldModel(object):
                     except:
                         pass
                 prev_point = (int(n[0]), int(n[1]))
-                if log:
-                    log(f'prev_point: {prev_point}')
+                # if log:
+                    # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
-        cv2.circle(colorized, self.goal_point, 9, (255, 0, 0), 5)
+        log(f'GOAL_POINT: {self.goal_point}')
+        cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
         # if log:
         #     log(f'DRAW PATH: {points}')
@@ -144,7 +149,6 @@ class WorldModel(object):
             local_points.append([x, y])
         is_clear = is_path_clear(local_points, radius=10, obstacles=self.ipm_image)
         self.__obstacles_lookup_num = self.__obstacles_lookup_num + 1 if not is_clear else 0
-        log(f'OBSTACLE num: {self.__obstacles_lookup_num} {is_clear} {points}')
         return self.__obstacles_lookup_num >= filter_num
 
     def is_lane_road(self):

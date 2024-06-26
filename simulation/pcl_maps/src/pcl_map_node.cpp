@@ -73,7 +73,7 @@ class PointCloudMapper : public rclcpp::Node
 
       if (file_record)
       {
-        mkdir("lidar_data", 0777);
+        mkdir("data/lidar_data", 0777);
       }
     }
  
@@ -129,9 +129,9 @@ class PointCloudMapper : public rclcpp::Node
     
       std::stringstream ss;
       if (!is_rear) {
-        ss << std::put_time(timeinfo, "lidar_data/Lidar_front_%Y-%m-%d_%H_%M_%S_");
+        ss << std::put_time(timeinfo, "data/lidar_data/Lidar_front_%Y-%m-%d_%H_%M_%S_");
       } else {
-        ss << std::put_time(timeinfo, "lidar_data/Lidar_rear_%Y-%m-%d_%H_%M_%S_");
+        ss << std::put_time(timeinfo, "data/lidar_data/Lidar_rear_%Y-%m-%d_%H_%M_%S_");
       }
     
       // tm can only go to seconds, milliseconds need to be obtained separately
@@ -161,7 +161,7 @@ class PointCloudMapper : public rclcpp::Node
       
       //RCLCPP_INFO(this->get_logger(), get_new_filename().c_str());
 
-      RCLCPP_INFO(this->get_logger(), "PCL data recieved!!!!!!!!!");
+      // RCLCPP_INFO(this->get_logger(), "PCL data recieved!!!!!!!!!");
 
       // Фильтрация облака точек - "разуплотнение"
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);
