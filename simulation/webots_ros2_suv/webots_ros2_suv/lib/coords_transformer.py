@@ -104,33 +104,7 @@ class CoordsTransformer(object):
 
         # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
         return (int(goal_x), int(goal_y))
-
-
-    def get_relative_coordinates__(self, target_lat, target_lon,  pos, pov_point):
-        # Разбиваем кортеж на составляющие
-        start_lat, start_lon, start_angle, scale_x, scale_y = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4]
-        start_angle = start_angle - self.__coord_corrections[5]
-        # Пересчитываем разницу в метрах для широты и долготы
-        delta_lat_meters = self.__delta_latitude_in_meters(target_lat, start_lat)
-        delta_lon_meters = self.__delta_longitude_in_meters(target_lon, start_lon, start_lat)
- 
-        # # Применяем поворот
-        rotated_x, rotated_y = self.__rotate_coordinates(delta_lat_meters, delta_lon_meters, start_angle)
-
-        # # Применяем масштабирование
-        scaled_x = rotated_x * scale_x
-        scaled_y = rotated_y * scale_y
-
-
-        # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
-        return (int(goal_x), int(goal_y))
-
-    def __rotate_coordinates(self, x, y, angle):
-        # Поворот координат на угол angle
-        rotated_x = x * math.cos(angle) - y * math.sin(angle)
-        rotated_y = x * math.sin(angle) + y * math.cos(angle)
-        return rotated_x, rotated_y  
-
+    
     def get_coord_corrections(self):
         return self.__coord_corrections  
 

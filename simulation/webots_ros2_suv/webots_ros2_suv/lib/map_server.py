@@ -23,6 +23,7 @@ import time
 import numpy as np
 import cv2
 from PIL import Image
+from .config_loader import ConfigLoader
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
@@ -178,13 +179,7 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_init_point(self):
-        config_path = os.path.join(BASE_RESOURCE_PATH,
-                                    pathlib.Path(os.path.join(BASE_RESOURCE_PATH, 'config', 'map_config.yaml')))
-        if not os.path.exists(config_path):
-            print('Global map coords config file file not found. Use default values')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
+        config = ConfigLoader("map_config").data
         return {'lat': config['lat'], 'lon': config['lon'], 'mapfile': config['mapfile']}
 
 

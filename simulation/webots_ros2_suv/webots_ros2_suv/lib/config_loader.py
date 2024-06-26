@@ -13,7 +13,7 @@ class ConfigLoader:
             config = yaml.safe_load(file)
             cur_directory = os.path.join(package, "config" ,config.get("current", "simulator"))
             if not os.path.exists(os.path.join(cur_directory, f"{name}.{type}")):
-                print(f"Config file file {cur_directory} not found. Solution will been stoped")
+                print(f"Config file file {cur_directory} not found")
             else:
                 with open(os.path.join(cur_directory, f"{name}.{type}"), 'r') as file:
                     self.data = yaml.safe_load(file)
