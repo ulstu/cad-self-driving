@@ -6,7 +6,6 @@ from ament_index_python.packages import get_package_share_directory
 from ackermann_msgs.msg import AckermannDrive
 
 class AbstractState:
-
     def __init__(self, node=None) -> None:
         self.node = node
         package_dir = get_package_share_directory('webots_ros2_suv')
@@ -29,7 +28,11 @@ class AbstractState:
         angle_points_count = self.turn_angle_num_path_points
         if world_model.path and len(world_model.path) < angle_points_count:
             angle_points_count = len(world_model.path) - 1
-        if not world_model.path or angle_points_count <= 2:
+        if len(world_model.gps_path) > 2:
+            command_message = AckermannDrive()
+            command_message.speed = float(speed)
+            command_message.steering_angle = world_model.gps_car_turn_angle
+        elif not world_model.path or angle_points_count <= 2:
             command_message = AckermannDrive()
             command_message.speed = 0.0
             command_message.steering_angle = 0.0
@@ -45,7 +48,7 @@ class AbstractState:
             command_message = AckermannDrive()
             command_message.speed = float(speed)
             command_message.steering_angle = error / math.pi * self.ackerman_proportional_coef
-        
+
         world_model.command_message= command_message
         # with open('/home/hiber/angle.csv','a') as fd:
         #     fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
@@ -53,4 +56,5 @@ class AbstractState:
         #self._logger.info(f'angle: {angle}; diff: {error * p_coef}')
 
     def log(self, message):
-        self.node._logger.info(message)    
+        self.node._logger.info(message)
+ 

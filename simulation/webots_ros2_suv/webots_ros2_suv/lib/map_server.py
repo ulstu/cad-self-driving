@@ -75,6 +75,8 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_position(self):
+        if self.world_model is None:
+            return None
         try:
             pos = self.world_model.get_current_position()
             self.driving_points.append([pos[0], pos[1]])
@@ -128,6 +130,10 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_params(self):
+        if self.world_model is None:
+            return None
+        if self.world_model.params is None:
+            return None
         return self.world_model.params
 
     @cherrypy.expose
@@ -144,12 +150,16 @@ class MapWebServer(object):
 
     @cherrypy.expose
     def get_sign_label(self):
+        if self.world_model is None:
+            return None
         if self.world_model.found_sign is None:
             return json.dumps({"detected": False, "sign": "знак не обнаружен"})
         return json.dumps({"detected": True, "sign": self.world_model.found_sign[1]})
 
     @cherrypy.expose
     def get_image(self, img_type, tm):
+        if self.world_model is None:
+            return None
         if img_type == "obj_detector":
             if self.world_model.img_front_objects_lines_signs is None:
                 return None

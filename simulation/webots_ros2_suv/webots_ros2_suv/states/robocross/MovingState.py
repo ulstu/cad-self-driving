@@ -1,6 +1,6 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
-from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
-import math
+from webots_ros2_suv.lib.map_utils import calc_dist_point
+
 
 class MovingState(AbstractState):
 
@@ -59,7 +59,7 @@ class MovingState(AbstractState):
                 # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
             world_model.params['dist_point'] = dist
-            self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+            self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
         world_model.cur_path_point = self.__cur_path_point
@@ -103,4 +103,3 @@ class MovingState(AbstractState):
         world_model.set_speed(speed)
         self.drive(world_model, speed=speed)
         return event
-
