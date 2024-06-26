@@ -129,7 +129,7 @@ class PathPlanningWorker(AbstractWorker):
             # super().log(f"PathPlanningWorker {str(world_model)}")
             # thread = Thread(target = self.plan_path, args = (world_model,))
             # thread.start()
-            # world_model = self.plan_path(world_model)
+            world_model = self.plan_path(world_model)
             pass
 
         except  Exception as err:
