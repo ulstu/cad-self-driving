@@ -48,6 +48,8 @@ class AbstractState:
         
         world_model.command_message= command_message
         self.log(f'command message: {command_message}')
+        world_model.params['speed'] = command_message.speed
+        world_model.params['steering'] = command_message.steering_angle
         # with open('/home/hiber/angle.csv','a') as fd:
         #     fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
         #command_message.steering_angle = 0.0

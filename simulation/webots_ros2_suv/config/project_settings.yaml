@@ -1,1 +1,2 @@
 use_gpu: True
+use_line_detection: True
