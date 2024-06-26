@@ -190,6 +190,7 @@ class GPSFollowState(AbstractState):
         for point in points:
             path_square_points.append(self.gps_to_rect(point[0], point[1]))
 
+        difference = None
         if len(path_square_points) > 1:
             nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.7)
             difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
@@ -202,13 +203,14 @@ class GPSFollowState(AbstractState):
 
 
             difference_angle = -self.AngleOfVectors(car_vector, difference)
-            world_model.gps_car_turn_angle = float(min(0.8, max(-0.8, difference_angle / 90)))
-            # self.logw(f'angle {difference_angle}')
+            world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
+            self.log(f'angle {difference_angle}')
             
         pg.event.get()
         self.sc.fill((0, 0, 0))
         pg.draw.line(self.sc, (255,0,0), move_screen(0, 0), move_screen(car_vector[0], car_vector[1]))
-        pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
+        if difference != None:
+            pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
         for point in path_square_points:
             pg.draw.circle(self.sc, (255,0,0), move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
         pg.display.update()
