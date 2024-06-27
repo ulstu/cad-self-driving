@@ -56,6 +56,15 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                     # for mask in results[0].masks:
                     #     for xy in mask.xy:
                     #         cv2.drawContours(world_model.img_front_objects_lines_signs, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
+
+                    masks = None
+                    if results[0].masks is not None:
+                        masks = results[0].masks
+                    
+                    labels = [self.model.names[int(label)] for label in results[0].boxes.cls]
+
+                    world_model.detected_road_markings = list(zip(masks, labels))
+
                     background_alpha = 0.7
                     if results[0].masks is not None:
                         for xy in results[0].masks.xy:
