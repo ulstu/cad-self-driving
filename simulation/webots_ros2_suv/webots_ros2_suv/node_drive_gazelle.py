@@ -1,3 +1,4 @@
+from std_msgs.msg import Bool
 import rclpy
 import traceback
 import json
@@ -19,34 +20,46 @@ from webots_ros2_driver.utils import controller_url_prefix
 from ackermann_msgs.msg import AckermannDrive
 import socket
 
+UDP_SEND_IP = '192.168.1.101'
+UDP_SEND_PORT = 90
+
 
 class NodeDriveGazelle(Node):
     def __init__(self):
         try:
             super().__init__('node_drive_gazelle')
+
             self.create_subscription(AckermannDrive, 'cmd_ackermann', self.__cmd_ackermann_callback, 1)
-            self.udp_ip = "192.168.1.101"
-            self.udp_port = 90
-            self.sock = socket.socket(socket.AF_INET,
-                                      socket.SOCK_DGRAM) 
+            self.create_subscription(Bool, 'cmd_control_unit', self.__cmd_control_unit_callback, 1)
+
+            self.socket_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         except Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     def __cmd_ackermann_callback(self, message):
         speed = message.speed
         steering_angle = message.steering_angle
-        is_pause = message.is_pause
 
-        message = {
+        jsonrpc_message = {
             "jsonrpc": "2.0",
             "method": "set_control_values",
-            "params": [speed, steering_angle, is_pause]
+            "params": [speed, steering_angle]
         }
 
-        str_message = json.dumps(message)
-        self.sock.sendto(str_message.encode(), (self.udp_ip, self.udp_port))
+        jsonrpc_message_str = json.dumps(jsonrpc_message)
+        self.socket_send.sendto(jsonrpc_message_str.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
 
-        self._logger.info(f'GAZELLE drive message: {speed} {steering_angle} {is_pause}')
+        self._logger.info(f'GAZELLE drive message: {speed} {steering_angle}')
+
+    def __cmd_control_unit_callback(self, is_pause):
+        jsonrpc_message = {
+            "jsonrpc": "2.0",
+            "method": "set_pause_state",
+            "params": [is_pause.data]
+        }
+
+        jsonrpc_message_str = json.dumps(jsonrpc_message)
+        self.socket_send.sendto(jsonrpc_message_str.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
 
 
 def main(args=None):

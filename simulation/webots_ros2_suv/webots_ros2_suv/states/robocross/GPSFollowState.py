@@ -231,8 +231,6 @@ class GPSFollowState(AbstractState):
                 world_model.is_pause = True
                 event = 'pause'
             elif zone['name'] == 'traffic_light':
-                self.log(f'{world_model.traffic_light_state}')
-
                 if world_model.traffic_light_state == 'red':
                     speed = 0
                     self.__cur_path_point = 0

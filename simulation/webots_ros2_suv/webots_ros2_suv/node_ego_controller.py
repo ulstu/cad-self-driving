@@ -1,3 +1,4 @@
+from std_msgs.msg import Bool
 import rclpy
 import numpy as np
 import traceback
@@ -37,8 +38,8 @@ import json
 
 RECV_BUFFER_SIZE = 128
 SENSOR_DEPTH = 40
-UDP_IP = '0.0.0.0'
-UDP_PORT = 8080
+UDP_RECV_IP = '0.0.0.0'
+UDP_RECV_PORT = 8080
 
 
 class NodeEgoController(Node):
@@ -77,6 +78,7 @@ class NodeEgoController(Node):
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
+            self.__control_unit_publisher = self.create_publisher(Bool, 'cmd_control_unit', 1)
 
             self.start_web_server()
 
@@ -99,15 +101,15 @@ class NodeEgoController(Node):
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
 
     def start_udp_server(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind((UDP_IP, UDP_PORT))
-        sock.setblocking(0)
+        socket_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socket_recv.bind((UDP_RECV_IP, UDP_RECV_PORT))
+        socket_recv.setblocking(0)
 
         while True:
-            is_data_available = select.select([sock], [], [])
+            is_data_available = select.select([socket_recv], [], [])
 
             if is_data_available[0]:
-                data, _ = sock.recv(RECV_BUFFER_SIZE)
+                data, _ = socket_recv.recv(RECV_BUFFER_SIZE)
                 data_dict = json.loads(data)
 
                 if data_dict['is_pause'] == 'True':
@@ -129,8 +131,11 @@ class NodeEgoController(Node):
 
     def drive(self):
         if self.__world_model:
-            # self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
+            is_pause = Bool()
+            is_pause.data = self.__world_model.is_pause
+
             self.__ackermann_publisher.publish(self.__world_model.command_message)
+            self.__control_unit_publisher.publish(is_pause)
 
     #@timeit
     def __on_image_message(self, data):
