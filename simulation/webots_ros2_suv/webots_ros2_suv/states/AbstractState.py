@@ -32,12 +32,10 @@ class AbstractState:
             command_message = AckermannDrive()
             command_message.speed = float(speed)
             command_message.steering_angle = world_model.gps_car_turn_angle
-            command_message.is_pause = world_model.is_pause
         elif not world_model.path or angle_points_count <= 2:
             command_message = AckermannDrive()
             command_message.speed = 0.0
             command_message.steering_angle = 0.0
-            command_message.is_pause = world_model.is_pause
         else:
             angles = []
             for i in range(1, angle_points_count):
@@ -51,7 +49,6 @@ class AbstractState:
             command_message = AckermannDrive()
             command_message.speed = float(speed)
             command_message.steering_angle = error / math.pi * self.ackerman_proportional_coef
-            command_message.is_pause = world_model.is_pause
 
         world_model.command_message = command_message
 
@@ -59,7 +56,7 @@ class AbstractState:
 
         world_model.params['speed'] = command_message.speed
         world_model.params['steering'] = command_message.steering_angle
-        world_model.params['is_pause'] = command_message.is_pause
+        world_model.params['is_pause'] = world_model.is_pause
 
         # with open('/home/hiber/angle.csv','a') as fd:
         #     fd.write(f'{command_message.speed},{command_message.steering_angle},{datetime.now()}\n')
