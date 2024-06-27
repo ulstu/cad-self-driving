@@ -12,6 +12,8 @@ from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_line
 from webots_ros2_suv.lib.map_utils import is_path_clear
 from ackermann_msgs.msg import AckermannDrive
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
+from typing import List
+from webots_ros2_suv.lib.lidar_yolo_box import LidarYoloBox
 
 class WorldModel(object):
     '''
@@ -34,9 +36,12 @@ class WorldModel(object):
         self.lane_contours_bev = None       # контуры линий дорожной разметки на изображении в BEV проекции
         self.lane_lines_bev = None          # линии дорожной разметки на изображении во BEV проекции
         self.count_roads = None
+        self.car_line_id = 1                # Номер полосы, на которой едет машина (правая полоса имеет id 1)
         self.img_front_objects = None       # изображение с камеры с детектированными объектами
         self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
         self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
+        self.img_front_objects_lines_signs_markings = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка
+        self.img_front_objects_lines_signs_markings_prj = None  # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка + projection
         self.yolo_detected_objects = None # объекты, обнаруженные на изображении с помощью YOLO
         self.objects = None                 # объекты во фронтальной проекции   
         self.ipm_image = None               # BEV сегментированное изображение 
@@ -52,9 +57,10 @@ class WorldModel(object):
         self.command_message = AckermannDrive() # Сообщение типа AckermanDrive для движения автомобиля
         self.traffic_light_state = "none"   # Текущее состояние светофора
         self.found_sign = None              # Найденный знак
+        self.lidar_bounding_boxes = []      # Найденные лидаром параллепипеды (не отфильтрованные по классам)
+        self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
-
         self.__obstacles_lookup_num = 0
 
     def load_map(self, mapyaml):
@@ -96,7 +102,8 @@ class WorldModel(object):
                     # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
         log(f'GOAL_POINT: {self.goal_point}')
-        cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
+        if self.goal_point is not None:
+            cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
         # if log:
         #     log(f'DRAW PATH: {points}')

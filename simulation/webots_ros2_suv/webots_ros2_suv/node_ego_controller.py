@@ -32,6 +32,7 @@ import threading
 
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
+import json
 
 SENSOR_DEPTH = 40
 
@@ -69,6 +70,7 @@ class NodeEgoController(Node):
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
+            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             
@@ -142,6 +144,37 @@ class NodeEgoController(Node):
             self.__world_model.update_car_pos(lat, lon, orientation)
             if self.__ws is not None:
                 self.__ws.update_model(self.__world_model)
+    
+    def __on_obstacles_message(self, data):
+         # в data.data находится наша строка, парсим её
+        obstacles_dict = json.loads(data.data);
+        # если прилетели данные от переднего лидара
+        if 'obstacles' in obstacles_dict:
+            obst_list = obstacles_dict['obstacles'];
+        # если прилетели данные от заднего лидара
+        if 'obstacles_rear' in obstacles_dict:
+            obst_list = obstacles_dict['obstacles_rear'];
+        
+        self.__world_model.lidar_bounding_boxes = []
+        # Обходим все обнаруженные препятствия
+        for p in obst_list:
+            # p[0] - номер препятствия
+            # p[1] - расстояние до ближайшей точки препятствия
+            # p[2] - высота самой нижней точки препятствия относительно датчика
+            # p[3] - высота самой верхней точки препятствия относительно датчика
+            # p[4], p[5], p[6], p[7] - списки из двух чисел - координаты углов препятствия
+            # p[8] - xmin
+            # p[9] - xmax
+            # p[10] - ymin
+            # p[11] - ymax
+            if 'obstacles' in obstacles_dict:
+                xmin, xmax = -p[10], -p[11]
+                ymin, ymax = -p[2], -p[3]
+                zmin, zmax = p[8], p[9]
+                box_edges = [[xmin, xmax], [ymin, ymax], [zmin, zmax]]
+                self.__world_model.lidar_bounding_boxes.append(box_edges)
+            else:
+                pass #TODO
 
 def main(args=None):
     try:

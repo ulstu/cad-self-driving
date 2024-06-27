@@ -80,7 +80,6 @@ class NodePointObstacles(Node):
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             
             self.lidardata = GlobalConfigLoader("lidardata").data
-
             self.MAP_SCALE = self.lidardata['visual_scale']
             self.GPS_SHIFT_X = self.lidardata['gps_shift_x']
             self.GPS_SHIFT_Y = self.lidardata['gps_shift_y']

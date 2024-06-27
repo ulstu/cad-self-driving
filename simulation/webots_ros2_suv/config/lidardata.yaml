@@ -26,4 +26,10 @@ max_hmin: 10.0
 max_distance: 20.0
 gps_shift_x: 0.0
 gps_shift_y: 0.0
-
+zed_x: -0.12
+zed_y: 0.93
+zed_z: -2.0
+projection_size: 2300
+visualize_projection: True
+area_to_accept: 0.7
+area_part: 0.3
