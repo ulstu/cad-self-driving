@@ -35,17 +35,18 @@ class NodeDriveGazelle(Node):
     def __cmd_ackermann_callback(self, message):
         speed = message.speed
         steering_angle = message.steering_angle
+        is_pause = message.is_pause
 
         message = {
             "jsonrpc": "2.0",
             "method": "set_control_values",
-            "params": [speed, steering_angle]
+            "params": [speed, steering_angle, is_pause]
         }
 
         str_message = json.dumps(message)
         self.sock.sendto(str_message.encode(), (self.udp_ip, self.udp_port))
 
-        self._logger.info(f'GAZELLE drive message: {speed} {steering_angle}')
+        self._logger.info(f'GAZELLE drive message: {speed} {steering_angle} {is_pause}')
 
 
 def main(args=None):

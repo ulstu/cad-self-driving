@@ -61,6 +61,7 @@ class WorldModel(object):
         self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
+        self.is_pause = False               # Находится ли автомобиль в состоянии паузы
         self.__obstacles_lookup_num = 0
 
     def load_map(self, mapyaml):
@@ -83,7 +84,7 @@ class WorldModel(object):
         self.params['lat'] = pos[0]
         self.params['lon'] = pos[1]
         self.params['angle'] = pos[2]
-
+        self.params['is_pause'] = self.is_pause
 
     def draw_scene(self, log=print):
         if self.ipm_colorized_lines is None:
@@ -105,6 +106,7 @@ class WorldModel(object):
         if self.goal_point is not None:
             cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
+
         # if log:
         #     log(f'DRAW PATH: {points}')
         font = cv2.FONT_HERSHEY_SIMPLEX 
@@ -164,6 +166,6 @@ class WorldModel(object):
         zones = []
         for p in self.global_map:
             if p['type'] == 'Polygon':
-                if is_point_in_polygon(lat, lon, p['coordinates'][0]) and self.cur_path_point > 2:
+                if is_point_in_polygon(lat, lon, p['coordinates'][0]): # and self.cur_path_point > 2:
                     zones.append(p)
         return zones
