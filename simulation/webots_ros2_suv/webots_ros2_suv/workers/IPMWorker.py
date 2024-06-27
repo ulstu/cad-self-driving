@@ -80,17 +80,19 @@ class IPMWorker(AbstractWorker):
             world_model.yolo_detected_objects = list(zip(resized_boxes, results[0].boxes.cls))
             
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
-
-            image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes)
-            world_model.ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False, log=self.log)
-            world_model.ipm_image = self.__map_builder.crop_ipm(world_model.ipm_image, log=self.log)
+        
+            # image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes) # THIS FUNCTION MIGHT BE NEEDED, SO DON'T REMOVE IT FROM HERE
+            image_seg[image_seg == 0] = 100
+            world_model.ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False)
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
 
             world_model.pov_point = (image.shape[0], int(image.shape[1] / 2))
             world_model.pov_point = self.__map_builder.calc_bev_point(world_model.pov_point)
             world_model.pov_point = (world_model.pov_point[0], world_model.pov_point[1] - 35)
             
-            world_model.ipm_image = self.__map_builder.put_objects(world_model.ipm_image, tbs, widths, results)
+            ipm_image_height = self.__map_builder.calc_bev_point((0, image_seg.shape[0]))[1]
+
+            world_model.ipm_image = self.__map_builder.put_objects(world_model.ipm_image, tbs, widths, results)[:ipm_image_height, :]
 
             world_model.ipm_colorized = np.asarray(colorize(world_model.ipm_image))
             world_model.img_front_objects = results[0].plot()

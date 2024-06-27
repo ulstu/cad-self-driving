@@ -10,9 +10,10 @@ from fastseg import MobileV3Large
 from fastseg.image import colorize, blend
 from webots_ros2_suv.lib.timeit import timeit
 import cv2
-from torchvision.models.segmentation import deeplabv3_resnet50
+from ultralytics import YOLO
 
 PACKAGE_NAME = 'webots_ros2_suv'
+local_seg_model_path = "resource/RCm/model.pt"
 
 
 class SemanticSegmentationWorker(AbstractWorker):
@@ -20,14 +21,15 @@ class SemanticSegmentationWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
         weights_path = os.path.join(package_dir, pathlib.Path(os.path.join(package_dir, 'resource', 'mobilev3large-lraspp.pt')))
-        #model_resnet50 = 
+        seg_model_path = os.path.join(package_dir, local_seg_model_path)
+        self.model = YOLO(seg_model_path)
+
 
         if torch.cuda.is_available():
+            self.model.to("cuda")
             self.seg_model = MobileV3Large.from_pretrained(weights_path).cuda().eval()
-            #self.seg_model = deeplabv3_resnet50(pretrained=True).eval().cuda()
         else:
             self.seg_model = MobileV3Large.from_pretrained(weights_path).eval()
-            #self.seg_model = deeplabv3_resnet50(pretrained=True).eval()
         super().log('Segmentation Node initialized')
 
 
@@ -39,12 +41,20 @@ class SemanticSegmentationWorker(AbstractWorker):
     def on_data(self, world_model):
         try:
             img = Image.fromarray(world_model.rgb_image)
-            # image_tensor = torch.from_numpy(np.array(img)).permute(2, 0, 1).float() / 255.0
-            # image_tensor = image_tensor.unsqueeze(0)
-            # image_tensor = image_tensor.cuda()
-            # with torch.no_grad():
-            #     world_model.seg_image = self.seg_model(image_tensor)['out'][0].argmax(0).cpu().numpy()
-            world_model.seg_image = self.seg_model.predict_one(img)
+
+            results = self.model.predict(np.array(img), verbose=False)
+
+            # world_model.seg_image = np.ones(world_model.rgb_image.shape[:2] + (1,), dtype=np.uint8)
+            world_model.seg_image = np.ones(world_model.rgb_image.shape[:2], dtype=np.uint8)
+            # world_model.test_rcm_image = results[0].plot()
+
+            if results[0].masks is not None:
+                print("DETECTED CROSS WALK AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                for xy in results[0].masks.xy:
+                    cv2.drawContours(world_model.seg_image, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
+
+            world_model.seg_image = world_model.seg_image
+
             world_model.seg_colorized = colorize(world_model.seg_image)
             world_model.seg_composited = blend(img, world_model.seg_colorized)
 

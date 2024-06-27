@@ -16,13 +16,14 @@ workers:
   pathplanning: "PathPlanningWorker.py"
   behavioranalysis: "BehavioralAnalysisWorker.py"
   reedsshepp: "ReedsSheppPlanningWorker.py"
+  roadmarkingdetection: "RoadMarkingDetectionWorker.py"
 workerstates:
-  start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign"]
-  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign"]
-  turn: ["semanticsegmentation", "ipm", "lanelinedetection", "reedsshepp"]
+  start: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "roadsign"]
+  moving: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  lanefollow: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  gpsfollow: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
+  stopped: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "roadsign"]
+  turn: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "reedsshepp"]
   emergency: []
 transitions:
   start:
