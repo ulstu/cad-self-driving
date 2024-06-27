@@ -54,6 +54,7 @@ class WorldModel(object):
         self.found_sign = None              # Найденный знак
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
+        self.is_pause = 0                   # Находится ли автомобиль в состоянии паузы (0 - нет, 1 - при заезде в зону терминала, 2 - при команде с главного блока управления)
 
         self.__obstacles_lookup_num = 0
 
@@ -77,7 +78,7 @@ class WorldModel(object):
         self.params['lat'] = pos[0]
         self.params['lon'] = pos[1]
         self.params['angle'] = pos[2]
-
+        self.params['is_pause'] = self.is_pause
 
     def draw_scene(self, log=print):
         if self.ipm_colorized_lines is None:
@@ -157,6 +158,6 @@ class WorldModel(object):
         zones = []
         for p in self.global_map:
             if p['type'] == 'Polygon':
-                if is_point_in_polygon(lat, lon, p['coordinates'][0]) and self.cur_path_point > 2:
+                if is_point_in_polygon(lat, lon, p['coordinates'][0]): # and self.cur_path_point > 2:
                     zones.append(p)
         return zones

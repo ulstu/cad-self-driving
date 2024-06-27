@@ -1,8 +1,6 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 import math
-import numpy as np
-
 import pygame as pg
 
 
@@ -225,16 +223,21 @@ class GPSFollowState(AbstractState):
                 world_model.cur_turn_polygon = zone['coordinates'][0]
                 self.__cur_path_point = 0
                 event = 'turn'
+            elif zone['name'] == 'terminal':
+                speed = 0
+                self.__cur_path_point = 0
+                world_model.is_pause = 1
+                event = 'pause'
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'
             elif zone['name'].startswith('speed'):
                 speed = float(zone['name'].split('speed')[1])
 
-        if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
-            event = 'start_move'
-        if world_model.is_lane_road():
-            event = 'start_lane_follow'
+        # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
+        #     event = 'start_move'
+        # if world_model.is_lane_road():
+        #     event = 'start_lane_follow'
         if event:
             world_model.path = None
 

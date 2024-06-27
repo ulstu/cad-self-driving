@@ -28,12 +28,18 @@ from .lib.map_server import start_web_server, MapWebServer
 from .lib.param_loader import ParamLoader
 from .lib.config_loader import ConfigLoader
 from .lib.external_data_sender import ExternalDataSender
+import select
+import socket
 import threading
-
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
+import json
 
+RECV_BUFFER_SIZE = 128
 SENSOR_DEPTH = 40
+UDP_IP = '0.0.0.0'
+UDP_PORT = 8080
+
 
 class NodeEgoController(Node):
     def __init__(self):
@@ -43,9 +49,8 @@ class NodeEgoController(Node):
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__ws = None
-
             self.__world_model = WorldModel()
-            
+
             package_dir = get_package_share_directory("webots_ros2_suv")
             config = ConfigLoader("map_config").data
             with open(f'{package_dir}/config/global_maps/{config["mapfile"]}') as mapdatafile:
@@ -71,8 +76,12 @@ class NodeEgoController(Node):
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
-            
+
             self.start_web_server()
+
+            udp_server_thread = threading.Thread(target=self.start_udp_server)
+            udp_server_thread.setDaemon(True)
+            udp_server_thread.start()
 
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
@@ -87,6 +96,24 @@ class NodeEgoController(Node):
     def start_web_server(self):
         self.__ws = MapWebServer(log=self._logger.info)
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
+
+    def start_udp_server(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((UDP_IP, UDP_PORT))
+        sock.setblocking(0)
+
+        while True:
+            is_data_available = select.select([sock], [], [])
+
+            if is_data_available[0]:
+                data, _ = sock.recv(RECV_BUFFER_SIZE)
+                data_dict = json.loads(data)
+
+                if data_dict['is_pause'] == '0':
+                    self.__world_model.is_pause = 0
+                elif data_dict['is_pause'] == '2':
+                    self.__world_model.is_pause = 2
+                    self.__fsm.on_event('pause')
 
     def __on_lidar_message(self, data):
         pass
