@@ -54,7 +54,7 @@ class WorldModel(object):
         self.found_sign = None              # Найденный знак
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
-        self.is_pause = 0                   # Находится ли автомобиль в состоянии паузы (0 - нет, 1 - при заезде в зону терминала, 2 - при команде с главного блока управления)
+        self.is_pause = False               # Находится ли автомобиль в состоянии паузы
 
         self.__obstacles_lookup_num = 0
 
@@ -97,8 +97,11 @@ class WorldModel(object):
                     # log(f'prev_point: {prev_point}')
         cv2.circle(colorized, self.pov_point, 9, (0, 255, 0), 5)
         log(f'GOAL_POINT: {self.goal_point}')
-        cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
+
+        if self.goal_point:
+            cv2.circle(colorized, (int(self.goal_point[0]),int(self.goal_point[1])) , 9, (255, 0, 0), 5)
         points = [e['coordinates'] for e in self.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == self.cur_path_segment][0]
+
         # if log:
         #     log(f'DRAW PATH: {points}')
         font = cv2.FONT_HERSHEY_SIMPLEX 

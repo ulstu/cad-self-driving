@@ -226,8 +226,17 @@ class GPSFollowState(AbstractState):
             elif zone['name'] == 'terminal':
                 speed = 0
                 self.__cur_path_point = 0
-                world_model.is_pause = 1
+                world_model.is_pause = True
                 event = 'pause'
+            elif zone['name'] == 'traffic_light':
+                self.log(f'{world_model.traffic_light_state}')
+
+                if world_model.traffic_light_state == 'red':
+                    speed = 0
+                    self.__cur_path_point = 0
+                    event = 'stop'
+            elif zone['name'] == 'crosswalk':
+                pass
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'

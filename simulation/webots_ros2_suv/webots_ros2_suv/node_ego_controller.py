@@ -109,10 +109,10 @@ class NodeEgoController(Node):
                 data, _ = sock.recv(RECV_BUFFER_SIZE)
                 data_dict = json.loads(data)
 
-                if data_dict['is_pause'] == '0':
-                    self.__world_model.is_pause = 0
-                elif data_dict['is_pause'] == '2':
-                    self.__world_model.is_pause = 2
+                if data_dict['is_pause'] == 'True':
+                    self.__world_model.is_pause = True
+                elif data_dict['is_pause'] == 'False':
+                    self.__world_model.is_pause = False
                     self.__fsm.on_event('pause')
 
     def __on_lidar_message(self, data):

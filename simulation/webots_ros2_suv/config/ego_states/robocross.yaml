@@ -88,6 +88,16 @@ map-elements:
     ol-type: !!str Polygon
     color: !!str ffa500
   - element:
+    id: "traffic_light"
+    name: !!str Зона светофора
+    ol-type: !!str Polygon
+    color: !!str 000000
+  - element:
+    id: "crosswalk"
+    name: !!str Зона пешеходного перехода
+    ol-type: !!str Polygon
+    color: !!str 40a8f7
+  - element:
     id: "stop"
     name: !!str Зона остановки
     ol-type: !!str Polygon
