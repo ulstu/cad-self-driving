@@ -1,5 +1,6 @@
 lidar_topicname: "/lidar"
 lidar2_topicname: "/lidar_rear"
+# front_image_topicname: "/zed/zed_node/rgb/image_rect_color"
 front_image_topicname: "/vehicle/camera/image_color"
 
 range_image_topicname: "/vehicle/range_finder/image"

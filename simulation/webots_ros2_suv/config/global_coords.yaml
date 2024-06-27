@@ -1,18 +1,18 @@
-lat: 43.63939225773861
-lon: 56.33517639374398
-orientation: 1.5
-scale_x: 30
-scale_y: 6
-bev_orientation: 0.0
-
-# lat: 0.0
-# lon: 0.0
-# orientation: 0.0
-# scale_x: 15
+# lat: 43.63939225773861
+# lon: 56.33517639374398
+# orientation: 1.5
+# scale_x: 30
 # scale_y: 6
-# bev_orientation: -0.35
+# bev_orientation: 0.0
 
-change_point_dist: 0.7
+lat: 0.0
+lon: 0.0
+orientation: 0.0
+scale_x: 15
+scale_y: 6
+bev_orientation: -0.35
+
+change_point_dist: 2
 bev_obstacle_ratio: 0.5
 
 kalman_path_planning_noise_scale: 0.05

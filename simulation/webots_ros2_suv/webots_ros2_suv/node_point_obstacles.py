@@ -194,8 +194,8 @@ class NodePointObstacles(Node):
                 cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255), 1);
                 cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255), 1);
         
-            cv2.imshow('NPO', self.img)  # Отображаем окно
-            cv2.waitKey(1) # Нужно для работы окна
+            # cv2.imshow('NPO', self.img)  # Отображаем окно
+            # cv2.waitKey(1) # Нужно для работы окна
 
 
         

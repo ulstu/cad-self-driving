@@ -16,3 +16,5 @@ tensorflow
 dill
 dubins
 geopy
+segmentation-models-pytorch
+pygame

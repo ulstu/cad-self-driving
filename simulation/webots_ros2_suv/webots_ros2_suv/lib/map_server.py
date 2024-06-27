@@ -23,6 +23,7 @@ import time
 import numpy as np
 import cv2
 from PIL import Image
+from .config_loader import ConfigLoader
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
@@ -32,6 +33,7 @@ HOME_DIR = os.path.expanduser('~')
 BASE_PATH = os.path.join(HOME_DIR, 'ros2_ws/src/webots_ros2_suv/')
 #BASE_PATH = BASE_RESOURCE_PATH
 STATIC_PATH = BASE_PATH + 'map-server/dist/'
+LIBS_PATH = BASE_PATH + 'map-server/libs/'
 YAML_PATH = BASE_PATH + 'config/ego_states/robocross.yaml'
 MAPS_PATH = BASE_PATH + 'config/global_maps/'
 ASSETS_PATH = STATIC_PATH + 'assets/'
@@ -75,6 +77,8 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_position(self):
+        if self.world_model is None:
+            return None
         try:
             pos = self.world_model.get_current_position()
             self.driving_points.append([pos[0], pos[1]])
@@ -128,6 +132,10 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_params(self):
+        if self.world_model is None:
+            return None
+        if self.world_model.params is None:
+            return None
         return self.world_model.params
 
     @cherrypy.expose
@@ -144,18 +152,22 @@ class MapWebServer(object):
 
     @cherrypy.expose
     def get_sign_label(self):
+        if self.world_model is None:
+            return None
         if self.world_model.found_sign is None:
             return json.dumps({"detected": False, "sign": "знак не обнаружен"})
         return json.dumps({"detected": True, "sign": self.world_model.found_sign[1]})
 
     @cherrypy.expose
     def get_image(self, img_type, tm):
+        if self.world_model is None:
+            return None
         if img_type == "obj_detector":
             if self.world_model.img_front_objects_lines_signs is None:
                 return None
             data = self.world_model.img_front_objects_lines_signs
         elif img_type == "seg":
-            self.world_model.draw_scene()
+            self.world_model.draw_scene(log=self.log)
             if self.world_model.ipm_colorized_lines is None:
                 return None
             data = self.world_model.ipm_colorized_lines
@@ -176,13 +188,7 @@ class MapWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_init_point(self):
-        config_path = os.path.join(BASE_RESOURCE_PATH,
-                                    pathlib.Path(os.path.join(BASE_RESOURCE_PATH, 'config', 'map_config.yaml')))
-        if not os.path.exists(config_path):
-            print('Global map coords config file file not found. Use default values')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
+        config = ConfigLoader("map_config").data
         return {'lat': config['lat'], 'lon': config['lon'], 'mapfile': config['mapfile']}
 
 
@@ -213,6 +219,11 @@ def start_web_server(map_server):
                                                '/assets': {
                                                    'tools.staticdir.on': True,
                                                    'tools.staticdir.dir': ASSETS_PATH,
+                                                   'tools.staticdir.index': 'index.html'
+                                               },
+                                               '/libs': {
+                                                   'tools.staticdir.on': True,
+                                                   'tools.staticdir.dir': LIBS_PATH,
                                                    'tools.staticdir.index': 'index.html'
                                                }
                                                })

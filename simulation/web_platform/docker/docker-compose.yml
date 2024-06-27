@@ -1,0 +1,17 @@
+version: '1.0'
+services:
+  havdev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: 
+    volumes:
+      - ../../pcl_maps:/home/ulstu/ros2_ws/pcl_maps
+      - ../../robot_interfaces:/home/ulstu/ros2_ws/robot_interfaces
+      - ../../webots_ros2_suv:/home/ulstu/ros2_ws/webots_ros2_suv
+    ports:
+      - 8008:8008
+    env_file:
+      - ./.env
+    environment:
+      - TEST=1

@@ -6,6 +6,7 @@ from geopy.distance import geodesic
 import cv2
 import numpy as np
 import yaml
+import math
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_suv.lib.config_loader import ConfigLoader
 
@@ -103,13 +104,7 @@ class CoordsTransformer(object):
 
         # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
         return (int(goal_x), int(goal_y))
-
-    def __rotate_coordinates(self, x, y, angle):
-        # Поворот координат на угол angle
-        rotated_x = x * math.cos(angle) - y * math.sin(angle)
-        rotated_y = x * math.sin(angle) + y * math.cos(angle)
-        return rotated_x, rotated_y  
-
+    
     def get_coord_corrections(self):
         return self.__coord_corrections  
 
