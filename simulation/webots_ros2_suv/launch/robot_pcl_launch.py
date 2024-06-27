@@ -18,6 +18,15 @@ from nav2_common.launch import RewrittenYaml
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
 
+local_project_settings_config_path = "config/project_settings.yaml"
+package_dir = get_package_share_directory(PACKAGE_NAME)
+project_settings_config_path = os.path.join(package_dir, local_project_settings_config_path)
+with open(project_settings_config_path, "r") as file:
+    project_settings_config = yaml.safe_load(file)
+
+if project_settings_config['use_gpu'] == False:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
 
