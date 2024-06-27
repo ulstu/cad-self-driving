@@ -216,6 +216,8 @@ class GPSFollowState(AbstractState):
         event = None
         zones = world_model.get_current_zones()
 
+        self.logi(f'ipm {world_model.ipm_colorized.shape}')
+
         speed = 10 # default speed
 
         for zone in zones:

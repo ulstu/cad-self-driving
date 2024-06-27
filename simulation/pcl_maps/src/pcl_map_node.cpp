@@ -161,7 +161,7 @@ class PointCloudMapper : public rclcpp::Node
       
       //RCLCPP_INFO(this->get_logger(), get_new_filename().c_str());
 
-
+      // RCLCPP_INFO(this->get_logger(), "PCL data recieved!!!!!!!!!");
 
       // Фильтрация облака точек - "разуплотнение"
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -246,8 +246,8 @@ class PointCloudMapper : public rclcpp::Node
           double hmax = -1000;   //Максимальная высота препятствия
           double xmin = 1000;
           double xmax = -1000;
-          double ymin = -1000;
-          double ymax = 1000;
+          double ymin = 1000;
+          double ymax = -1000;
           for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++) {  
             pcl::PointXYZRGB cluster_point = cloud_cluster->points[*pit];
 

@@ -68,4 +68,13 @@ class AbstractState:
 
     def log(self, message):
         self.node._logger.info(message)
+
+    def logi(self, message):
+        self.node._logger.info('\033[92m' + message + '\033[0m')
+    
+    def logw(self, message):
+        self.node._logger.info('\033[93m' + message + '\033[0m')
+    
+    def loge(self, message):
+        self.node._logger.info('\033[91m' + message + '\033[0m')
  
