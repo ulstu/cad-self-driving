@@ -116,11 +116,57 @@ Mailbox_Handle mbxHandleRFtx;
 Модуль `protocol.c` является частью задачи `workRF`. В задаче, связанной с обслуживанием приемопередатчика, перед инициализацией радиоканала в CC1310 выполняются предустановки протокола: вызывается функция `Preset_protocol()`, после чего инициализируется и разрешается работа приемопередатчика. 
 При получении сообщения из радиоканала посредством TI RTOS срабатывает функция `rxrfcallback`, в которой заполняется структура currentDataEntry, которая содержит принятые данные, их длину и уровень сигнала. Далее, все эти параметры передаются в функции `Package_processing` в `protocol.c` 
 
-==================
+```C++
+void rxrfcallback(RF_Handle h, RF_CmdHandle ch, RF_EventMask e)
+{
+ pHPacket pInputPacket;
+ if(e & RF_EventRxEntryDone)
+ {
+  GPIO_toggle(Board_GPIO_LED_RX);
+  do
+  {
+  /* Get current unhandled data entry */
+   currentDataEntry = RFQueue_getDataEntry();
+
+   /* Handle the packet data, located at &currentDataEntry->data:
+    * - Length is the first byte with the current configuration
+    * - Data starts from the second byte */
+   //*(uint8_t*)(&currentDataEntry->data) - длина пакета
+   pInputPacket=(pHPacket)(&currentDataEntry->data+1);
+   if((pInputPacket->Start==START_BYTE) && ((*(uint8_t*)(&currentDataEntry->data + (*(uint8_t*)(&currentDataEntry->data))))==STOP_BYTE) && (pInputPacket->TTL!=0) && ((*(uint8_t*)(&currentDataEntry->data))<=PACKET_SIZE_MAX))
+   {//Пришел пакет
+    Package_processing((uint8_t*)(&currentDataEntry->data + 1), *(uint8_t*)(&currentDataEntry->data), rxStatistics.lastRssi); //на обработку
+   }
+
+  } while(RFQueue_nextEntry()==DATA_ENTRY_FINISHED);
+ }
+}
+
+```
  
 В задаче "workRF", периодически (период не должен быть меньше времени передачи по радиоканалу самого длинного сообщения) вызывается функция Procedure_sending_packages 
  
- ==================
+ ```C++
+
+    //проверяем буффер вывода в RF
+     len_sending_packages=0;
+     Procedure_sending_packages(&pBuf_sending_packages, &len_sending_packages);
+     if((len_sending_packages) && (len_sending_packages<=PACKET_SIZE_MAX))
+     {
+      //есть, что выводить в радио
+      abortGraceful = 0;
+      RF_cancelCmd(rfHandle, rfRxCmdHandle, abortGraceful);
+ 
+      // Send packet
+      msg_RF.len=len_sending_packages;
+      memcpy(msg_RF.buf, pBuf_sending_packages, msg_RF.len);
+      RF_cmdPropTx.pktLen=msg_RF.len;
+      RF_cmdPropTx.pPkt=msg_RF.buf;
+      RF_CmdHandle result = RF_postCmd(rfHandle, (RF_Op*)&RF_cmdPropTx, RF_PriorityNormal, &txrfcallback, RF_EventCmdDone);
+      continue;
+     }
+ 
+ ```
 
 Если длина сообщения не равна нулю, то согласно работе протокола (файл protocol.c) требуется выполнить передачу сообщения по радиоканалу.
     Таким образом, показан принцип интеграции протокола в основной код программы. 
@@ -133,10 +179,47 @@ extern Mailbox_Handle mbxHandleUARTtx; // данные в интерфейс uar
 
 В периодически вызываемой функции Procedure_sending_packages проверяется наличие данных из интерфейса uart, и если они есть то выполняется заполнение буфера пользовательских данных.
 
- =================
+ ```C++
+
+ void Procedure_sending_packages(uint8_t** pBuf_sending_packages, uint8_t* pLen_sending_packages)
+ {
+ 
+  if(Mailbox_pend(mbxHandleRFtx, &msg_uart, BIOS_NO_WAIT))
+  {
+   //заполняем буфер пользовательских данных данными из uart
+ 
+   if(msg_uart.len<(PACKET_SIZE_MAX-(sizeof(HPacket)+1)))
+   {
+    if(Subscriber.Number_Module==1)
+    {
+     DataUp.len=msg_uart.len+1;//+номер сессии
+     memcpy(DataUp.buf, msg_uart.buf, DataUp.len);
+     DataUp.buf[msg_uart.len]=DataUp.session;
+     DataUp.repeat=DATA_REPEAT_UP_DOWN;//количество повторов отправки пользовательских данных вверх
+     DataUp.session++;
+    }
+ 
+ ```
 
 Ниже показан пример выделения в функции Package_processing из принятого сообщения пользовательских данных и передача их в интерфейс uart.
 
- ==================
+ ```C++
+ if(PacketReceiv.len>(1+sizeof(HPacket)))
+ {
+  DataUp.len=PacketReceiv.len-1-sizeof(HPacket);
+  memcpy(DataUp.buf, &PacketReceiv.buf[sizeof(HPacket)], DataUp.len);
+  DataUp.repeat=1;
+ 
+  if(Dropout[0]!=DataUp.buf[DataUp.len-1])
+  {
+   //такие польз. данные еще в uart не отправляли. Номера сессий не совпадают
+   msg_toUART.len=DataUp.len-1;
+   Dropout[0]=DataUp.buf[msg_toUART.len];//фиксируем текущий номер сессии от Сервера
+   memcpy(msg_toUART.buf, DataUp.buf, msg_toUART.len);
+   Mailbox_post(mbxHandleUARTtx, &msg_toUART, BIOS_NO_WAIT);//передаем в uart пользовательские данные
+  }
+ }
+ 
+ ```
 
 Приведенная выше реализация позволяет полностью обеспечить организацию радиоканала между территориально распределенными устройствами для передачи телеметрической информации без использования дополнительного кода. 
