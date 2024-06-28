@@ -9,6 +9,11 @@ class LaneFollowState(AbstractState):
         self.runs = 0
         self.__cur_path_point = 1
 
+        self.old_dist = 0
+        self.old_path_point = 0
+        self.old_seg = 0
+
+
     def find_goal_point_x(self, arr, val=100):
         max_length = 0
         max_start = 0
@@ -55,7 +60,10 @@ class LaneFollowState(AbstractState):
             
             if dist < self.config['change_point_dist'] or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
-            self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+            
+            if self.old_dist != dist or self.old_path_point != self.__cur_path_point or self.old_seg == world_model.cur_path_point:
+                self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+                self.old_dist, self.old_path_point, self.old_seg = dist, self.__cur_path_point, world_model.cur_path_segment
         else:
             self.__cur_path_point = len(points) - 1
 

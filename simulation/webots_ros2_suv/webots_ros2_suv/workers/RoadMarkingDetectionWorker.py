@@ -50,33 +50,43 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                 if project_settings_config["use_road_marking_detection"] == True:
                     img = Image.fromarray(world_model.rgb_image)
 
-                    world_model.img_front_objects_lines_signs_markings = np.copy(world_model.img_front_objects_lines_signs)
+                    world_model.img_front_objects_prj_lines_signs_markings = np.copy(world_model.img_front_objects_prj_lines_signs)
 
-                    results = self.model.predict(np.array(img), verbose=True)
-                    # for mask in results[0].masks:
-                    #     for xy in mask.xy:
-                    #         cv2.drawContours(world_model.img_front_objects_lines_signs, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
+                    results = self.model.predict(np.array(img), verbose=False)
+                    masks = []
+                    if results[0].masks is not None:
+                        masks = results[0].masks
+
+                    labels = [self.model.names[int(label)] for label in results[0].boxes.cls]
+
+                    world_model.detected_road_markings = list(zip(masks, labels))
                     background_alpha = 0.7
                     if results[0].masks is not None:
                         for xy in results[0].masks.xy:
 
                             # print("_*_" * 100)
-                            # print(world_model.img_front_objects_lines_signs_markings)
+                            # print(world_model.img_front_objects_prj_lines_signs_markings)
                             # print("_*_" * 100)
 
-                            # image_mask = np.zeros_like(world_model.img_front_objects_lines_signs_markings).astype(np.uint8)
+                            # image_mask = np.zeros_like(world_model.img_front_objects_prj_lines_signs_markings).astype(np.uint8)
 
                             # cv2.drawContours(image_mask, [np.expand_dims(xy, 1).astype(int)], 
                             #                  contourIdx=-1, 
                             #                  color=(255, 255, 255), thickness=-1)
                             
                             # indices = np.any(image_mask != np.array([0, 0, 0], dtype=np.uint8), axis=-1)
-                            # world_model.img_front_objects_lines_signs_markings[indices] = cv2.addWeighted(world_model.img_front_objects_lines_signs_markings, 
+                            # world_model.img_front_objects_prj_lines_signs_markings[indices] = cv2.addWeighted(world_model.img_front_objects_prj_lines_signs_markings, 
                             #                                                                               1 - background_alpha, image_mask, background_alpha, 0, image_mask)[indices]
-
-                            cv2.drawContours(world_model.img_front_objects_lines_signs_markings, [np.expand_dims(xy, 1).astype(int)], 
+                            if xy.shape[0] == 0:
+                                break
+                            if world_model.img_front_objects_prj_lines_signs_markings is None:
+                                break
+                            try:
+                                cv2.drawContours(world_model.img_front_objects_prj_lines_signs_markings.astype(np.uint8), [np.expand_dims(xy, 1).astype(int)], 
                                              contourIdx=-1, 
                                              color=(255, 210, 74), thickness=-1)
+                            except:
+                                pass
 
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))

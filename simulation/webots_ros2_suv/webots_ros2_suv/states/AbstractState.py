@@ -18,6 +18,9 @@ class AbstractState:
             self.ackerman_proportional_coef = self.config['ackerman_proportional_coef']
             self.turn_angle_num_path_points = self.config['turn_angle_num_path_points']
             self.default_speed = self.config['default_speed']
+        
+        self.old_speed = 0
+        self.old_angle = 0
 
     def on_event(self, event, world_model=None):
         raise NotImplementedError
@@ -51,8 +54,10 @@ class AbstractState:
             command_message.steering_angle = error / math.pi * self.ackerman_proportional_coef
 
         world_model.command_message = command_message
-
-        self.log(f'command message: {command_message}')
+        if (command_message.speed != self.old_speed or command_message.steering_angle != self.old_angle):
+            self.log(f'command message: {command_message}')
+            self.old_speed = command_message.speed
+            self.old_angle = command_message.steering_angle
 
         world_model.params['speed'] = command_message.speed
         world_model.params['steering'] = command_message.steering_angle

@@ -29,7 +29,7 @@ def intersection_area(rect1, rect2):
     rect2_size = rect2[1] - rect2[0]
     min_area = abs(min(rect1_size[0] * rect1_size[1], rect2_size[0] * rect2_size[1]))
 
-    return (x_intersection * y_intersection) / min_area
+    return (x_intersection * y_intersection) / min_area if min_area != 0 else 0
 
 class IPMWorker(AbstractWorker):
     def __init__(self, *args, **kwargs) -> None:
@@ -98,7 +98,9 @@ class IPMWorker(AbstractWorker):
             world_model.img_front_objects = results[0].plot()
             world_model.map_builder = self.__map_builder
             
-            world_model.img_front_objects_lines_signs_prj = np.copy(world_model.img_front_objects_lines_signs)
+            world_model.img_front_objects_prj = np.copy(world_model.img_front_objects)
+
+            #cv2.rectangle(world_model.img_front_objects_lines_signs_markings_prj, (0, 0), (100, 100), (255, 0, 0), thickness=-1)
 
             with open(self.lidardata_path, "r") as file:
                 lidardata_config = yaml.safe_load(file)
@@ -119,12 +121,12 @@ class IPMWorker(AbstractWorker):
                             point = np.array([x, y, z]) - self.zed_pos       
                             p.append(point)
                 
-                front_p1 = [world_model.img_front_objects_lines_signs_prj.shape[1], world_model.img_front_objects_lines_signs_prj.shape[0]] # min
+                front_p1 = [world_model.img_front_objects_prj.shape[1], world_model.img_front_objects_prj.shape[0]] # min
                 front_p2 = [0, 0] # max
                 to_next = False
                 p_front = []
                 for point in p:
-                    image_shape = np.array(world_model.img_front_objects_lines_signs_prj.shape[:2])[::-1]
+                    image_shape = np.array(world_model.img_front_objects_prj.shape[:2])[::-1]
                     size = np.array([lidardata_config["projection_size"], lidardata_config["projection_size"]])
                     
                     if point[2] <= 0:
@@ -137,8 +139,8 @@ class IPMWorker(AbstractWorker):
 
                     point_front = point_front * (size / 2) + image_shape / 2
 
-                    point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_lines_signs_prj.shape[1])
-                    point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_lines_signs_prj.shape[0])
+                    point_front[0] = min(max(0, point_front[0]), world_model.img_front_objects_prj.shape[1])
+                    point_front[1] = min(max(0, point_front[1]), world_model.img_front_objects_prj.shape[0])
 
                     front_p1[0] = min(front_p1[0], point_front[0])
                     front_p1[1] = min(front_p1[1], point_front[1])
@@ -166,7 +168,10 @@ class IPMWorker(AbstractWorker):
 
                     lidar_box_area = abs(lidar_box_size[0] * lidar_box_size[1])
                     yolo_box_area = abs(yolo_box_size[0] * yolo_box_size[1])
-                    area_part = min(lidar_box_area / yolo_box_area, yolo_box_area / lidar_box_area)
+                    if lidar_box_area == 0 or yolo_box_area == 0:
+                        area_part = lidar_box_area if lidar_box_area != 0 else yolo_box_area
+                    else:
+                        area_part = min(lidar_box_area / yolo_box_area, yolo_box_area / lidar_box_area)
                     
                     if inter_area >= lidardata_config["area_to_accept"] and area_part >= lidardata_config["area_part"]:
                         p = np.array(p)
@@ -191,15 +196,15 @@ class IPMWorker(AbstractWorker):
                     bottom_edge = [p_front[0], p_front[4], p_front[7], p_front[3]]
                     back_edge   = [p_front[4], p_front[5], p_front[6], p_front[7]]
 
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(back_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(left_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(back_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(left_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
                     
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(top_edge).astype(int)], contourIdx=-1, color=(170, 170, 170), thickness=-1)
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(right_edge).astype(int)], contourIdx=-1, color=(190, 190, 190), thickness=-1)
-                    cv2.drawContours(world_model.img_front_objects_lines_signs_prj, [np.array(front_edge).astype(int)], contourIdx=-1, color=(220, 220, 220), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(top_edge).astype(int)], contourIdx=-1, color=(170, 170, 170), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(right_edge).astype(int)], contourIdx=-1, color=(190, 190, 190), thickness=-1)
+                    cv2.drawContours(world_model.img_front_objects_prj, [np.array(front_edge).astype(int)], contourIdx=-1, color=(220, 220, 220), thickness=-1)
 
-                    cv2.rectangle(world_model.img_front_objects_lines_signs_prj, front_p1, front_p2, color=(255, 0, 0), thickness=2)
+                    cv2.rectangle(world_model.img_front_objects_prj, front_p1, front_p2, color=(255, 0, 0), thickness=2)
                 
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             return world_model

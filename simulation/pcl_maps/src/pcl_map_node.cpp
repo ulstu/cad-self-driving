@@ -41,7 +41,7 @@ class PointCloudMapper : public rclcpp::Node
       rear_lidar_y = config["rear_lidar_y"].as<double>();
       rear_lidar_z = config["rear_lidar_z"].as<double>();
       filter_leaf_size = config["filter_leaf_size"].as<double>();
-      segmentation_threshould = config["segmentation_threshould"].as<double>();
+      segmentation_threshold = config["segmentation_threshold"].as<double>();
       cluster_tolerance = config["cluster_tolerance"].as<double>();
       min_cluster_size = config["min_cluster_size"].as<int>();
       max_cluster_size = config["max_cluster_size"].as<int>();
@@ -54,10 +54,25 @@ class PointCloudMapper : public rclcpp::Node
       vehicle_corner3_y = config["vehicle_corner3_y"].as<double>();
       vehicle_corner4_x = config["vehicle_corner4_x"].as<double>();
       vehicle_corner4_y = config["vehicle_corner4_y"].as<double>();
+      front_lidar_x_angle = config["front_lidar_x_angle"].as<double>();
+      front_lidar_y_angle = config["front_lidar_y_angle"].as<double>();
+      front_lidar_z_angle = config["front_lidar_z_angle"].as<double>();
+      rear_lidar_x_angle = config["rear_lidar_x_angle"].as<double>();
+      rear_lidar_y_angle = config["rear_lidar_y_angle"].as<double>();
+      rear_lidar_z_angle = config["rear_lidar_z_angle"].as<double>();
       max_distance = config["max_distance"].as<double>();
       file_record_frameinterval = config["file_record_frameinterval"].as<int>();
       min_hmax = config["min_hmax"].as<double>();
       max_hmin = config["max_hmin"].as<double>();
+      max_hmax = config["max_hmax"].as<double>();
+      orthogonal_boxes = config["orthogonal_boxes"].as<bool>();
+      rear_filter_leaf_size = config["rear_filter_leaf_size"].as<double>();
+      rear_segmentation_threshold = config["rear_segmentation_threshold"].as<double>();
+      rear_cluster_tolerance = config["rear_cluster_tolerance"].as<double>();
+      rear_min_cluster_size = config["rear_min_cluster_size"].as<int>();
+      rear_max_cluster_size = config["rear_max_cluster_size"].as<int>();
+
+
       //Публикаторы данных о препятствиях
       json_publisher = this->create_publisher<std_msgs::msg::String>("obstacles",10);
       lidar_subscriber = this->create_subscription<sensor_msgs::msg::PointCloud2>(
@@ -86,8 +101,14 @@ class PointCloudMapper : public rclcpp::Node
     double rear_lidar_y = 0;
     double rear_lidar_z = 0;
     double filter_leaf_size = 0.2;
-    double segmentation_threshould = 0.5;
+    double segmentation_threshold = 0.5;
     double cluster_tolerance = 0.3;
+    double front_lidar_x_angle = -5.0;
+    double front_lidar_y_angle = 0.0;
+    double front_lidar_z_angle = 0.0;
+    double rear_lidar_x_angle = -5.0;
+    double rear_lidar_y_angle = 0.0;
+    double rear_lidar_z_angle = 0.0;
     double vehicle_corner1_x = 0;
     double vehicle_corner1_y = 0;
     double vehicle_corner2_x = 0;
@@ -99,19 +120,26 @@ class PointCloudMapper : public rclcpp::Node
     double max_distance = 20;
     double min_hmax = 1000;
     double max_hmin = 0;
-
+    double max_hmax = 3.5;
     int min_cluster_size = 5;
     int max_cluster_size = 10000;
     bool file_record = false;
     int file_record_frameinterval = 1;
     int recieved_frames = 0;
+    bool orthogonal_boxes = false;
+    double rear_filter_leaf_size = 0.2;
+    double rear_segmentation_threshold = 0.5;
+    double rear_cluster_tolerance = 0.3;
+    int rear_min_cluster_size = 5;
+    int rear_max_cluster_size = 10000;
+
 
     //Дистанция между двумя точками
     double calc_distance (double x1, double y1, double x2, double y2) {
       return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
     }
 
-    //Минимальное значение из четырех
+    //Минимальное значение из четырех (для вычисления расстояния до ближайшего угла)
     double minval(double v1, double v2, double v3, double v4) {
       double min = v1 < v2 ? v1 : v2;
       min = v3 < min ? v3 : min;
@@ -119,40 +147,42 @@ class PointCloudMapper : public rclcpp::Node
       return min;
     }
  
+    //Получение имени файла для записи облака точек
     std::string get_new_filename(bool is_rear) {
       system_clock::time_point tp = system_clock::now();
-    
       time_t raw_time = system_clock::to_time_t(tp);
-    
-      // Tm* does not need to be deleted after use, because tm* is created by localtime, and there will be one in each thread
       struct tm  *timeinfo = std::localtime(&raw_time);
-    
       std::stringstream ss;
       if (!is_rear) {
         ss << std::put_time(timeinfo, "data/lidar_data/Lidar_front_%Y-%m-%d_%H_%M_%S_");
       } else {
         ss << std::put_time(timeinfo, "data/lidar_data/Lidar_rear_%Y-%m-%d_%H_%M_%S_");
       }
-    
-      // tm can only go to seconds, milliseconds need to be obtained separately
       std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
-    
       std::string milliseconds_str = std::to_string(ms.count() % 1000);
-    
       if (milliseconds_str.length() < 3) {
         milliseconds_str = std::string(3 - milliseconds_str.length(), '0') + milliseconds_str;
       }
-    
       return ss.str() + milliseconds_str + ".pcd";
     }
 
     //Создание JSON-сообщения с данными о препятствии по облаку точек
     std_msgs::msg::String make_json_obstacles(const sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg, std::string key, bool is_rear,
-                                              double lidar_x, double lidar_y, double lidar_z) {
+                                              double lidar_x, double lidar_y, double lidar_z, double angle_x, double angle_y, double angle_z) {
       auto message = std_msgs::msg::String();
       message.data = "{ \"" + key + "\" : [";
-      pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-      pcl::fromROSMsg(*cloud_msg, *cloud);
+      pcl::PointCloud<pcl::PointXYZRGB>::Ptr rawcloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+      pcl::fromROSMsg(*cloud_msg, *rawcloud);
+      // Поворачиваем всё облако точек в соответствии с параметрами установки лидара
+      Eigen::Affine3f transform = Eigen::Affine3f::Identity();//Initialize the transformation matrix as the identity matrix
+      transform.rotate(Eigen::AngleAxisf(angle_x * (M_PI / 180), Eigen::Vector3f::UnitX()));
+      transform.rotate(Eigen::AngleAxisf(angle_y * (M_PI / 180), Eigen::Vector3f::UnitY()));
+      transform.rotate(Eigen::AngleAxisf(angle_z * (M_PI / 180), Eigen::Vector3f::UnitZ()));
+      pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
+      pcl::transformPointCloud(*rawcloud, *cloud, transform);
+
+
+      //Если нужно, записываем облако точек в файл
       recieved_frames++;
       if ((file_record) && recieved_frames >= file_record_frameinterval) {
         pcl::io::savePCDFileBinary(get_new_filename(is_rear), *cloud);
@@ -161,21 +191,25 @@ class PointCloudMapper : public rclcpp::Node
       
       //RCLCPP_INFO(this->get_logger(), get_new_filename().c_str());
 
-      // RCLCPP_INFO(this->get_logger(), "PCL data recieved!!!!!!!!!");
+
 
       // Фильтрация облака точек - "разуплотнение"
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);
       pcl::VoxelGrid<pcl::PointXYZRGB> voxelGrid;
       voxelGrid.setInputCloud(cloud);
       //oxelGrid.setLeafSize(0.02, 0.02, 0.02);
-      voxelGrid.setLeafSize(filter_leaf_size, filter_leaf_size, filter_leaf_size);
+      if (!is_rear) {
+        voxelGrid.setLeafSize(filter_leaf_size, filter_leaf_size, filter_leaf_size);
+      } else {
+        voxelGrid.setLeafSize(rear_filter_leaf_size, rear_filter_leaf_size, rear_filter_leaf_size);
+      }
       voxelGrid.filter(*cloud_filtered);
 
       //  Сегментация
       pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);  
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices);  
       pcl::SACSegmentation<pcl::PointXYZRGB> seg;  
-      double threshould = segmentation_threshould; // 0.01
+      double threshould = is_rear ? rear_segmentation_threshold : segmentation_threshold; // 0.01
       seg.setOptimizeCoefficients (true);  
       seg.setModelType (pcl::SACMODEL_PLANE);  
       seg.setMethodType (pcl::SAC_RANSAC);  
@@ -183,7 +217,7 @@ class PointCloudMapper : public rclcpp::Node
       seg.setInputCloud (cloud_filtered);  
       seg.segment (*inliers, *coefficients);  
 
-/*
+/*    Красить точки пока не надо
       for (size_t i = 0; i < inliers->indices.size (); ++i) {
         cloud_filtered->points[inliers->indices[i]].r = 255;  
         cloud_filtered->points[inliers->indices[i]].g = 0;  
@@ -206,9 +240,9 @@ class PointCloudMapper : public rclcpp::Node
       std::vector<pcl::PointIndices> cluster_indices;
       pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ece;
       // specify euclidean cluster parameters
-      ece.setClusterTolerance (cluster_tolerance); // 30cm earlier 0.02
-      ece.setMinClusterSize (min_cluster_size);
-      ece.setMaxClusterSize (max_cluster_size);
+      ece.setClusterTolerance (is_rear ? rear_cluster_tolerance : cluster_tolerance); // 30cm earlier 0.02
+      ece.setMinClusterSize (is_rear ? rear_min_cluster_size : min_cluster_size);
+      ece.setMaxClusterSize (is_rear? rear_max_cluster_size : max_cluster_size);
       ece.setSearchMethod (tree);
       ece.setInputCloud (cloud_filtered);
       // exctract the indices pertaining to each cluster and store in a vector of pcl::PointIndices
@@ -228,7 +262,7 @@ class PointCloudMapper : public rclcpp::Node
       for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)  
         {  
           double dist = 1000; //maximal obstacle distacne
-          //Кластер для горизонтальной проекции
+          //Кластер для горизонтальной проекции, с которым будем работать
           pcl::PointCloud<pcl::PointXYZRGB>::Ptr one_cluster(new pcl::PointCloud<pcl::PointXYZRGB>());
           one_cluster->width = cloud_cluster->width;
           one_cluster->height = cloud_cluster->height;
@@ -280,8 +314,8 @@ class PointCloudMapper : public rclcpp::Node
           }
 
           //Если препятствие не проходит под наш фильтр по высоте, идём к следующему, не добавляя этого
-          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || dist > max_distance) {
-            //std::cout << "Skipping: zero = "  <<  zero_point.z << ", min_hmax = " << min_hmax << ", max_hmin = " << max_hmin << ", hmin = " << hmin << ", hmax = " << hmax << std::endl;
+          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || (hmax + zero_point.z > max_hmax) || dist > max_distance)
+          {
             continue;
           }  
 
@@ -326,61 +360,50 @@ class PointCloudMapper : public rclcpp::Node
 	        const Eigen::Quaternionf bboxQ(tm_inv.block<3, 3>(0, 0));
 	        const Eigen::Vector3f    bboxT(c);
 
-          char val_str[80];
+          char val_str[400];
           if (!isFirst) {
            message.data += ", ";
           }
 
           //Добавление информации о препятствии в JSON
           isFirst = false;
-          message.data += "[";
-          sprintf(val_str, "%d", j);
+
+          sprintf(val_str, "[%d, %lf, %lf, %lf, ", j, dist, hmin + zero_point.z, hmax + zero_point.z);
           message.data += val_str;
-          message.data += ", ";
-          sprintf(val_str, "%lf", dist);
-          message.data += val_str;
-          message.data += ", ";
-          sprintf(val_str, "%lf", hmin + zero_point.z);
-          message.data += val_str;
-          message.data += ", ";
-          sprintf(val_str, "%lf", hmax + zero_point.z);
-          message.data += val_str;
-          message.data += ", ";
 
         
         //Определение координат углов препятствия
-          vtkSmartPointer<vtkDataSet> boundingbox;
-          boundingbox = pcl::visualization::createCube(bboxT, bboxQ, whd(0), whd(1), whd(2));
-       
-          for (int i = 0; i < 4; i++) {
-             
-             double boxpoints[3];
-             boundingbox->GetPoint(i, boxpoints);
-             if (is_rear) { //Если лидар смотрит назад, то координаты у точек идут наоборот
-              boxpoints[0] *= -1;
-              boxpoints[1] *= -1;
-             }
-             message.data += "[";
-             sprintf(val_str, "%lf", boxpoints[0] + lidar_x);
-             message.data += val_str;
-             message.data += ", ";
-             sprintf(val_str, "%lf", boxpoints[1] + lidar_y);
-             message.data += val_str;
-             message.data += "]";
-             if (i < 3) {
-              message.data += ", ";
-             }
+          if (orthogonal_boxes) { // Если нужны ортогональные BoundingBox'ы
+            if (!is_rear) {
+              sprintf(val_str, "[%lf, %lf], [%lf, %lf], [%lf, %lf], [%lf, %lf]", xmin, ymin, xmax, ymin, xmin, ymax, xmax, ymax);
+            } else {
+              sprintf(val_str, "[%lf, %lf], [%lf, %lf], [%lf, %lf], [%lf, %lf]", xmin * -1, ymin * -1, xmax * -1, 
+                                ymin * -1, xmin * -1, ymax * -1, xmax * -1, ymax * -1);
+            }
+            message.data += val_str;
+
+          } else {
+            vtkSmartPointer<vtkDataSet> boundingbox;
+            boundingbox = pcl::visualization::createCube(bboxT, bboxQ, whd(0), whd(1), whd(2));
+        
+            for (int i = 0; i < 4; i++) {
+              
+              double boxpoints[3];
+              boundingbox->GetPoint(i, boxpoints);
+              if (is_rear) { //Если лидар смотрит назад, то координаты у точек идут наоборот
+                boxpoints[0] *= -1;
+                boxpoints[1] *= -1;
+              }
+              sprintf(val_str, "[%lf, %lf]", boxpoints[0] + lidar_x, boxpoints[1] + lidar_y);
+              message.data+=val_str;
+              if (i < 3) {
+                message.data += ", ";
+              }
+            }
           }
-          sprintf(val_str, ", %lf", xmin);
+
+          sprintf(val_str, ", %lf, %lf, %lf, %lf]", xmin, xmax, ymin, ymax);
           message.data += val_str;
-          sprintf(val_str, ", %lf", xmax);
-          message.data += val_str;
-          sprintf(val_str, ", %lf", ymin);
-          message.data += val_str;
-          sprintf(val_str, ", %lf", ymax);
-          message.data += val_str;
-          
-          message.data += "]";
           j++;  
         }  
         message.data += "]}";
@@ -390,12 +413,14 @@ class PointCloudMapper : public rclcpp::Node
 
     // Обработка сообщения с переднего лидара
     void lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg) {
-      json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles", false, front_lidar_x, front_lidar_y, front_lidar_z));
+      json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles", false, front_lidar_x, front_lidar_y, front_lidar_z, 
+      front_lidar_x_angle, front_lidar_y_angle, front_lidar_z_angle));
     }
 
     // Обработка сообщения с заднего лидара
     void lidar_callback_rear_2(const sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg) {
-      json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles_rear", true, rear_lidar_x, rear_lidar_y, front_lidar_z));
+      json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles_rear", true, rear_lidar_x, rear_lidar_y, rear_lidar_z, 
+                              rear_lidar_x_angle, rear_lidar_y_angle, rear_lidar_z_angle));
     }
 
 

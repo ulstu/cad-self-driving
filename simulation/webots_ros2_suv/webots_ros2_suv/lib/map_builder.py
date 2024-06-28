@@ -16,6 +16,7 @@ from ament_index_python.packages import get_package_share_directory
 from .orientation import local_to_global
 from .behavioral_analysis import BehaviourAnalyser
 from webots_ros2_suv.lib.ipm_transformer import IPMTransformer
+from webots_ros2_suv.lib.config_loader import ConfigLoader, GlobalConfigLoader
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 
@@ -44,11 +45,7 @@ class MapBuilder(object):
         return results
 
     def load_ipm_config(self, config_path):
-        if not os.path.exists(config_path):
-            print('Config file not found. Use default values')
-            return
-        with open(config_path) as file:
-            config = yaml.full_load(file)
+        config = ConfigLoader("ipm_config").data
         self.__homograpthy_matrix = np.array(config['homography'])
         self.__horizont_line_height = config['horizont']
         self.__img_height = config['height']

@@ -167,7 +167,7 @@ class GPSFollowState(AbstractState):
 
     def on_event(self, event, world_model=None):
         self.runs = self.runs + 1
-
+        self.log("gps follow state")
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -202,7 +202,7 @@ class GPSFollowState(AbstractState):
 
             difference_angle = -self.AngleOfVectors(car_vector, difference)
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
-            self.log(f'angle {difference_angle}')
+            # self.log(f'angle {difference_angle}')
             
         pg.event.get()
         self.sc.fill((0, 0, 0))
@@ -216,7 +216,7 @@ class GPSFollowState(AbstractState):
         event = None
         zones = world_model.get_current_zones()
 
-        self.logi(f'ipm {world_model.ipm_colorized.shape}')
+        # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
         speed = 10 # default speed
 

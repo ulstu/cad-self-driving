@@ -43,7 +43,7 @@ class MovingState(AbstractState):
         if not world_model.global_map:
             return (0, 0)
         points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment]
-        self.log(f'PATH SEGMENT: {world_model.cur_path_segment} PATH: {points}')
+        # self.log(f'PATH SEGMENT: {world_model.cur_path_segment} PATH: {points}')
 
         points = points[0]
 
@@ -59,7 +59,7 @@ class MovingState(AbstractState):
                 # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
             world_model.params['dist_point'] = dist
-            self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+            # self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
         world_model.cur_path_point = self.__cur_path_point
@@ -76,7 +76,7 @@ class MovingState(AbstractState):
         lat, lon, o = world_model.get_current_position()
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
         world_model.goal_point = self.find_next_goal_point(world_model)
-        self.log(f'CUR POS: {lat} {lon} {world_model.goal_point}')
+        # self.log(f'CUR POS: {lat} {lon} {world_model.goal_point}')
 
         event = None
         zones = world_model.get_current_zones()
