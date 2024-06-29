@@ -65,6 +65,7 @@ class PointCloudMapper : public rclcpp::Node
       min_hmax = config["min_hmax"].as<double>();
       max_hmin = config["max_hmin"].as<double>();
       max_hmax = config["max_hmax"].as<double>();
+      min_axis_distance = config["min_axis_distance"].as<double>();
       orthogonal_boxes = config["orthogonal_boxes"].as<bool>();
       rear_filter_leaf_size = config["rear_filter_leaf_size"].as<double>();
       rear_segmentation_threshold = config["rear_segmentation_threshold"].as<double>();
@@ -76,7 +77,8 @@ class PointCloudMapper : public rclcpp::Node
       //Публикаторы данных о препятствиях
       json_publisher = this->create_publisher<std_msgs::msg::String>("obstacles",10);
       lidar_subscriber = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "lidar", 
+        // "lidar",
+        "/ch64w/lslidar_point_cloud", 
         10, 
         std::bind(&PointCloudMapper::lidar_callback, this, std::placeholders::_1)\
       );
@@ -117,6 +119,7 @@ class PointCloudMapper : public rclcpp::Node
     double vehicle_corner3_y = 0;
     double vehicle_corner4_x = 0;
     double vehicle_corner4_y = 0;
+    double min_axis_distance = 1;
     double max_distance = 20;
     double min_hmax = 1000;
     double max_hmin = 0;
@@ -314,7 +317,7 @@ class PointCloudMapper : public rclcpp::Node
           }
 
           //Если препятствие не проходит под наш фильтр по высоте, идём к следующему, не добавляя этого
-          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || (hmax + zero_point.z > max_hmax) || dist > max_distance)
+          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || (hmax + zero_point.z > max_hmax) || dist > max_distance || ymin < min_axis_distance)
           {
             continue;
           }  

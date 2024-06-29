@@ -48,19 +48,19 @@ class LaneLineDetectionWorker(AbstractWorker):
             if world_model and project_settings_config["use_line_detection"] == True:
 
                 img = np.array(Image.fromarray(world_model.rgb_image))
-                line_batches, mask_batches, results = self.lane_line_model.predict([img], verbose=False)
-                prev_img = np.copy(world_model.img_front_objects_prj)
+                line_batches, mask_batches, results = self.lane_line_model.predict([img])
+                prev_image = np.copy(world_model.img_front_objects_prj)
                 
-                world_model.img_front_objects_prj_lines = self.lane_line_model.generate_prediction_plots([prev_img], self.labels, mask_batches, line_batches)[0]
+                image_to_draw = self.lane_line_model.generate_prediction_plots([prev_image], self.labels, mask_batches, line_batches)[0]
 
                 world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
 
-                count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(world_model.img_front_objects_prj_lines, 
+                count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(image_to_draw, 
                                                                                                 line_batches, 
                                                                                                 0.45, 1.0, 
-                                                                                                world_model.img_front_objects_prj_lines.shape)
+                                                                                                image_to_draw.shape)
                 
-                self.lines_analizator.draw_labels(world_model.img_front_objects_prj_lines, 
+                self.lines_analizator.draw_labels(image_to_draw, 
                                                   label_names=[f"Count of lanes: {count_roads}", f"Car on lane: {car_line_id}"],
                                                   colors=[(27, 198, 250), (25, 247, 184)])
 
@@ -77,18 +77,18 @@ class LaneLineDetectionWorker(AbstractWorker):
                         x, y = world_model.map_builder.calc_bev_point([point[0], point[1] - world_model.map_builder.get_horizont_line()])
                         points_bev.append([x, y])
                     
-                    world_model.img_front_objects_prj_lines = self.lane_line_model.generate_prediction_plots([prev_img], self.labels, mask_batches, line_batches)[0]
+                    image_to_draw = self.lane_line_model.generate_prediction_plots([prev_image], self.labels, mask_batches, line_batches)[0]
                     world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
 
-                    count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(world_model.img_front_objects_prj_lines, 
+                    count_roads, car_line_id = self.lines_analizator.analize_roads_with_accamulator(image_to_draw, 
                                                                                                     line_batches, 
                                                                                                     0.45, 1.0, 
-                                                                                                    world_model.img_front_objects_prj_lines.shape)
+                                                                                                    image_to_draw.shape)
                     
                     world_model.count_roads = count_roads
                     world_model.car_line_id = car_line_id
                     
-                    self.lines_analizator.draw_labels(world_model.img_front_objects_prj_lines, 
+                    self.lines_analizator.draw_labels(image_to_draw, 
                                                     label_names=[f"Count of lanes: {count_roads}", f"Car on lane: {car_line_id}"],
                                                     colors=[(27, 198, 250), (25, 247, 184)])
 
@@ -131,8 +131,10 @@ class LaneLineDetectionWorker(AbstractWorker):
 
                     draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 0, 255)], thickness=4)
                 else:
-                     world_model.img_front_objects_prj_lines = prev_img
+                     world_model.img_front_objects_prj_lines = image_to_draw
                      world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+                
+                world_model.img_front_objects_prj_lines = image_to_draw
 
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))

@@ -50,7 +50,7 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                 if project_settings_config["use_road_marking_detection"] == True:
                     img = Image.fromarray(world_model.rgb_image)
 
-                    world_model.img_front_objects_prj_lines_signs_markings = np.copy(world_model.img_front_objects_prj_lines_signs)
+                    image_to_draw = np.copy(world_model.img_front_objects_prj_lines_signs)
 
                     results = self.model.predict(np.array(img), verbose=False)
                     masks = []
@@ -79,14 +79,13 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                             #                                                                               1 - background_alpha, image_mask, background_alpha, 0, image_mask)[indices]
                             if xy.shape[0] == 0:
                                 break
-                            if world_model.img_front_objects_prj_lines_signs_markings is None:
-                                break
                             try:
-                                cv2.drawContours(world_model.img_front_objects_prj_lines_signs_markings.astype(np.uint8), [np.expand_dims(xy, 1).astype(int)], 
+                                cv2.drawContours(image_to_draw, [np.expand_dims(xy, 1).astype(int)], 
                                              contourIdx=-1, 
                                              color=(255, 210, 74), thickness=-1)
                             except:
                                 pass
+                        world_model.img_front_objects_prj_lines_signs_markings = image_to_draw
 
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))

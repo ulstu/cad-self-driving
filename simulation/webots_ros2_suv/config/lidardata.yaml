@@ -1,6 +1,6 @@
 visualize: True
 visual_scale: 15
-lidar_reversed: True
+lidar_reversed: False
 orthogonal_boxes: True
 front_lidar_x: 0.0
 front_lidar_y: 0.0
@@ -10,7 +10,7 @@ front_lidar_y_angle: 0.0
 front_lidar_z_angle: 0.0
 rear_lidar_x: 0.0
 rear_lidar_y: 0.0
-rear_lidar_z: 0.0
+rear_lidar_z: 0.75
 rear_lidar_x_angle: 0.0
 rear_lidar_y_angle: 0.0
 rear_lidar_z_angle: 0.0
@@ -37,6 +37,7 @@ vehicle_corner4_y: 0.5
 min_hmax: 0.6
 max_hmin: 0.6
 max_hmax: 3.5
+min_axis_distance: 1.0
 max_distance: 20.0
 gps_shift_x: 0.0
 gps_shift_y: 0.0
