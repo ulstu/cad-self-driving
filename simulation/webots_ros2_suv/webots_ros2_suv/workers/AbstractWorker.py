@@ -1,6 +1,13 @@
+import os
+from ament_index_python.packages import get_package_share_directory
+import pathlib
+import yaml
+from webots_ros2_suv.lib.config_loader import ConfigLoader
+
 class AbstractWorker:
     def __init__(self, node=None) -> None:
         self.node = node
+        self.config = ConfigLoader("global_coords").data
 
     def log(self, message):
         self.node._logger.info(message)

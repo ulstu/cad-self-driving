@@ -1,7 +1,7 @@
 import math
 import os
 import pathlib
-from geopy.distance import geodesic
+from geopy.distance import geodesic, distance
 
 import cv2
 import numpy as np
@@ -49,7 +49,7 @@ class CoordsTransformer(object):
     def calc_bearing(self, pointA, pointB):
         """
         Вычисляет азимут между двумя точками по формуле
-            θ = atan2(sin(Δlong).cos(lat2),
+       geodesic     θ = atan2(sin(Δlong).cos(lat2),
                     cos(lat1).sin(lat2) − sin(lat1).cos(lat2).cos(Δlong))
         Параметры:
         pointA: кортеж чисел с плавающей запятой: (широта, долгота) начальной точки
@@ -81,7 +81,37 @@ class CoordsTransformer(object):
         start_coords = (lat, lon)
         goal_coords = (lon_goal, lat_goal)
         distance_meters = geodesic(start_coords, goal_coords).meters
-        # print(f'angle: {angle} angledeg: {math.degrees(angle)} x: {x} y: {y} distance: {distance_meters} pos: {pos} goal: {goal_coords}')
+
+        # Определение направления движения к целевой точке в глобальной системе координат
+        bearing = self.calc_bearing(start_coords, goal_coords)
+        bearing_radians = math.radians(bearing)
+
+        # Учитываем угол поворота автомобиля
+        relative_bearing = bearing_radians - angle
+
+        # Перевод расстояния в пиксели
+        distance_pixels = distance_meters * meters_to_pixels
+
+        # Вычисляем смещение в координатах изображения
+        delta_x = distance_pixels * math.sin(relative_bearing)
+        delta_y = distance_pixels * math.cos(relative_bearing)
+
+        # Вычисляем новые координаты на изображении
+        goal_x = x + delta_x
+        goal_y = y - delta_y  # Смещение вниз по оси Y уменьшает координату
+
+        return (int(goal_x), int(goal_y))
+    
+    def get_relative_coordinates_f(self, lat_goal, lon_goal, pos, pov_point):
+        x, y, lat, lon, angle = pov_point[0], pov_point[1], pos[1], pos[0], pos[2]
+        # Константа для перевода метров в пиксели
+        meters_to_pixels = 15
+
+        # Вычисление расстояния в метрах с помощью geopy
+        start_coords = (lat, lon)
+        goal_coords = (lon_goal, lat_goal)
+        
+        distance_meters = geodesic(start_coords, goal_coords).meters
 
         # Определение направления движения к целевой точке в глобальной системе координат
         bearing = self.calc_bearing(start_coords, goal_coords)
@@ -102,33 +132,68 @@ class CoordsTransformer(object):
         goal_x = x + delta_x
         goal_y = y - delta_y  # Смещение вниз по оси Y уменьшает координату
 
-        # print(f'delta_x: {delta_x} delta_y:{delta_y} goal_x: {goal_x} goal_y:{goal_y}')
-        return (int(goal_x), int(goal_y))
+        return (goal_x, goal_y)
     
     def get_coord_corrections(self):
         return self.__coord_corrections  
 
-
-    def get_global_coordinates_from_ipm_coords(self, relative_x, relative_y, pos):
-        # Разбиваем кортеж на составляющие
+    def get_global_coordinates_from_ipm_coords_(self, relative_x, relative_y, pos, pov_point):
         start_lat, start_lon, start_angle, scale_x, scale_y, bev_orientation = pos[0], pos[1], pos[2], self.__coord_corrections[3], self.__coord_corrections[4], self.__coord_corrections[5]
-        #start_lat, start_lon, start_angle, scale_x, scale_y, bev_orientation = self.__coord_corrections
 
-        # Применяем обратное масштабирование
-        unscaled_x = relative_x / scale_x
-        unscaled_y = relative_y / scale_y
-
+        # Константа для перевода метров в пиксели
+        meters_to_pixels = 15
+ 
+        # Применяем обратное масштабирование (перевод пикселей в метры)
+        unscaled_x = (relative_x - pov_point[0]) / meters_to_pixels
+        unscaled_y = (relative_y + pov_point[1]) / meters_to_pixels
+ 
         # Применяем обратный поворот
-        start_angle = start_angle - bev_orientation
-        angle_rad = math.radians(-start_angle)  # Обратный угол
-        rotated_x = unscaled_x * math.cos(angle_rad) + unscaled_y * math.sin(angle_rad)
-        rotated_y = -unscaled_x * math.sin(angle_rad) + unscaled_y * math.cos(angle_rad)
-
+        # start_angle = bev_orientation - start_angle
+        # angle_rad = -start_angle  # Обратный угол -
+ 
+        # rotated_x = unscaled_x * math.cos(angle_rad) - unscaled_y * math.sin(angle_rad)
+        # rotated_y = unscaled_x * math.sin(angle_rad) + unscaled_y * math.cos(angle_rad)
+ 
         # Преобразуем относительные координаты в глобальные
-        latitude = self.__get_latitude_back(start_lat, rotated_y)
-        longitude = self.__get_longitude_back(start_lon, rotated_x, start_lat)
+        # latitude = self.__get_latitude_back(start_lat, rotated_y)
+        # longitude = self.__get_longitude_back(start_lon, rotated_x, start_lat)
+        rotated_distance = math.sqrt(unscaled_x ** 2 + unscaled_y ** 2)
+        # rotated_angle = math.atan2(unscaled_y, unscaled_x) / math.pi * 180
+        
+        loc1_pt = distance(meters=rotated_distance).destination((start_lat, start_lon), bearing=-start_angle)
 
-        return latitude, longitude
+        return loc1_pt.latitude, loc1_pt.longitude
+    
+    def get_global_coordinates(self, local_x, local_y, pos, pov_point):
+        """
+        Преобразует точки в локальных координатах обратно в глобальные координаты.
+
+        :param local_x: координата X в локальной системе
+        :param local_y: координата Y в локальной системе
+        :param pos: текущее положение (широта, долгота, угол поворота)
+        :param pov_point: точка зрения (X, Y) в пикселях
+        :return: кортеж глобальных координат (широта, долгота)
+        """
+        x, y, lat, lon, angle = pov_point[0], pov_point[1], pos[1], pos[0], pos[2]
+        meters_to_pixels = 15
+
+        # Смещение в пикселях
+        delta_x = local_x - x
+        delta_y = y - local_y  # Смещение вниз уменьшает координату
+
+        # Учитываем угол поворота автомобиля
+        relative_bearing = math.atan2(delta_x, delta_y)
+        bearing_radians = relative_bearing + angle
+
+        # Перевод пикселей в метры
+        distance_pixels = math.sqrt(delta_x**2 + delta_y**2)
+        distance_meters = distance_pixels / meters_to_pixels
+
+        # Определение новой точки
+        start_coords = (lat, lon)
+        destination = geodesic(meters=distance_meters).destination(start_coords, math.degrees(bearing_radians))
+
+        return (destination.longitude, destination.latitude)
 
     def __get_latitude_back(self, start_lat, delta_meters):
         m = (1 / ((2 * math.pi / 360) * self.__EARTH_RADIUS_KM)) / 1000

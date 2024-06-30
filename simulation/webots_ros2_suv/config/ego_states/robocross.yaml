@@ -29,7 +29,7 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["moving"] # "moving"
+    start_move: ["moving"] # "gpsfollow"
     stop: ["stopped"]
   gpsfollow:
     # start_move: ["moving"]
