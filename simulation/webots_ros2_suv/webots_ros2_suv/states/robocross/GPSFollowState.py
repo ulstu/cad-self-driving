@@ -2,12 +2,13 @@ from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 import math
 import numpy as np
+import time
 
 import pygame as pg
 
 
 def move_screen(x, y):
-    return [int(500 + x * 60), int(400 + y * 60)]
+    return [int(400 + x * 60), int(400 + y * 60)]
 
 
 class GPSFollowState(AbstractState):
@@ -15,7 +16,7 @@ class GPSFollowState(AbstractState):
         super().__init__( *args, **kwargs)
         self.runs = 0
         self.__cur_path_point = 1
-        self.sc = pg.display.set_mode((1000, 800))
+        self.sc = pg.display.set_mode((800, 800))
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -175,39 +176,49 @@ class GPSFollowState(AbstractState):
 
         # world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
         # world_model.goal_point = self.find_next_goal_point(world_model)
-
-        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
-        points_offset = self.__cur_path_point
-        points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
-        world_model.gps_path = points
-
+        
         lat, lon, orientation = world_model.get_current_position() # Текущее месторасположение автомобиля
         orientation -= 1.5
         car_position = self.gps_to_rect(lat, lon)
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
 
-        path_square_points = []
-        for point in points:
-            path_square_points.append(self.gps_to_rect(point[0], point[1]))
+        while True:
+            points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+            points_offset = self.__cur_path_point
+            points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
+            world_model.gps_path = points
 
-        difference = None
-        if len(path_square_points) > 1:
-            nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.7)
-            difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
+            path_square_points = []
+            for point in points:
+                path_square_points.append(self.gps_to_rect(point[0], point[1]))
 
-            dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
+            if len(path_square_points) > 1:
+                nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.7)
+                difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
+
+                dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
+
+                conf = self.config['change_point_dist']
+            else:
+                break
 
             if dist < self.config['change_point_dist']:
                 self.__cur_path_point += 1
                 world_model.cur_path_point = self.__cur_path_point
+            else:
+                break
 
-
+        if len(path_square_points) > 1:            
             difference_angle = -self.AngleOfVectors(car_vector, difference)
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
-            self.log(f'angle {difference_angle}')
-            
+        else:
+            world_model.gps_car_turn_angle = 0.0
+
         pg.event.get()
         self.sc.fill((0, 0, 0))
+
+        pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
+
         pg.draw.line(self.sc, (255,0,0), move_screen(0, 0), move_screen(car_vector[0], car_vector[1]))
         if difference != None:
             pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
@@ -217,30 +228,26 @@ class GPSFollowState(AbstractState):
 
         event = None
         zones = world_model.get_current_zones()
-
-        self.logi(f'ipm {world_model.ipm_colorized.shape}')
-
-        speed = 10 # default speed
-
-        for zone in zones:
-            if zone['name'] == 'turn':
-                world_model.cur_turn_polygon = zone['coordinates'][0]
+        
+        # default speed
+        speed = self.config['default_speed']
+        for z in zones:
+            if z['name'] == 'turn':
+                world_model.cur_turn_polygon = z['coordinates'][0]
                 self.__cur_path_point = 0
-                event = 'turn'
-            elif zone['name'] == 'stop':
+                event = "turn"
+            elif z['name'] == 'stop':
                 self.__cur_path_point = 0
-                event = 'stop'
-            elif zone['name'].startswith('speed'):
-                speed = float(zone['name'].split('speed')[1])
+                event = "stop"
+            elif z['name'].startswith("speed"):
+                speed = float(z['name'].split('speed')[1])
+        # if not world_model.is_obstacle_before_path_point(filter_num=10, log=self.log):
+        #     event = "start_gps_follow"
+        # if world_model.is_lane_road():
+        #     event = "start_lane_follow"
 
-        if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
-            event = 'start_move'
-        if world_model.is_lane_road():
-            event = 'start_lane_follow'
         if event:
             world_model.path = None
-
         world_model.set_speed(speed)
         self.drive(world_model, speed=speed)
-
         return event

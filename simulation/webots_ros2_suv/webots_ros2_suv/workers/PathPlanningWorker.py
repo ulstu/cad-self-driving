@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 from webots_ros2_suv.lib.a_star import astar, kalman_filter_path, smooth_path_with_dubins, bezier_curve
 from threading import Thread
 from geopy.distance import geodesic
+from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
+
 
 class PathPlanningWorker(AbstractWorker):
 
@@ -49,6 +51,12 @@ class PathPlanningWorker(AbstractWorker):
                                  self.robot_radius, 
                                  self.step_size,
                                  super().log)
+        
+        world_model.gps_path = []
+        if world_model.path != None and len(world_model.path) > 0:
+            for point in world_model.path:
+                world_model.gps_path.append(world_model.coords_transformer.get_global_coordinates(point[0], point[1], world_model.get_current_position(), world_model.pov_point))
+            world_model.gps_path = kalman_filter_path(world_model.gps_path)
         # if not world_model.path and self.buffer:
             # world_model.path = self.buffer
             # world_model.params['final_path_len'] = len(world_model.path)
@@ -65,7 +73,6 @@ class PathPlanningWorker(AbstractWorker):
         #     world_model.path = bezier_curve(world_model.path, 20)
         #     world_model.params['final_path_len'] = len(world_model.path)
         if world_model.path:
-        # if world_model.path:
             world_model.params['linear_path_len'] = '-'
             world_model.params['init_path_len'] = len(world_model.path)
             # world_model.path = kalman_filter_path(world_model.path, self.process_noise_scale)
@@ -106,15 +113,75 @@ class PathPlanningWorker(AbstractWorker):
 
         return filtered_coords
 
+    def check_path(self, world_model):
+        n = 0
+        for i in range(2, len(world_model.gps_path)):
+            point = world_model.gps_path[i]
+
+            relative_point = world_model.coords_transformer.get_relative_coordinates(point[0], 
+                                                                                     point[1], 
+                                                                                     pos=world_model.get_current_position(),
+                                                                                     pov_point=world_model.pov_point)
+            
+            sub_ipm = world_model.ipm_image[relative_point[1] - 10:relative_point[1] + 10, relative_point[0] - 10:relative_point[0] + 10]
+            if sub_ipm.mean(axis=0).mean(axis=0) < 90:
+                return False
+            n += 1
+        return True
+    
+    def find_next_goal_point(self, world_model):
+        if not world_model.global_map:
+            return (0, 0)
+        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment]
+
+        points = points[0]
+
+        dists = []
+        for p in points:
+            dists.append(calc_dist_point(p, world_model.get_current_position()))
+        self.__cur_path_point = world_model.cur_path_point
+        if self.__cur_path_point < len(points) - 1:
+            x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
+            dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
+            world_model.params["point_dist"] = dist
+            if dist < self.config['change_point_dist']:
+                # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
+                self.__cur_path_point = self.__cur_path_point + 1
+                self.plan_a_star(world_model)
+            world_model.params['dist_point'] = dist
+            # self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+        else:
+            self.__cur_path_point = len(points) - 1
+        world_model.cur_path_point = self.__cur_path_point
+
+        x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], 
+                                                                       points[self.__cur_path_point][1], 
+                                                                       pos=world_model.get_current_position(),
+                                                                       pov_point=world_model.pov_point)
+        return (x, y)
+
     def plan_path(self, world_model):
+
+        world_model.goal_point = self.find_next_goal_point(world_model)
+
         if not world_model.goal_point:
             return world_model
 
-        world_model.path = None
-        self.plan_a_star(world_model)
-        if world_model.path:
-            super().log(f'PATH len: {len(world_model.path)}')
-        # world_model.path = self.kalman_filter_path(world_model.path)
+        if world_model.gps_path == None:
+            self.plan_a_star(world_model)
+            self.logw("Path is empty")
+        elif len(world_model.gps_path) == 0:
+            self.plan_a_star(world_model)
+            self.logw("Path is empty")
+        elif not self.check_path(world_model):
+            self.plan_a_star(world_model)
+            self.logw("Path stucked")
+        
+        # self.logi(f"len {len(world_model.path)}")
+
+        if len(world_model.gps_path) == 0:
+            self.logw(f'Path is empty')
+            
         return world_model
 
     def on_event(self, event, scene=None):
@@ -123,14 +190,13 @@ class PathPlanningWorker(AbstractWorker):
 
     #@timeit
     def on_data(self, world_model):
-        try:
-            # super().log(f"PathPlanningWorker {str(world_model)}")
-            # thread = Thread(target = self.plan_path, args = (world_model,))
-            # thread.start()
-            # world_model = self.plan_path(world_model)
-            pass
+        # try:
+        thread = Thread(target = self.plan_path, args = (world_model,))
+        thread.start()
+        world_model = self.plan_path(world_model)
+        pass
 
-        except  Exception as err:
-            super().error(''.join(traceback.TracebackException.from_exception(err).format()))
+        # except  Exception as err:
+        #     super().error(''.join(traceback.TracebackException.from_exception(err).format()))
 
         return world_model

@@ -178,7 +178,7 @@ pygame.display.set_caption("Initial N")
 pygame.mixer.init()
 
 # изображения
-trueno = pygame.image.load("trueno.png")
+trueno = pygame.image.load("/home/robolife/cad-self-driving/navigation/sdgazelle/src/trueno.png")
 
 # Следование до точки
 destinations = []

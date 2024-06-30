@@ -12,11 +12,11 @@ bev_orientation: 0.0
 # scale_y: 6
 # bev_orientation: -0.35
 
-change_point_dist: 0.5
+change_point_dist: 1
 bev_obstacle_ratio: 0.5
 
 kalman_path_planning_noise_scale: 0.05
-robot_radius: 1
+robot_radius: 1.5
 a_star_step_size: 20
 dubins_sample_size: 5
 dubins_turning_radius: 10
