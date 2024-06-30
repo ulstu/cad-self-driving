@@ -1,4 +1,3 @@
-from std_msgs.msg import Bool
 import rclpy
 import traceback
 import json
@@ -19,6 +18,7 @@ from .lib.orientation import quaternion_from_euler
 from webots_ros2_driver.utils import controller_url_prefix
 from ackermann_msgs.msg import AckermannDrive
 import socket
+from std_msgs.msg import String
 
 UDP_SEND_IP = '192.168.1.101'
 UDP_SEND_PORT = 90
@@ -30,7 +30,7 @@ class NodeDriveGazelle(Node):
             super().__init__('node_drive_gazelle')
 
             self.create_subscription(AckermannDrive, 'cmd_ackermann', self.__cmd_ackermann_callback, 1)
-            self.create_subscription(Bool, 'cmd_control_unit', self.__cmd_control_unit_callback, 1)
+            self.create_subscription(String, 'cmd_control_unit', self.__cmd_control_unit_callback, 1)
 
             self.socket_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         except Exception as err:
@@ -51,11 +51,11 @@ class NodeDriveGazelle(Node):
 
         self._logger.info(f'GAZELLE drive message: {speed} {steering_angle}')
 
-    def __cmd_control_unit_callback(self, is_pause):
+    def __cmd_control_unit_callback(self, software_state):
         jsonrpc_message = {
             "jsonrpc": "2.0",
             "method": "set_pause_state",
-            "params": [is_pause.data]
+            "params": [software_state.data]
         }
 
         jsonrpc_message_str = json.dumps(jsonrpc_message)

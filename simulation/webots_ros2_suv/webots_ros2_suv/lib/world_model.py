@@ -61,7 +61,8 @@ class WorldModel(object):
         self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
-        self.is_pause = False               # Находится ли автомобиль в состоянии паузы
+        self.software_state = 'None'        # Программное состояние автомобиля (данное решение)
+        self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = []                 # Данные о препятствиях с лидара
@@ -86,7 +87,8 @@ class WorldModel(object):
         self.params['lat'] = pos[0]
         self.params['lon'] = pos[1]
         self.params['angle'] = pos[2]
-        self.params['is_pause'] = self.is_pause
+        self.params['software_state'] = self.software_state
+        self.params['hardware_state'] = self.hardware_state
 
     def draw_scene(self, log=print):
         if self.ipm_colorized_lines is None:

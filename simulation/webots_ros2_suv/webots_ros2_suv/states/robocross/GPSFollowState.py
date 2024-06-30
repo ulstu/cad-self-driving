@@ -168,6 +168,7 @@ class GPSFollowState(AbstractState):
 
 
     def on_event(self, event, world_model=None):
+        world_model.software_state = 'Auto'
         self.runs = self.runs + 1
         self.log("gps follow state")
         # if world_model.traffic_light_state == 'red':
@@ -230,15 +231,17 @@ class GPSFollowState(AbstractState):
             elif zone['name'] == 'terminal':
                 speed = 0
                 self.__cur_path_point = 0
-                world_model.is_pause = True
                 event = 'pause'
             elif zone['name'] == 'traffic_light':
                 if world_model.traffic_light_state == 'red':
                     speed = 0
                     self.__cur_path_point = 0
                     event = 'stop'
-            elif zone['name'] == 'crosswalk' and world_model.pedestrian_on_crosswalk:
-                event = 'stop'
+            elif zone['name'] == 'crosswalk':
+                if world_model.pedestrian_on_crosswalk:
+                    speed = 0
+                    self.__cur_path_point = 0
+                    event = 'stop'
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'
