@@ -1,4 +1,3 @@
-from std_msgs.msg import Bool
 import rclpy
 import numpy as np
 import traceback
@@ -31,15 +30,16 @@ from .lib.config_loader import ConfigLoader
 from .lib.external_data_sender import ExternalDataSender
 import select
 import socket
+from std_msgs.msg import String
 import threading
 from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 import json
 
-RECV_BUFFER_SIZE = 128
+RECV_BUFFER_SIZE = 256
 SENSOR_DEPTH = 40
-UDP_RECV_IP = '0.0.0.0'
-UDP_RECV_PORT = 8080
+UDP_RECV_IP = '0.0.0.0' # 192.168.1.100
+UDP_RECV_PORT = 9090
 
 
 class NodeEgoController(Node):
@@ -78,7 +78,7 @@ class NodeEgoController(Node):
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
-            self.__control_unit_publisher = self.create_publisher(Bool, 'cmd_control_unit', 1)
+            self.__control_unit_publisher = self.create_publisher(String, 'cmd_control_unit', 1)
 
             self.start_web_server()
 
@@ -89,9 +89,9 @@ class NodeEgoController(Node):
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
-            self.__fsm.on_event('start_move')
-            # self.__fsm.on_event("stop")
-            # self.__fsm.on_event("reset")
+            # self.__fsm.on_event('start_move')
+            # self.__fsm.on_event('reset')
+            # self.__fsm.on_event('stop')
 
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
@@ -112,11 +112,23 @@ class NodeEgoController(Node):
                 data, _ = socket_recv.recv(RECV_BUFFER_SIZE)
                 data_dict = json.loads(data)
 
-                if data_dict['is_pause'] == 'True':
-                    self.__world_model.is_pause = True
-                elif data_dict['is_pause'] == 'False':
-                    self.__world_model.is_pause = False
-                    self.__fsm.on_event('pause')
+                match data_dict['params']['current_control_mode']:
+                    case 'E-Stop':
+                        self.__world_model.hardware_state = 'E-Stop'
+                    case 'Manual':
+                        self.__world_model.hardware_state = 'Manual'
+                    case 'Auto':
+                        self.__world_model.hardware_state = 'Auto'
+
+                        if self.__world_model.software_state != 'Pause':
+                            self.__fsm.on_event('start_move')
+                    case 'Pause':
+                        self.__world_model.hardware_state = 'Pause'
+
+                        if self.__world_model.software_state != 'Pause':
+                            self.__fsm.on_event('pause')
+                    case 'Disabled':
+                        self.__world_model.hardware_state = 'Disabled'
 
     def __on_lidar_message(self, data):
         pass
@@ -131,11 +143,11 @@ class NodeEgoController(Node):
 
     def drive(self):
         if self.__world_model:
-            is_pause = Bool()
-            is_pause.data = self.__world_model.is_pause
+            software_state = String()
+            software_state.data = self.__world_model.software_state
 
             self.__ackermann_publisher.publish(self.__world_model.command_message)
-            self.__control_unit_publisher.publish(is_pause)
+            self.__control_unit_publisher.publish(software_state)
 
     #@timeit
     def __on_image_message(self, data):
