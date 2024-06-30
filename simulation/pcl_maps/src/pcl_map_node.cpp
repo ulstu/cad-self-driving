@@ -82,9 +82,10 @@ class PointCloudMapper : public rclcpp::Node
         10, 
         std::bind(&PointCloudMapper::lidar_callback, this, std::placeholders::_1)\
       );
+      auto qos = rclcpp::QoS(1);
       lidar_subscriber_rear = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "lidar_rear", 
-        10, 
+        "/points", 
+        qos.best_effort(), 
         std::bind(&PointCloudMapper::lidar_callback_rear_2, this, std::placeholders::_1)\
       );
 
@@ -286,8 +287,14 @@ class PointCloudMapper : public rclcpp::Node
           double ymin = 1000;
           double ymax = -1000;
           for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++) {  
-            pcl::PointXYZRGB cluster_point = cloud_cluster->points[*pit];
+            pcl::PointXYZRGB cluster_point =  cloud_cluster->points[*pit];
+            
+            if (is_rear) {
+              double tmp = cluster_point.y;
+              cluster_point.y = cluster_point.x;
+              cluster_point.y = tmp;
 
+            } 
             //Сохраняем высоту низа и верха препятствия
             if (cluster_point.z < hmin)
               hmin = cluster_point.z;
@@ -305,22 +312,32 @@ class PointCloudMapper : public rclcpp::Node
             cluster_point.z = zero_point.z;
 
             one_cluster->push_back(cluster_point);
-            double pdist1 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner1_x, vehicle_corner1_y);
-            double pdist2 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner2_x, vehicle_corner2_y);
-            double pdist3 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner3_x, vehicle_corner3_y);
-            double pdist4 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner4_x, vehicle_corner4_y);
-            double pdist = minval(pdist1, pdist2, pdist3, pdist4);
-            if (pdist < dist) {
-              dist = pdist;
+            if (!is_rear) {
+              double pdist1 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner1_x, vehicle_corner1_y);
+              double pdist2 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner2_x, vehicle_corner2_y);
+              double pdist = pdist1 < pdist2 ? pdist1 : pdist2;
+              if (pdist < dist) {
+                dist = pdist;
+              }
+            } else {
+              double pdist1 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner3_x, vehicle_corner3_y);
+              double pdist2 = calc_distance(cluster_point.x, cluster_point.y, vehicle_corner4_x, vehicle_corner4_y);
+              double pdist = pdist1 < pdist2 ? pdist1 : pdist2;
+              if (pdist < dist) {
+                dist = pdist;
+              }
             }
             size++;
           }
 
           //Если препятствие не проходит под наш фильтр по высоте, идём к следующему, не добавляя этого
-          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || (hmax + zero_point.z > max_hmax) || dist > max_distance || ymin < min_axis_distance)
+          if ((hmax + zero_point.z < min_hmax) || (hmin + zero_point.z > max_hmin) || (hmax + zero_point.z > max_hmax) || dist > max_distance || dist < min_axis_distance)
           {
             continue;
-          }  
+          }
+          if (is_rear && xmin < 0) {
+            continue;
+          }
 
 
           //Минимальные и максимальные значения координат

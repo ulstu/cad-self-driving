@@ -197,7 +197,7 @@ class NodePointObstacles(Node):
 
             
             for figure in self.all_figures:
-                if self.LIDAR_REVERSED:
+                if not figure[4]:
                     p1[0] = int(512.0 - figure[0][1] * scale) # Вычисляем X первой точки препятствия на нашем рисунке
                     p1[1] = int(512.0 - figure[0][0] * scale) # Вычисляем Y первой точки препятствия на нашем рисунке
                     p4[0] = int(512.0 - figure[1][1] * scale)
