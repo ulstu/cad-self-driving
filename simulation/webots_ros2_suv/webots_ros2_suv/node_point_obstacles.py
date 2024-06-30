@@ -36,7 +36,7 @@ from .lib.param_loader import ParamLoader
 from .lib.config_loader import GlobalConfigLoader
 
 
-def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y):
+def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y, lidar_reversed):
     """
     Функция вычисления географических координат точки
     На вход подаются:
@@ -53,7 +53,10 @@ def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint
     corr_x = newpoint_x - geosensor_x; 
     corr_y = newpoint_y - geosensor_y;
     # Вычисляем азимут требуемой точки
-    azimuth = math.degrees(math.atan(corr_y / corr_x)) + angle
+    if lidar_reversed:
+        azimuth = angle - math.degrees(math.atan(corr_y / corr_x))
+    else:
+        azimuth = math.degrees(math.atan(corr_x / corr_y)) + angle
     # Вычисляем расстоние до требуемой точки
     shift = math.sqrt(corr_x ** 2 + corr_y ** 2)
     # Вычисляем и возвращаем географические координаты точки
@@ -77,18 +80,26 @@ class NodePointObstacles(Node):
             param = ParamLoader()
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
-            self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
+            # self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             
+            # загружаем локальные конфигурацтлнные файлы
             self.lidardata = GlobalConfigLoader("lidardata").data
+            
+            # with open("webots_ros2_suv/config/lidardata.yaml", "r") as file:
+                # self.lidardata = yaml.safe_load(file)
             self.MAP_SCALE = self.lidardata['visual_scale']
             self.GPS_SHIFT_X = self.lidardata['gps_shift_x']
             self.GPS_SHIFT_Y = self.lidardata['gps_shift_y']
+            self.LIDAR_REVERSED = self.lidardata['lidar_reversed']
             self.geocoords = []
             self.rear_figures = []
             self.front_figures = []
+
+            # Вот это нужно получать с odom!!!
             self.lat = 53.0
             self.lon = 48.0
             self.ang = 0
+            
         except  Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
         
@@ -122,17 +133,18 @@ class NodePointObstacles(Node):
         self.geocoords = []
         for p in obst_list:
             # Геокоординаты 4-х точек - углов препятствия
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[4][1],  p[4][0])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[4][1],  p[4][0], self.LIDAR_REVERSED)
             self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[5][1],  p[4][0])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[5][1],  p[4][0], self.LIDAR_REVERSED)
             self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[6][1],  p[4][0])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[6][1],  p[4][0], self.LIDAR_REVERSED)
             self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[7][1],  p[4][0])
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[7][1],  p[4][0], self.LIDAR_REVERSED)
             self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
             # Геокоординаты середины диагонали препятствия
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (p[4][1] + p[7][1]) / 2,  (p[4][0] + p[7][0]) / 2) 
+            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (p[4][1] + p[7][1]) / 2,  (p[4][0] + p[7][0]) / 2, self.LIDAR_REVERSED) 
             self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
+                
 
 
 
@@ -150,10 +162,18 @@ class NodePointObstacles(Node):
                 # p[9] - xmax
                 # p[10] - ymin
                 # p[11] - ymax
-                if 'obstacles' in obstacles_dict:
-                    self.front_figures.append([p[4], p[5], p[6], p[7], True, p[0], p[1], p[2], p[3]])
+
+                # Определение класса препятствия
+                if abs(p[9] - p[8]) > 1 and abs(p[11] - p[10]) > 1:
+                    pclass = 'C'
                 else:
-                    self.rear_figures.append([p[4], p[5], p[6], p[7], False, p[0], p[1], p[2], p[3]])
+                    pclass = 'P'
+
+
+                if 'obstacles' in obstacles_dict:
+                    self.front_figures.append([p[4], p[5], p[6], p[7], True, p[0], p[1], p[2], p[3], pclass])
+                else:
+                    self.rear_figures.append([p[4], p[5], p[6], p[7], False, p[0], p[1], p[2], p[3], pclass])
 
         self.all_figures = self.front_figures + self.rear_figures
         # self._logger.info(str(self.geocoords))
@@ -175,26 +195,38 @@ class NodePointObstacles(Node):
             scale = self.MAP_SCALE # Домножаем на scale, чтобы картинка не была слишком мелкой, т.к. координаты в метрах. 1 метр будет 15 пикселей
                                    # на рисунке
 
+            
             for figure in self.all_figures:
-                p1[0] = int(512.0 - figure[0][1] * scale) # Вычисляем X первой точки препятствия на нашем рисунке
-                p1[1] = int(512.0 - figure[0][0] * scale) # Вычисляем Y первой точки препятствия на нашем рисунке
-                p4[0] = int(512.0 - figure[1][1] * scale)
-                p4[1] = int(512.0 - figure[1][0] * scale)
-                p2[0] = int(512.0 - figure[2][1] * scale)
-                p2[1] = int(512.0 - figure[2][0] * scale)
-                p3[0] = int(512.0 - figure[3][1] * scale)
-                p3[1] = int(512.0 - figure[3][0] * scale)
+                if self.LIDAR_REVERSED:
+                    p1[0] = int(512.0 - figure[0][1] * scale) # Вычисляем X первой точки препятствия на нашем рисунке
+                    p1[1] = int(512.0 - figure[0][0] * scale) # Вычисляем Y первой точки препятствия на нашем рисунке
+                    p4[0] = int(512.0 - figure[1][1] * scale)
+                    p4[1] = int(512.0 - figure[1][0] * scale)
+                    p2[0] = int(512.0 - figure[2][1] * scale)
+                    p2[1] = int(512.0 - figure[2][0] * scale)
+                    p3[0] = int(512.0 - figure[3][1] * scale)
+                    p3[1] = int(512.0 - figure[3][0] * scale)
+                else:
+                    p1[1] = int(512.0 - figure[0][1] * scale) # Вычисляем Y первой точки препятствия на нашем рисунке
+                    p1[0] = int(512.0 + figure[0][0] * scale) # Вычисляем X первой точки препятствия на нашем рисунке
+                    p4[1] = int(512.0 - figure[1][1] * scale)
+                    p4[0] = int(512.0 + figure[1][0] * scale)
+                    p2[1] = int(512.0 - figure[2][1] * scale)
+                    p2[0] = int(512.0 + figure[2][0] * scale)
+                    p3[1] = int(512.0 - figure[3][1] * scale)
+                    p3[0] = int(512.0 + figure[3][0] * scale)
 
+                
                 # Рисуем текст - номер препятствия
-                cv2.putText(self.img, "Fig #" + str(figure[5]) + ", d = " + str(figure[6]) + ", hmin = " + str(figure[7]) + ", hmax = " + str(figure[8]), (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0))
+                cv2.putText(self.img, f"[{figure[9]}]Fig #{figure[5]}, d={figure[6]}, hmin={figure[7]}, hmax={figure[8]}", (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0));
                 # Рисуем рамку препятствия
                 cv2.line(self.img, (p1[0], p1[1]), (p2[0], p2[1]), (255,255,255), 1);
                 cv2.line(self.img, (p2[0], p2[1]), (p3[0], p3[1]), (255,255,255), 1);
                 cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255), 1);
                 cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255), 1);
         
-            # cv2.imshow('NPO', self.img)  # Отображаем окно
-            # cv2.waitKey(1) # Нужно для работы окна
+            cv2.imshow('NPO', self.img)  # Отображаем окно
+            cv2.waitKey(1) # Нужно для работы окна
 
 
         

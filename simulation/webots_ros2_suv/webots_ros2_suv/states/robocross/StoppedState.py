@@ -1,5 +1,4 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
-from webots_ros2_suv.states.robocross.GPSFollowState import intersect_person_with_crosswalk
 
 class StoppedState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:

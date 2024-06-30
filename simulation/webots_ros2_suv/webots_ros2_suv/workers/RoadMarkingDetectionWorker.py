@@ -66,7 +66,7 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                 if project_settings_config["use_road_marking_detection"] == True:
                     img = Image.fromarray(world_model.rgb_image)
 
-                    world_model.img_front_objects_lines_signs_markings = np.copy(world_model.img_front_objects_lines_signs)
+                    image_to_draw = np.copy(world_model.img_front_objects_prj_lines_signs)
 
                     results = self.model.predict(np.array(img), verbose=True)
                     # for mask in results[0].masks:
@@ -78,39 +78,45 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                         masks_points = np.array([np.array(xy) for xy in results[0].masks.xy])
                     
                     labels = [self.model.names[int(label)] for label in results[0].boxes.cls]
-
-                    world_model.detected_road_markings = list(zip(masks_points, labels))
+                    
+                    
+                    world_model.detected_road_markings = list(zip(masks_points, labels)) if masks_points is not None else []
 
                     background_alpha = 0.7
                     if results[0].masks is not None:
                         for xy in results[0].masks.xy:
 
                             # print("_*_" * 100)
-                            # print(world_model.img_front_objects_lines_signs_markings)
+                            # print(world_model.img_front_objects_prj_lines_signs_markings)
                             # print("_*_" * 100)
 
-                            # image_mask = np.zeros_like(world_model.img_front_objects_lines_signs_markings).astype(np.uint8)
+                            # image_mask = np.zeros_like(world_model.img_front_objects_prj_lines_signs_markings).astype(np.uint8)
 
                             # cv2.drawContours(image_mask, [np.expand_dims(xy, 1).astype(int)], 
                             #                  contourIdx=-1, 
                             #                  color=(255, 255, 255), thickness=-1)
                             
                             # indices = np.any(image_mask != np.array([0, 0, 0], dtype=np.uint8), axis=-1)
-                            # world_model.img_front_objects_lines_signs_markings[indices] = cv2.addWeighted(world_model.img_front_objects_lines_signs_markings, 
+                            # world_model.img_front_objects_prj_lines_signs_markings[indices] = cv2.addWeighted(world_model.img_front_objects_prj_lines_signs_markings, 
                             #                                                                               1 - background_alpha, image_mask, background_alpha, 0, image_mask)[indices]
-
-                            cv2.drawContours(world_model.img_front_objects_lines_signs_markings, [np.expand_dims(xy, 1).astype(int)], 
+                            if xy.shape[0] == 0:
+                                break
+                            try:
+                                cv2.drawContours(image_to_draw, [np.expand_dims(xy, 1).astype(int)], 
                                              contourIdx=-1, 
                                              color=(255, 210, 74), thickness=-1)
-                    
-                zones = world_model.get_current_zones()
-                pedestrian_on_crosswalk = False
-                for zone in zones:
-                    if zone['name'] == 'crosswalk':
-                        if intersect_person_with_crosswalk(world_model):
+                            except:
+                                pass
+                        world_model.img_front_objects_prj_lines_signs_markings = image_to_draw
+                
+                if intersect_person_with_crosswalk(world_model):
+                    zones = world_model.get_current_zones()
+                    pedestrian_on_crosswalk = False
+                    for zone in zones:
+                        if zone['name'] == 'crosswalk':
                             pedestrian_on_crosswalk = True
                             break
-                world_model.pedestrian_on_crosswalk = pedestrian_on_crosswalk
+                    world_model.pedestrian_on_crosswalk = pedestrian_on_crosswalk
 
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))

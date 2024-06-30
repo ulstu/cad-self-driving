@@ -53,7 +53,7 @@ class NodeVisual(Node):
 
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             # self.create_subscription(PointCloud2, param.get_param("lidar"), self.__on_point_cloud, qos)
-            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
+            # self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
             # with open("src/webots_ros2_suv/config/lidardata.yaml", "r") as file:
                 # self.lidardata = yaml.safe_load(file)
 
