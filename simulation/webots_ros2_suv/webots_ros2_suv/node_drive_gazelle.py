@@ -61,7 +61,6 @@ class NodeDriveGazelle(Node):
         jsonrpc_message_str = json.dumps(jsonrpc_message)
         self.socket_send.sendto(jsonrpc_message_str.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
 
-
 def main(args=None):
     try:
         rclpy.init(args=args)

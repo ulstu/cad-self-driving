@@ -8,5 +8,7 @@ class StoppedState(AbstractState):
         self.drive(world_model, speed=0.0)
 
         if world_model.traffic_light_state == 'green':
-            return 'start_move'
+            if not world_model.pedestrian_on_crosswalk:
+                return 'start_move'
+        
         return None

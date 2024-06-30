@@ -22,7 +22,7 @@ BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 
 class MapBuilder(object):
     def __init__(self, model_path, ipm_config):
-        self.__model = YOLO(model_path)
+        self._model = YOLO(model_path)
         self.load_ipm_config(ipm_config)
         self.__corr_depth_pos = (0, 10)
         self.__track_history = defaultdict(lambda: [])
@@ -40,8 +40,8 @@ class MapBuilder(object):
 
 
     def detect_objects(self, image):
-        #results = self.__model.predict(source=image, save=False, save_txt=False)
-        results = self.__model.track(source=image, persist=True, verbose=False)
+        #results = self._model.predict(source=image, save=False, save_txt=False)
+        results = self._model.track(source=image, persist=True, verbose=False)
         return results
 
     def load_ipm_config(self, config_path):

@@ -2,6 +2,7 @@ from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 import math
 import pygame as pg
+import numpy as np
 
 
 def move_screen(x, y):
@@ -165,6 +166,7 @@ class GPSFollowState(AbstractState):
     def MedianVector(self, first, second, k):
         return [first[0] * k + second[0] * (1 - k), first[1] * k + second[1] * (1 - k)]
 
+
     def on_event(self, event, world_model=None):
         self.runs = self.runs + 1
         self.log("gps follow state")
@@ -235,8 +237,8 @@ class GPSFollowState(AbstractState):
                     speed = 0
                     self.__cur_path_point = 0
                     event = 'stop'
-            elif zone['name'] == 'crosswalk':
-                pass
+            elif zone['name'] == 'crosswalk' and world_model.pedestrian_on_crosswalk:
+                event = 'stop'
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'
