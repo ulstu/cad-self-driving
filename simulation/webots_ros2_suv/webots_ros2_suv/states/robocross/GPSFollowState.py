@@ -2,6 +2,7 @@ from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 import math
 import pygame as pg
+import numpy as np
 
 
 def move_screen(x, y):
@@ -165,10 +166,11 @@ class GPSFollowState(AbstractState):
     def MedianVector(self, first, second, k):
         return [first[0] * k + second[0] * (1 - k), first[1] * k + second[1] * (1 - k)]
 
+
     def on_event(self, event, world_model=None):
         world_model.software_state = 'Auto'
         self.runs = self.runs + 1
-
+        self.log("gps follow state")
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -203,7 +205,7 @@ class GPSFollowState(AbstractState):
 
             difference_angle = -self.AngleOfVectors(car_vector, difference)
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
-            self.log(f'angle {difference_angle}')
+            # self.log(f'angle {difference_angle}')
             
         pg.event.get()
         self.sc.fill((0, 0, 0))
@@ -217,7 +219,7 @@ class GPSFollowState(AbstractState):
         event = None
         zones = world_model.get_current_zones()
 
-        self.logi(f'ipm {world_model.ipm_colorized.shape}')
+        # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
         speed = 10 # default speed
 

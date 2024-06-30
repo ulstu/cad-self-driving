@@ -194,30 +194,31 @@ class NodeEgoController(Node):
         # если прилетели данные от переднего лидара
         if 'obstacles' in obstacles_dict:
             obst_list = obstacles_dict['obstacles'];
+            self.__world_model.obstacles = obst_list
         # если прилетели данные от заднего лидара
         if 'obstacles_rear' in obstacles_dict:
             obst_list = obstacles_dict['obstacles_rear'];
-        
         self.__world_model.lidar_bounding_boxes = []
+        
         # Обходим все обнаруженные препятствия
-        for p in obst_list:
-            # p[0] - номер препятствия
-            # p[1] - расстояние до ближайшей точки препятствия
-            # p[2] - высота самой нижней точки препятствия относительно датчика
-            # p[3] - высота самой верхней точки препятствия относительно датчика
-            # p[4], p[5], p[6], p[7] - списки из двух чисел - координаты углов препятствия
-            # p[8] - xmin
-            # p[9] - xmax
-            # p[10] - ymin
-            # p[11] - ymax
-            if 'obstacles' in obstacles_dict:
-                xmin, xmax = -p[10], -p[11]
-                ymin, ymax = -p[2], -p[3]
-                zmin, zmax = p[8], p[9]
-                box_edges = [[xmin, xmax], [ymin, ymax], [zmin, zmax]]
-                self.__world_model.lidar_bounding_boxes.append(box_edges)
-            else:
-                pass #TODO
+        # for p in obst_list:
+        #     # p[0] - номер препятствия
+        #     # p[1] - расстояние до ближайшей точки препятствия
+        #     # p[2] - высота самой нижней точки препятствия относительно датчика
+        #     # p[3] - высота самой верхней точки препятствия относительно датчика
+        #     # p[4], p[5], p[6], p[7] - списки из двух чисел - координаты углов препятствия
+        #     # p[8] - xmin
+        #     # p[9] - xmax
+        #     # p[10] - ymin
+        #     # p[11] - ymax
+        #     if 'obstacles' in obstacles_dict:
+        #         xmin, xmax = -p[10], -p[11]
+        #         ymin, ymax = -p[2], -p[3]
+        #         zmin, zmax = p[8], p[9]
+        #         box_edges = [[xmin, xmax], [ymin, ymax], [zmin, zmax]]
+        #         self.__world_model.lidar_bounding_boxes.append(box_edges)
+        #     else:
+        #         pass #TODO
 
 def main(args=None):
     try:

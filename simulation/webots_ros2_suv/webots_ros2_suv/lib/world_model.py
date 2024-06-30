@@ -38,10 +38,10 @@ class WorldModel(object):
         self.count_roads = None
         self.car_line_id = 1                # Номер полосы, на которой едет машина (правая полоса имеет id 1)
         self.img_front_objects = None       # изображение с камеры с детектированными объектами
-        self.img_front_objects_lines = None # изображение с камеры с детектированными объектами + линии дорожной разметки
-        self.img_front_objects_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
-        self.img_front_objects_lines_signs_markings = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка
-        self.img_front_objects_lines_signs_markings_prj = None  # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка + projection
+        self.img_front_objects_prj = None   # изображение с камеры с детектированными объектами + проекция
+        self.img_front_objects_prj_lines = None # изображение с камеры с детектированными объектами + проекция + линии дорожной разметки
+        self.img_front_objects_prj_lines_signs = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки
+        self.img_front_objects_prj_lines_signs_markings = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка
         self.yolo_detected_objects = None # объекты, обнаруженные на изображении с помощью YOLO
         self.objects = None                 # объекты во фронтальной проекции   
         self.ipm_image = None               # BEV сегментированное изображение 
@@ -64,7 +64,8 @@ class WorldModel(object):
         self.software_state = 'None'        # Программное состояние автомобиля (данное решение)
         self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
         self.__obstacles_lookup_num = 0
-        self.pedestrian_on_crosswalk = False
+        self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
+        self.obstacles = []                 # Данные о препятствиях с лидара
 
     def load_map(self, mapyaml):
         self.global_map = []

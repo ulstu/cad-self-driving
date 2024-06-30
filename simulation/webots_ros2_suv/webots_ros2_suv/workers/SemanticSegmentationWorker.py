@@ -47,9 +47,8 @@ class SemanticSegmentationWorker(AbstractWorker):
             # world_model.seg_image = np.ones(world_model.rgb_image.shape[:2] + (1,), dtype=np.uint8)
             world_model.seg_image = np.ones(world_model.rgb_image.shape[:2], dtype=np.uint8)
             # world_model.test_rcm_image = results[0].plot()
-
+            
             if results[0].masks is not None:
-                print("DETECTED CROSS WALK AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                 for xy in results[0].masks.xy:
                     cv2.drawContours(world_model.seg_image, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
 

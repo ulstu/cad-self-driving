@@ -19,27 +19,27 @@ workers:
   reedsshepp: "ReedsSheppPlanningWorker.py"
   roadmarkingdetection: "RoadMarkingDetectionWorker.py"
 workerstates:
-  start: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "roadsign"]
-  moving: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  lanefollow: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  gpsfollow: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "lightswitch", "roadsign", "behavioranalysis", "pathplanning"]
-  stopped: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "roadsign"]
-  paused: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "roadsign"]
-  turn: ["semanticsegmentation", "ipm", "roadmarkingdetection", "lanelinedetection", "reedsshepp"]
+  start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
+  moving: ["semanticsegmentation", "ipm", "pathplanning"] # ,"lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
+  paused: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
+  turn: ["semanticsegmentation", "ipm", "lanelinedetection", "roadmarkingdetection", "reedsshepp"]
   emergency: []
 transitions:
   start:
-    start_move: ["gpsfollow"] # "moving"
+    start_move: ["moving"] # "moving"
     stop: ["stopped"]
   gpsfollow:
     # start_move: ["moving"]
-    start_gps_follow: ["gpsfollow"] 
+    # start_gps_follow: ["gpsfollow"] 
     # start_lane_follow: ["lanefollow"]
     pause: ["paused"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   moving:
-    start_gps_follow: ["gpsfollow"]
+    # start_gps_follow: ["gpsfollow"]
     start_lane_follow: ["lanefollow"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
