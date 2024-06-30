@@ -13,9 +13,25 @@ from webots_ros2_suv.lib.lane_line_model import LaneLineModel
 from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask, default_palette
 from webots_ros2_suv.lib.map_builder import MapBuilder
 from webots_ros2_suv.lib.LinesAnalizator import LinesAnalizator
+from webots_ros2_suv.workers.IPMWorker import intersection_area
 import cv2
 import yaml
 from ultralytics import YOLO
+
+def intersect_person_with_crosswalk(world_model):
+    crosswalk_boxes = []
+    for points, label in world_model.detected_road_markings:
+        if label == "crosswalk":
+            p1 = np.array([np.min(points[:, 0]), np.min(points[:, 1])])
+            p2 = np.array([np.max(points[:, 0]), np.max(points[:, 1])])
+            crosswalk_boxes.append(np.array([p1, p2]))
+    
+    for yolo_box, label in world_model.yolo_detected_objects:
+        if label == "person":
+            for crosswalk_box in crosswalk_boxes:
+                if intersection_area(yolo_box, crosswalk_box) > 0.5:
+                    return True
+    return False
 
 PACKAGE_NAME = "webots_ros2_suv"
 local_model_path = "resource/RMm/model.pt"
@@ -57,13 +73,13 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                     #     for xy in mask.xy:
                     #         cv2.drawContours(world_model.img_front_objects_lines_signs, [np.expand_dims(xy, 1).astype(int)], contourIdx=-1, color=0, thickness=-1)
 
-                    masks = None
+                    masks_points = None
                     if results[0].masks is not None:
-                        masks = results[0].masks
+                        masks_points = np.array([np.array(xy) for xy in results[0].masks.xy])
                     
                     labels = [self.model.names[int(label)] for label in results[0].boxes.cls]
 
-                    world_model.detected_road_markings = list(zip(masks, labels))
+                    world_model.detected_road_markings = list(zip(masks_points, labels))
 
                     background_alpha = 0.7
                     if results[0].masks is not None:
@@ -86,6 +102,15 @@ class RoadMarkingDetectionWorker(AbstractWorker):
                             cv2.drawContours(world_model.img_front_objects_lines_signs_markings, [np.expand_dims(xy, 1).astype(int)], 
                                              contourIdx=-1, 
                                              color=(255, 210, 74), thickness=-1)
+                    
+                zones = world_model.get_current_zones()
+                pedestrian_on_crosswalk = False
+                for zone in zones:
+                    if zone['name'] == 'crosswalk':
+                        if intersect_person_with_crosswalk(world_model):
+                            pedestrian_on_crosswalk = True
+                            break
+                world_model.pedestrian_on_crosswalk = pedestrian_on_crosswalk
 
         except  Exception as err:
             super().error(''.join(traceback.TracebackException.from_exception(err).format()))
