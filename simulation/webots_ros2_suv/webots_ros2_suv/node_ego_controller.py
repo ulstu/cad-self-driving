@@ -47,6 +47,7 @@ class NodeEgoController(Node):
         try:
             super().__init__('node_ego_controller')
             self._logger.info(f'Node Ego Started')
+            self._logger.info(os.environ.get("CONFIG_DIRECTORY"))
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__ws = None

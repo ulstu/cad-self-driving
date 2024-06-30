@@ -69,8 +69,7 @@ class NodeBEVBuilder1(Node):
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
-            with open(f"{PACKAGE_NAME}/config/lidardata.yaml", "r") as file:
-                self.lidardata = yaml.safe_load(file)
+            self.lidardata = ConfigLoader("lidardata").data
             self.MAP_SCALE = self.lidardata['visual_scale']
             self.rear_figures = []
             self.front_figures = []

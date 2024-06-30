@@ -32,8 +32,10 @@ class PointCloudMapper : public rclcpp::Node
     //Конструктор, инициализация
     PointCloudMapper(): Node("pcl_map_node"), count_(0)
     {
+      this->declare_parameter("config_dir", rclcpp::PARAMETER_STRING);
+      rclcpp::Parameter config_dir = this->get_parameter("config_dir"); 
       //Загрузка констант из YAML
-      YAML::Node config = YAML::LoadFile("src/webots_ros2_suv/config/lidardata.yaml");
+      YAML::Node config = YAML::LoadFile(config_dir.as_string() + "/lidardata.yaml");
       front_lidar_x = config["front_lidar_x"].as<double>();
       front_lidar_y = config["front_lidar_y"].as<double>();
       front_lidar_z = config["front_lidar_z"].as<double>();

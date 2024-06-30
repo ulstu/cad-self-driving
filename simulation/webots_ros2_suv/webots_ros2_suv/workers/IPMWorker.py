@@ -36,7 +36,7 @@ class IPMWorker(AbstractWorker):
         super().__init__( *args, **kwargs)
         package_dir = get_package_share_directory(PACKAGE_NAME)
 
-        self.lidardata_path = os.path.join(package_dir, "config/lidardata.yaml")
+        # self.lidardata_path = os.path.join(package_dir, "config/lidardata.yaml")
         # with open(self.lidardata_path, "r") as file:
         #     lidardata_config = yaml.safe_load(file)
     
@@ -104,10 +104,10 @@ class IPMWorker(AbstractWorker):
 
             # cv2.rectangle(world_model.img_front_objects_lines_signs_markings_prj, (0, 0), (100, 100), (255, 0, 0), thickness=-1)
 
-            with open(self.lidardata_path, "r") as file:
-                lidardata_config = yaml.safe_load(file)
+            # with open(self.lidardata_path, "r") as file:
+            #     lidardata_config = yaml.safe_load(file)
     
-            self.zed_pos = np.array([lidardata_config["zed_x"], -lidardata_config["zed_y"], lidardata_config["zed_z"]])
+            # self.zed_pos = np.array([lidardata_config["zed_x"], -lidardata_config["zed_y"], lidardata_config["zed_z"]])
             world_model.lidar_yolo_boxes = []
 
             # for box in world_model.lidar_bounding_boxes:

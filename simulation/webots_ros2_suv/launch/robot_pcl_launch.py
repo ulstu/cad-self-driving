@@ -17,6 +17,7 @@ from nav2_common.launch import RewrittenYaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
+CONFIG_DIRECTORY = "simulator"
 
 local_project_settings_config_path = "config/project_settings.yaml"
 package_dir = get_package_share_directory(PACKAGE_NAME)
@@ -51,13 +52,13 @@ def get_ros2_nodes(*args):
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
-
+    package = get_package_share_directory("webots_ros2_suv")
     pcl_map_node = Node(
         package="pcl_maps",
         executable='pcl_map_node',
         name='pcl_map_node',
         output='screen' ,
-        parameters=[{'use_sim_time': USE_SIM_TIME}]
+        parameters=[{'use_sim_time': USE_SIM_TIME, "config_dir": os.path.join(package, "config", CONFIG_DIRECTORY)}]
     )
 
     node_globalmap = Node(
@@ -168,6 +169,10 @@ def generate_launch_description():
         ],
         respawn=True
     )
+    # package = get_package_share_directory("webots_ros2_suv")
+    # with open(f'{package}/config/main.yaml', 'w') as file:
+    #     yaml.dump({"current": CONFIG_DIRECTORY}, file, default_flow_style=False)
+    os.environ['CONFIG_DIRECTORY'] = CONFIG_DIRECTORY
     return LaunchDescription([
         DeclareLaunchArgument(
             'world',
