@@ -64,6 +64,7 @@ class WorldModel(object):
         self.is_pause = False               # Находится ли автомобиль в состоянии паузы
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
+        self.obstacles = []                 # Данные о препятствиях с лидара
 
     def load_map(self, mapyaml):
         self.global_map = []
