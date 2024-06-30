@@ -12,8 +12,9 @@ bev_orientation: 0.0
 # scale_y: 6
 # bev_orientation: -0.35
 
-change_point_dist: 2
-bev_obstacle_ratio: 0.5
+
+change_point_dist: 0.3
+bev_obstacle_ratio: 1
 
 kalman_path_planning_noise_scale: 0.05
 robot_radius: 10

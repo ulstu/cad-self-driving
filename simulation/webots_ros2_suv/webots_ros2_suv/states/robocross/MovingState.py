@@ -45,6 +45,7 @@ class MovingState(AbstractState):
     def move_screen(self, x, y):
         return [int(400 + x * 15), int(400 + y * 15)]
 
+
     def gps_to_rect(self, dLon, dLat):
         # Номер зоны Гаусса-Крюгера
         zone = int(dLon / 6.0 + 1)
@@ -112,7 +113,6 @@ class MovingState(AbstractState):
         # if world_model.traffic_light_state == "red":
         #     return "stop"
         #world_model.goal_point = (self.find_goal_point_x(world_model.ipm_image[10,:]), 10)
-        
         # self.log(f'CUR POS: {lat} {lon} {world_model.goal_point}')
 
         lat, lon, orientation = world_model.get_current_position() # Текущее месторасположение автомобиля

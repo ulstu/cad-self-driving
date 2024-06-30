@@ -1,10 +1,10 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 import math
-import numpy as np
 import time
 
 import pygame as pg
+import numpy as np
 
 
 def move_screen(x, y):
@@ -168,9 +168,11 @@ class GPSFollowState(AbstractState):
     def MedianVector(self, first, second, k):
         return [first[0] * k + second[0] * (1 - k), first[1] * k + second[1] * (1 - k)]
 
-    def on_event(self, event, world_model=None):
-        self.runs = self.runs + 1
 
+    def on_event(self, event, world_model=None):
+        world_model.software_state = 'Auto'
+        self.runs = self.runs + 1
+        self.log("gps follow state")
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -213,7 +215,6 @@ class GPSFollowState(AbstractState):
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
         else:
             world_model.gps_car_turn_angle = 0.0
-
         pg.event.get()
         self.sc.fill((0, 0, 0))
 
@@ -228,24 +229,40 @@ class GPSFollowState(AbstractState):
 
         event = None
         zones = world_model.get_current_zones()
-        
-        # default speed
-        speed = self.config['default_speed']
-        for z in zones:
-            if z['name'] == 'turn':
-                world_model.cur_turn_polygon = z['coordinates'][0]
-                self.__cur_path_point = 0
-                event = "turn"
-            elif z['name'] == 'stop':
-                self.__cur_path_point = 0
-                event = "stop"
-            elif z['name'].startswith("speed"):
-                speed = float(z['name'].split('speed')[1])
-        # if not world_model.is_obstacle_before_path_point(filter_num=10, log=self.log):
-        #     event = "start_gps_follow"
-        # if world_model.is_lane_road():
-        #     event = "start_lane_follow"
 
+        # self.logi(f'ipm {world_model.ipm_colorized.shape}')
+
+        speed = self.config['default_speed']
+
+        for zone in zones:
+            if zone['name'] == 'turn':
+                world_model.cur_turn_polygon = zone['coordinates'][0]
+                self.__cur_path_point = 0
+                event = 'turn'
+            elif zone['name'] == 'terminal':
+                speed = 0
+                # self.__cur_path_point = 0
+                event = 'pause'
+            elif zone['name'] == 'traffic_light':
+                if world_model.traffic_light_state == 'red':
+                    speed = 0
+                    # self.__cur_path_point = 0
+                    event = 'stop'
+            elif zone['name'] == 'crosswalk':
+                if world_model.pedestrian_on_crosswalk:
+                    speed = 0
+                    # self.__cur_path_point = 0
+                    event = 'stop'
+            elif zone['name'] == 'stop':
+                self.__cur_path_point = 0
+                event = 'stop'
+            elif zone['name'].startswith('speed'):
+                speed = float(zone['name'].split('speed')[1])
+
+        # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
+        #     event = 'start_move'
+        # if world_model.is_lane_road():
+        #     event = 'start_lane_follow'
         if event:
             world_model.path = None
         world_model.set_speed(speed)

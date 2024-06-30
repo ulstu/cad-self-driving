@@ -1,0 +1,3436 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/mercedes_benz/MercedesBenzSprinterSimple.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/StraightRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Asphalt.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/PedestrianCrossing.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Sand.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/RoughConcrete.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/FormedConcrete.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/CurvedRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/AddLaneRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/devices/velodyne/protos/VelodyneHDL-64E.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/mercedes_benz/MercedesBenzSprinter.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/Pole.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/GenericTrafficLight.proto"
+
+WorldInfo {
+  ERP 0.6
+  basicTimeStep 10
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.1793579325546987 -0.3177308228654892 0.9310627563332793 5.674453955275469
+  position -72.33711233325026 83.84157821400403 7.692863721489312
+  follow "vehicle"
+}
+TexturedBackground {
+  texture "noon_sunny_empty"
+  skybox FALSE
+  skyColor [
+    1 1 1
+  ]
+}
+TexturedBackgroundLight {
+}
+Solid {
+  translation -32.5 31.425 0
+  children [
+    Shape {
+      appearance FormedConcrete {
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -25 -43.425 0
+            25 -43.425 0
+            -25 43.425 0
+            25 43.425 0
+          ]
+        }
+        texCoord TextureCoordinate {
+          point [
+            0 0
+            100 0
+            0 173.7
+            100 173.7
+          ]
+        }
+        coordIndex [
+          2, 0, 1, 3, -1
+        ]
+        texCoordIndex [
+          2, 0, 1, 3, -1
+        ]
+      }
+    }
+  ]
+  name "Snowcase Surface"
+  model "floor"
+  boundingObject Plane {
+    size 50 86.85
+  }
+  locked TRUE
+}
+Pose {
+  translation -24.075 18.75 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 34.5 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -21.376 -6.075 0.5
+  rotation 0 0 1 -3.1415853071795863
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 27.75 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -21.376 -7.425 0.5
+  rotation 0 0 1 -3.1415853071795863
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 27.75 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -15.075 18.75 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 34.5 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -16.425 18.75 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 34.5 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -39.075 19.425 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 62.85 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -31.425 26.251 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 49.5 0.151 1
+      }
+    }
+  ]
+}
+MercedesBenzSprinterSimple {
+  translation -29.55 37.87 0.4
+  rotation 0 0 1 -5.307179586466759e-06
+  color 1 1 1
+  name "Sollers Atlant 4"
+}
+MercedesBenzSprinterSimple {
+  translation -46.34 -8.02 0.4
+  rotation 0 0 1 3.14159
+  color 1 1 1
+  name "Sollers Atlant 1"
+}
+MercedesBenzSprinterSimple {
+  translation -46.24 19 0.4
+  rotation 0 0 1 3.14159
+  color 1 1 1
+  name "Sollers Atlant 2"
+}
+Transform {
+  scale 0.15 0.15 0.15
+  children [
+    CadShape {
+      url [
+        "../objects/snowcase_road_markings/snowcase_road_markings.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Pose {
+  translation -27.8 18.83 1.5
+  children [
+    Shape {
+      geometry Box {
+        size 5 5 3
+      }
+    }
+  ]
+}
+Pose {
+  translation -836.136 -57.2721 1
+  rotation 0 0 1 0.295
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 1 0.639216 0.282353
+        }
+      }
+      geometry Box {
+        size 5 2 2
+      }
+    }
+  ]
+}
+StraightRoadSegment {
+  translation -51.925 74.85 0
+  rotation 0 0 1 1.5708
+  name "Road 1"
+  width 11.15
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 100
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -410.262 142.96 0
+  rotation 0 0 1 1.8575
+  name "Road 23"
+  width 14.995
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -569.509 115.157 0
+  rotation 0 0 -1 -1.6
+  name "Road 28"
+  width 14.995
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -737.96 83.135 0
+  rotation 0 0 1 1.84
+  name "Road 36"
+  width 14.725
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -661.902 -9.32886 0
+  rotation 0 0 1 1.8645
+  name "Road 85"
+  width 14.55
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -770.111 85.759 0
+  rotation 0 0 1 1.854
+  name "Road 41"
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -842.227 -68.2004 0
+  rotation 0 0 1 1.8645
+  name "Road 75"
+  width 6.985
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -751.303 -40.6285 0
+  rotation 0 0 1 1.8645
+  name "Road 80"
+  width 6.985
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -641.65 -7.19109 0
+  rotation 0 0 1 1.8645
+  name "Road 89"
+  width 6.985
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -598.559 5.841 0
+  rotation 0 0 1 1.8645
+  name "Road 94"
+  width 6.995
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation 74.6329 285.414 0
+  rotation 0 0 1 1.82
+  name "Road 99"
+  width 7.03
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+StraightRoadSegment {
+  translation -813.131 69.1762 0
+  rotation 0 0 -1 -1.076405307179586
+  name "Road 46"
+  width 7.75
+  numberOfLanes 1
+  lines []
+  length 25
+  appearance Asphalt {
+    colorOverride 1 0.470588 0
+    IBLStrength 25
+  }
+}
+PedestrianCrossing {
+  translation -51.92 76.74 -0.19
+  name "Pedestrian Crossing"
+  scale 1 0.5 0.5
+}
+Pedestrian {
+  translation -53.59 76.65 1.27
+  name "Pedestrian"
+}
+StraightRoadSegment {
+  translation -57.5 162.34 0.01
+  name "Pothole"
+  width 5
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 11.15
+  appearance Sand {
+  }
+}
+MercedesBenzSprinterSimple {
+  translation -46.44 46.84 0.4
+  rotation 0 0 1 3.14159
+  color 1 1 1
+  name "Sollers Atlant 3"
+}
+Pose {
+  translation -47.25 50.925 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 16.501 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -27 36.076 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 6 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -15.75 35.925 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 1.2 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -35.175 -6.75 0.5
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 1.2005 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -7.575 -6.75 0.5
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 1.2005 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -15.75 1.575 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 1.2 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -27.75 1.576 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 7.2 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -27.75 50.926 0.5
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 7.2 0.151 1
+      }
+    }
+  ]
+}
+Pose {
+  translation -24.075 47.25 0.5
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Box {
+        size 7.5 0.151 1
+      }
+    }
+  ]
+}
+CurvedRoadSegment {
+  translation -41.925 174.85 0
+  rotation 0 0 1 1.5708
+  name "Road 2"
+  width 11.15
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -400.68 145.807 0
+  rotation 0 0 1 -2.855
+  name "Road 20"
+  width 15
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -728.723 85.854 0
+  rotation 0 0 1 -2.8499996938995746
+  name "Road 34"
+  width 15.45
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -678.408 11.795 0
+  rotation 0 0 1 0.2915929999999996
+  name "Road 84"
+  width 15.1815
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -760.53 88.6005 0
+  rotation 0 0 -1 2.855
+  name "Road 39"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -839.876 -41.463 0
+  rotation 0 0 1 1.85739
+  name "Road 76"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -748.947 -13.9147 0
+  rotation 0 0 1 1.85739
+  name "Road 81"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -639.302 19.577 0
+  rotation 0 0 1 1.85739
+  name "Road 90"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -596.211 32.6108 0
+  rotation 0 0 1 1.85739
+  name "Road 95"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 84.3117 287.973 0
+  rotation 0 0 1 -2.89
+  name "Road 98"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -559.518 115.49 0
+  rotation 0 0 1 -3.11
+  name "Road 26"
+  width 15
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -419.853 140.138 0
+  rotation 0 0 -1 1.2842
+  name "Road 21"
+  width 15
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -747.698 80.5105 0
+  rotation 0 0 -1 1.28
+  name "Road 35"
+  width 14.55
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -659.553 17.4412 0
+  rotation 0 0 1 1.86159
+  name "Road 86"
+  width 14.55
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -779.709 82.9525 0
+  rotation 0 0 -1 1.2842
+  name "Road 40"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -859.026 -47.1741 0
+  rotation 0 0 1 0.295
+  name "Road 74"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -768.084 -19.651 0
+  rotation 0 0 1 0.295
+  name "Road 79"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -658.454 13.8298 0
+  rotation 0 0 1 0.295
+  name "Road 88"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -615.358 26.8519 0
+  rotation 0 0 1 0.295
+  name "Road 93"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 64.9128 283.019 4.852e-08
+  rotation 9.58979e-09 1.29367e-08 -1 1.32
+  name "Road 100"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -822.574 69.9352 0
+  rotation 0 0 -1 1.2795
+  name "Road 45"
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -579.503 114.863 0
+  rotation 0 0 1 -1.54
+  name "Road 27"
+  width 15
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -41.93 184.85 0
+  name "Road 3"
+  width 11.15
+  length 25.085
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -301.95 164.469 0
+  rotation 0 0 1 0.2865
+  name "Road 17"
+  width 15
+  rightBorder FALSE
+  length 25.085
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -132.23 164.81 0
+  rotation 0 0 1 0.2800000000000008
+  name "Road 72"
+  width 7.5
+  numberOfLanes 1
+  leftBorder FALSE
+  length 55.84
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -78.0629 180.347 0
+  rotation 0 0 1 0.14
+  name "Road 74"
+  width 7.5
+  numberOfLanes 1
+  leftBorder FALSE
+  length 20.67
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -397.86 136.213 0
+  rotation 0 0 1 0.2865
+  name "Road 19"
+  width 15
+  length 100
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -725.852 76.328 0
+  rotation 0 0 1 0.295
+  name "Road 31"
+  width 15.349
+  rightBorder FALSE
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -742.429 71.2913 0
+  rotation 0 0 1 0.295
+  name "Road 37"
+  width 15.349
+  leftBorder FALSE
+  length 17.33
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -817.34 52.617 0
+  rotation 0 0 1 0.295
+  name "Road 44"
+  width 23.173
+  numberOfLanes 3
+  leftBorder FALSE
+  length 12.42
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -918.633 17.9225 0
+  rotation 0 0 1 0.295
+  name "Road 49"
+  width 15.5
+  leftBorder FALSE
+  length 7.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -980.373 -0.83825 0
+  rotation 0 0 1 0.295
+  name "Road 50"
+  width 15.5
+  length 64.53
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -1076.02 -29.8687 0
+  rotation 0 0 1 0.295
+  name "Road 54"
+  width 15.5
+  rightBorder FALSE
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+  locked FALSE
+}
+StraightRoadSegment {
+  translation -1005.39 -4.4305 0
+  rotation 0 0 1 0.295
+  name "Road 52"
+  width 23.173
+  numberOfLanes 3
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -969.723 -70.0715 0
+  rotation 0 0 1 0.295
+  name "Road 62"
+  width 22.5
+  numberOfLanes 3
+  rightBorder FALSE
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -774.518 65.5385 0
+  rotation 0 0 1 0.295
+  name "Road 42"
+  width 23
+  numberOfLanes 3
+  leftBorder FALSE
+  length 20
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -755.387 71.3517 0
+  rotation 0 0 1 0.295
+  name "Road 38"
+  width 23
+  numberOfLanes 3
+  length 12.4
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -805.46 56.227 0
+  rotation 0 0 1 0.295
+  name "Road 43"
+  width 23.173
+  numberOfLanes 3
+  length 32.36
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -417.045 130.561 0
+  rotation 0 0 1 0.2865
+  name "Road 22"
+  width 15
+  leftBorder FALSE
+  length 20
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -579.32 104.51 0
+  rotation 0 0 -1 -0.05
+  name "Road 29"
+  width 15
+  leftBorder FALSE
+  length 20
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -436.21 124.905 0
+  rotation 0 0 1 0.2865
+  name "Road 24"
+  width 14.98
+  length 20
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -299.82 157.27 0
+  rotation 0 0 1 0.2865
+  name "Road 16"
+  width 15
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25.08
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation 102.25 270.389 0
+  rotation 0 0 1 0.25
+  name "Road 8"
+  width 15
+  leftBorder FALSE
+  length 25.085
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -1033.09 -85.3416 0
+  rotation 0 0 0.9999999999999999 0.2925
+  name "Road 57"
+  width 15
+  rightBorder FALSE
+  length 25.085
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -1009.08 -78.1115 0
+  rotation 0 0 0.9999999999999999 0.295
+  name "Road 60"
+  width 15
+  rightBorder FALSE
+  length 40
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -922.99 -51.974 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 65"
+  width 15
+  leftBorder FALSE
+  length 12.6
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -910.936 -48.3157 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 66"
+  width 15
+  length 50
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -863.103 -33.7816 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 77"
+  width 15
+  rightBorder FALSE
+  length 20.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -772.184 -6.1544 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 82"
+  width 15
+  rightBorder FALSE
+  length 20.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -681.27 21.4715 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 87"
+  width 15
+  rightBorder FALSE
+  length 20.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -662.045 27.3129 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 91"
+  width 15
+  rightBorder FALSE
+  length 20.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -619.443 40.258 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 96"
+  width 15
+  rightBorder FALSE
+  length 20.1
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -843.92 -28.008 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 78"
+  width 15.106
+  length 75
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -752.996 -0.4185 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 83"
+  width 15.1815
+  length 75
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -643.349 32.986 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 92"
+  width 15.015
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -600.277 46.0438 0
+  rotation 0 0 1 0.2949999999999999
+  name "Road 97"
+  width 15.073
+  endingRoadBorderWidth 0.726
+  length 175.32
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -1030.86 -92.5585 0
+  rotation 0 0 0.9999999999999999 0.2925
+  name "Road 58"
+  width 15
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25.085
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation 58.71 266.987 0
+  rotation 0 0 1 0.25
+  name "Road 10"
+  width 15
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation 87.7725 274.408 0
+  rotation 0 0 1 0.25
+  name "Road 11"
+  width 15
+  rightBorder FALSE
+  length 50
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation 68.3931 269.46 0
+  rotation 0 0 1 0.25
+  name "Road 101"
+  width 15
+  leftBorder FALSE
+  length 33
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -296.79 146.923 0
+  rotation 0 0 1 0.254
+  name "Road 15"
+  width 10
+  numberOfLanes 1
+  lines []
+  rightBorder FALSE
+  leftBorder FALSE
+  length 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+StraightRoadSegment {
+  translation -723.51 68.4205 0
+  rotation 0 0 1 0.254
+  name "Road 33"
+  width 15
+  leftBorder FALSE
+  length 25.04
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -17 434.85 -3.49204e-06
+  rotation -3.131254999999993e-08 -4.7948899999999903e-08 -0.9999999999999984 2.891
+  name "Road 4"
+  width 11.15
+  curvatureRadius 250
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -41.77 -65.15 4.88002e-05
+  rotation 3.80679e-07 -2.486e-07 -1 -0.25059530717958634
+  name "Road 73"
+  width 11.15
+  rightBorder FALSE
+  curvatureRadius 250
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation 44.99 192.66 0
+  rotation 0 0 -1 -0.25
+  name "Road 5"
+  width 11.15
+  length 100
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation -181.97 199.825 0
+  rotation 0 0 -1 2.855
+  name "Road 13"
+  width 15
+  length 100
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation -817.325 52.6215 0
+  rotation 0 0 -1 2.8475
+  name "Road 47"
+  width 23.173
+  length 100
+  numberOfLanes 3
+  newLaneLeft FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation -103.746 176.994 0
+  rotation 0 0 -1 2.89
+  name "Road 71"
+  width 11.25
+  length 46.9606
+  newLaneLeft FALSE
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation -945.818 -62.808 0
+  rotation 0 0 1 0.294093
+  name "Road 63"
+  width 22.5
+  length 25
+  numberOfLanes 3
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+AddLaneRoadSegment {
+  translation -1005.37 -4.424 0
+  rotation 0 0 -1 2.8475
+  name "Road 53"
+  width 23.173
+  length 50
+  numberOfLanes 3
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 133.75 248.76 0
+  rotation 0 0 1 -1.3165
+  name "Road 6"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -1041.38 -57.7047 0
+  rotation 0 0 1 1.8675
+  name "Road 55"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -986.78 20.2184 0
+  rotation 0 0 -1 1.275
+  name "Road 51"
+  width 6.825
+  numberOfLanes 1
+  lines []
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -964.519 -87.1324 0
+  rotation 0 0 1 1.86659
+  name "Road 61"
+  width 6.825
+  numberOfLanes 1
+  lines []
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 133.751 248.76 0
+  rotation 0 0 1 0.254296
+  name "Road 7"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -1041.35 -57.804 0
+  rotation 0 0 1 -2.85
+  name "Road 56"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -265.991 127.801 0
+  rotation 0 0 1 0.254296
+  name "Road 14"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -692.045 46.886 0
+  rotation 0 0 1 0.254296
+  name "Road 32"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -998.679 -112.893 0
+  rotation 0 0 1 0.28925
+  name "Road 59"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 127.92 169.865 0
+  rotation 0 0 1 0.75
+  name "Road 9"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  curvatureRadius 100
+  totalAngle 0.5
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -269.17 58.15 0
+  rotation 0 0 1 0.8
+  name "Road 18"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  leftBorder FALSE
+  curvatureRadius 100
+  totalAngle 0.5
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -955.58 54.387 0
+  rotation 0 0 1 -2.344
+  name "Road 64"
+  width 7.5
+  numberOfLanes 1
+  lines []
+  curvatureRadius 100
+  totalAngle 0.5
+  appearance Asphalt {
+    IBLStrength 10
+  }
+  locked FALSE
+}
+CurvedRoadSegment {
+  translation -942.561 131.445 0
+  rotation 0 0 1 -2.8751
+  name "Road 48"
+  width 15
+  numberOfLanes 1
+  lines []
+  curvatureRadius 100
+  totalAngle 0.5
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation 2625.75 -9397.92 0
+  rotation 0 0 -1 -0.2846
+  name "Road 12"
+  width 15
+  curvatureRadius 10000
+  totalAngle 0.025
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -575 605.256 0
+  rotation 0 0 1 -2.86
+  name "Road 25"
+  width 14.98
+  curvatureRadius 500
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -325.5 617.2 0
+  rotation 0 0 1 -2.86
+  name "Road 68"
+  width 15
+  curvatureRadius 500
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -556.525 -394.793 0
+  rotation 0 0 -1 -0.2951
+  name "Road 30"
+  width 15.349
+  curvatureRadius 500
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -289.85 -382.155 0
+  rotation 0 0 -1 -0.2895
+  name "Road 67"
+  width 15
+  curvatureRadius 500
+  totalAngle 0.25
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+MercedesBenzSprinter {
+  translation -52.1873 61.9602 0.48158
+  rotation 0.001671940374080169 -0.001660460371511632 -0.9999972237395163 -1.602705307179586
+  color 0.501961 0 0
+  name "vehicle"
+  controller "<extern>"
+  supervisor TRUE
+  sensorsSlotFront [
+    RangeFinder {
+      translation -0.67 0.09 0.98
+      name "range_finder"
+      fieldOfView 1
+      width 840
+      height 480
+      minRange 0.5
+      maxRange 40
+    }
+    VelodyneHDL-64E {
+      translation -0.67 0.09 0.78
+    }
+    Camera {
+      translation -0.675 -0.13 0.66
+      children [
+        Pose {
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 840
+      height 480
+    }
+  ]
+  sensorsSlotTop [
+    Compass {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    GPS {
+    }
+  ]
+  sensorsSlotCenter [
+    Accelerometer {
+    }
+    Radar {
+    }
+    Gyro {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+}
+CurvedRoadSegment {
+  translation -214.7 232.852 0
+  rotation 0 0 -1 2.357
+  name "Road 69"
+  width 15
+  curvatureRadius 100
+  totalAngle 0.5
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+CurvedRoadSegment {
+  translation -126.4 144.376 0
+  rotation 0 0 1 0.785393
+  name "Road 70"
+  width 15
+  leftBorder FALSE
+  curvatureRadius 25
+  totalAngle 0.51
+  appearance Asphalt {
+    IBLStrength 10
+  }
+}
+Pose {
+  translation -56.128 76.6406 0.01
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          ambientIntensity 0.5
+          diffuseColor 1 1 1
+          emissiveColor 1 1 1
+          shininess 0
+          specularColor 1 1 1
+        }
+      }
+      geometry Box {
+        size 0.5525 3.58 0.001
+      }
+      castShadows FALSE
+    }
+  ]
+}
+Pose {
+  translation -54.049 76.64 0.01
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          ambientIntensity 0.5
+          diffuseColor 1 1 1
+          emissiveColor 1 1 1
+          shininess 0
+          specularColor 1 1 1
+        }
+      }
+      geometry Box {
+        size 0.53 3.58 0.001
+      }
+      castShadows FALSE
+    }
+  ]
+}
+Pose {
+  translation -51.97 76.6406 0.01
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          ambientIntensity 0.5
+          diffuseColor 1 1 1
+          emissiveColor 1 1 1
+          shininess 0
+          specularColor 1 1 1
+        }
+      }
+      geometry Box {
+        size 0.55 3.58 0.001
+      }
+      castShadows FALSE
+    }
+  ]
+}
+Pose {
+  translation -49.86 76.6406 0.01
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          ambientIntensity 0.5
+          diffuseColor 1 1 1
+          emissiveColor 1 1 1
+          shininess 0
+          specularColor 1 1 1
+        }
+      }
+      geometry Box {
+        size 0.55 3.58 0.001
+      }
+      castShadows FALSE
+    }
+  ]
+}
+Pose {
+  translation -47.702 76.6467 0.01
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          ambientIntensity 0.5
+          diffuseColor 1 1 1
+          emissiveColor 1 1 1
+          shininess 0
+          specularColor 1 1 1
+        }
+      }
+      geometry Box {
+        size 0.53 3.5925 0.001
+      }
+      castShadows FALSE
+    }
+  ]
+}
+Floor {
+  translation -455.54 102.358 -0.01
+  rotation 0 0 1 0.25
+  name "Grass Surface"
+  size 1273.5 275
+  appearance Grass {
+  }
+}
+Pose {
+  translation 44.45 199.55 3.74
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation 121.3 223.77 3.74
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation 60.93 258.82 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -297.55 149.06 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -270.627 157.228 3.74
+  rotation 0 0 -1 -2.3561953071795863
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -0.25
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/2.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/3.18.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -152.369 176.539 3.74
+  rotation 0 0 -1 0.261797
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -0.25
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/2.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/4.1.3.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -105.397 183.62 3.74
+  rotation 0 0 1 2.38716e-06
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.6.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -78.957 188.93 3.74
+  rotation 0 0 1 2.38716e-06
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -179.59 191.69 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation 87.85 265.71 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.6.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -313.19 152.31 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.6.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -723.64 67.88 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.6.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -863.78 25.31 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -930.18 23.61 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/2.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -1001.69 -16.6499 3.74
+  rotation 0 0 1 3.14159
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -1047.29 -38.4918 3.74
+  rotation 0 0 1 -2.8797953071795863
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -1026.6 -74.2691 3.74
+  rotation 0 0 -1 2.05009e-06
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -989.67 -63.0191 3.74
+  rotation 0 0 -1 2.05009e-06
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/5.15.4.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pose {
+  translation -949.49 -50.6491 3.74
+  rotation 0 0 -1 2.05009e-06
+  children [
+    Group {
+      children [
+        Pose {
+          translation -0.107071 -0.0122474 -1
+          rotation 0 0 1 0.261799
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "../Road Signs/6.3.1.png"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.01 0.75 0.75
+              }
+            }
+          ]
+        }
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.752941 0.74902 0.737255
+            }
+          }
+          geometry Cylinder {
+            height 7.5
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation 143.52 211.65 -0.02
+  name "Pole 1"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/6.8.1.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation 134.45 294.49 -0.02
+  rotation 0 0 1 3.14159
+  name "Pole 3"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -264.16 184.41 -0.02
+  rotation 0 0 1 3.14159
+  name "Pole 5"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -698.42 93.91 -0.02
+  rotation 0 0 1 3.14159
+  name "Pole 8"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -813.931 78.4418 -0.02
+  rotation 0 0 -1 2.3562
+  name "Pole 9"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -829.258 63.2436 -0.02
+  rotation 0 0 -1 -3.1415853071795863
+  name "Pole 10"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/5.15.3.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -1007.68 8.4536 -0.02
+  rotation 0 0 -1 -3.1415853071795863
+  name "Pole 12"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/5.15.5.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -985.24 15.1335 -0.02
+  rotation 0 0 -1 -3.1415853071795863
+  name "Pole 11"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/5.15.5.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation 162.727 241.488 -0.02
+  rotation 0 0 -1 -0.261795307179586
+  name "Pole 2"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.1.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation 70.247 284.323 -0.02
+  rotation 0 0 1 -1.5708053071795867
+  name "Pole 4"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -399.553 144.963 -0.02
+  rotation 0 0 1 3.14158
+  name "Pole 6"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.1.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/4.1.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -1054.35 -84.7381 -0.02
+  rotation 0 0 -1 1.30901
+  name "Pole 13"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/4.1.3.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -1019.5 -97.3221 -0.02
+  rotation 0 0 -1 1.3065e-05
+  name "Pole 15"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.1.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -1030.91 -92.5921 -0.02
+  rotation 0 0 -1 1.3065e-05
+  name "Pole 14"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/5.15.3.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -944.95 -74.7221 -0.02
+  rotation 0 0 -1 1.3065e-05
+  name "Pole 16"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/5.15.5.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -420.763 146.943 -0.02
+  rotation 0 0 1 -1.5708053071795867
+  name "Pole 7"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -754.703 -15.9243 -0.02
+  rotation -9.58979e-09 9.58985e-09 -1 -1.5707853071795865
+  name "Pole 17"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -658.393 4.88514 -0.0199996
+  rotation -9.58979e-09 9.58985e-09 -1 -1.5707853071795865
+  name "Pole 18"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -642.683 8.965 -0.0199996
+  rotation -9.58979e-09 9.58985e-09 -1 -1.5707853071795865
+  name "Pole 19"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -598.593 21.7146 -0.0199996
+  rotation -9.58979e-09 9.58985e-09 -1 -1.5707853071795865
+  name "Pole 20"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.4.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.049115 0.00328175 -0.72
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -137.893 155.881 -0.0199974
+  rotation -0.001738220850500573 5.425202654517672e-09 0.9999984892929964 -1.5307179586088182e-05
+  name "Pole 21"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/3.18.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Pole {
+  translation -101.553 168.571 -0.0199974
+  rotation -0.001738220850500573 5.425202654517672e-09 0.9999984892929964 -1.5307179586088182e-05
+  name "Pole 22"
+  slot [
+    Pose {
+      translation -0.049115 0.00328175 0.03
+      rotation 0 0 1 0.261799
+      children [
+        Shape {
+          appearance Appearance {
+            texture ImageTexture {
+              url [
+                "../Road Signs/2.3.2.png"
+              ]
+            }
+          }
+          geometry Box {
+            size 0.01 0.75 0.75
+          }
+        }
+      ]
+    }
+  ]
+}
+Transform {
+  translation -15.77 48.378 0
+  scale 1 0.75 1
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Mesh {
+        url [
+          "../objects/concrete_barrier/concrete_barrier.obj"
+        ]
+        name "Concrete Barrier 1"
+      }
+    }
+  ]
+}
+Transform {
+  translation -15.77 44.621 0
+  scale 1 0.75 1
+  children [
+    Shape {
+      appearance RoughConcrete {
+      }
+      geometry Mesh {
+        url [
+          "../objects/concrete_barrier/concrete_barrier.obj"
+        ]
+        name "Concrete Barrier 2"
+      }
+    }
+  ]
+}
+Transform {
+  translation -16.855 188.825 0
+  rotation 0 0 1 -1.5707953071795862
+  scale 0.1 2.5067 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -279.556 177.206 0
+  rotation 0 0 -1 1.284
+  scale 0.1 12.5059 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -299.69 156.797 0
+  rotation 0 0 -1 1.2845
+  scale 0.1 9.9978 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -723.475 68.5045 0
+  rotation 0 0 -1 1.276
+  scale 0.1 29.0931 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -920.418 23.7987 0
+  rotation 0 0 -1 1.275
+  scale 0.1 6.4527 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -948.609 -53.5718 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 9.0051 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -434.271 102.745 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 49.9993 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -430.193 89.3094 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 17.5272 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -617.077 32.5135 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 2.49995 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -678.914 13.7173 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 7.49915 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -769.817 -13.9128 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 7.49835 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -860.737 -41.5432 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 6.25912 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -968.483 -74.1523 0
+  rotation 0 0 -1 1.27575
+  scale 0.1 3.9986 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+Transform {
+  translation -16.855 178.775 0
+  rotation 0 0 1 -1.5707953071795862
+  scale 0.1 2.5067 0.01
+  children [
+    CadShape {
+      url [
+        "../objects/curb_line/curb_line.obj"
+      ]
+      castShadows FALSE
+    }
+  ]
+}
+GenericTrafficLight {
+  translation -607.437 19.3463 -0.0200099
+  rotation -1.82489e-07 1.28253e-06 1 -1.3089953071795861
+  name "Traffic Light"
+  state "green"
+}

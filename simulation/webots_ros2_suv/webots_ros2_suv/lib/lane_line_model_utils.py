@@ -612,8 +612,8 @@ def get_line_contour(
         count_pass = 0
         while i < points.shape[0] + 1:
             start_point2_id = (start_point1_id - i) % points.shape[0]
-            diff_start_point_2 = (points[(start_point2_id - 1) % points.shape[0]] - points[start_point2_id])
-            dir_start_point_2 = diff_start_point_2 / np.linalg.norm(diff_start_point_2)
+            # diff_start_point_2 = (points[(start_point2_id - 1) % points.shape[0]] - points[start_point2_id])
+            # dir_start_point_2 = diff_start_point_2 / np.linalg.norm(diff_start_point_2)
 
             distance = np.linalg.norm(points[start_point2_id] - points[start_point1_id])
 
