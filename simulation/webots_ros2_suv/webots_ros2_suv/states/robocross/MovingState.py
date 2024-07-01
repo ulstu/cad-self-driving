@@ -12,6 +12,8 @@ class MovingState(AbstractState):
         self.__cur_path_point = 1
         self.__cur_gps_point = 1
         self.sc = pg.display.set_mode((800, 800))
+        self.logi(f"MoveState init")
+
 
     def find_goal_point_x(self, arr, val=100):
         max_length = 0
@@ -109,6 +111,7 @@ class MovingState(AbstractState):
         return [first[0] * k + second[0] * (1 - k), first[1] * k + second[1] * (1 - k)]
 
     def on_event(self, event, world_model=None):
+        self.logi(f"MoveState OnEvent")
         self.runs = self.runs + 1
         # if world_model.traffic_light_state == "red":
         #     return "stop"
@@ -159,6 +162,8 @@ class MovingState(AbstractState):
         self.sc.fill((0, 0, 0))
 
         bev_image = pg.image.frombuffer(world_model.ipm_colorized_lines.tostring(), world_model.ipm_colorized_lines.shape[1::-1], "BGR")
+        
+        self.logi(f"{world_model.ipm_colorized_lines.shape}")
         self.sc.blit(bev_image, (0,0))
 
         # pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))

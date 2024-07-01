@@ -86,7 +86,8 @@ class PointCloudMapper : public rclcpp::Node
       );
       auto qos = rclcpp::QoS(1);
       lidar_subscriber_rear = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        "/points", 
+        "/points",
+        // "/lidar_rear", 
         qos.best_effort(), 
         std::bind(&PointCloudMapper::lidar_callback_rear_2, this, std::placeholders::_1)\
       );

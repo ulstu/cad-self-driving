@@ -21,6 +21,7 @@ a_star_step_size: 20
 dubins_sample_size: 5
 dubins_turning_radius: 10
 min_path_points_dist: 10
+bezier_num_points: 20
 
 ackerman_angle_correction: 0.0
 ackerman_proportional_coef: 1.2

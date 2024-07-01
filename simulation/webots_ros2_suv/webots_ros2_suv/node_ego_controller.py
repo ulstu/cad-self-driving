@@ -68,7 +68,8 @@ class NodeEgoController(Node):
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
-            self.__fsm.on_event(None)
+            # self.__fsm.on_event(None)
+            self.__fsm.on_event("start_move")
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
 
@@ -87,7 +88,7 @@ class NodeEgoController(Node):
             udp_server_thread.setDaemon(True)
             udp_server_thread.start()
 
-            self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
+            # self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
             # self.__fsm.on_event('start_move')

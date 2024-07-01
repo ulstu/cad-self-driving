@@ -41,7 +41,7 @@ class PathPlanningWorker(AbstractWorker):
             self.step_size = config['a_star_step_size']
             self.sample_size = config['dubins_sample_size']
             self.min_path_points_dist = config['min_path_points_dist']
-            # self.bezier_num_points = config['bezier_num_points']
+            self.bezier_num_points = config['bezier_num_points']
 
 
     def plan_a_star(self, world_model):

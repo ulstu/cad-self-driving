@@ -17,6 +17,7 @@ from nav2_common.launch import RewrittenYaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
+CONFIG_DIRECTORY = "real"
 
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
@@ -70,12 +71,13 @@ def get_ros2_nodes(*args):
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
     
+    package = get_package_share_directory("webots_ros2_suv")
     pcl_map_node = Node(
         package="pcl_maps",
         executable='pcl_map_node',
         name='pcl_map_node',
         output='screen' ,
-        parameters=[{'use_sim_time': USE_SIM_TIME}]
+        parameters=[{'use_sim_time': USE_SIM_TIME, "config_dir": os.path.join(package, "config", CONFIG_DIRECTORY)}]
     )
     
     driver_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'params', 'lslidar_ch64w.yaml')
@@ -96,7 +98,6 @@ def get_ros2_nodes(*args):
         name='rviz2',
         arguments=['-d', rviz_dir],
         output='screen')
-
     package_dir = get_package_share_directory(PACKAGE_NAME)
     urdf = os.path.join(
         package_dir,
@@ -129,7 +130,6 @@ def get_ros2_nodes(*args):
             arguments=["0", "0", "0", "0", "0", "0"] + s,
             parameters=[{'use_sim_time': USE_SIM_TIME}]
         ))
-
     return [
         state_publisher_node,
         node_sensors_gazelle,
@@ -153,6 +153,7 @@ def generate_launch_description():
             'camera_model': 'zed2'
         }.items()
     )
+    os.environ['CONFIG_DIRECTORY'] = CONFIG_DIRECTORY
     return LaunchDescription([
         zed_wrapper_launch
     ] + get_ros2_nodes())
