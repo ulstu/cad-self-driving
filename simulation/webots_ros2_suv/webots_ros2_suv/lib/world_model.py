@@ -63,6 +63,7 @@ class WorldModel(object):
         self.gps_car_turn_angle = 0.0
         self.software_state = 'None'        # Программное состояние автомобиля (данное решение)
         self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
+        self.previous_zone = None
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = []                 # Данные о препятствиях с лидара
@@ -117,14 +118,14 @@ class WorldModel(object):
         fontScale = 1
         color = (255, 255, 0) 
         thickness = 2
-        try:
-            for i, p in enumerate(points):
-                x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
-                cv2.circle(colorized, (int(x), int(y)), 8, (0, 0, 255), 2)
-                image = cv2.putText(colorized, f'{i}', (int(x + 20), int(y)), font,  fontScale, color, thickness, cv2.LINE_AA)
+        # try:
+        # for i, p in enumerate(points):
+        #     x, y = self.coords_transformer.get_relative_coordinates(p[0], p[1], self.get_current_position(), self.pov_point)
+        #     cv2.circle(colorized, (int(x), int(y)), 8, (0, 0, 255), 2)
+        #     cv2.putText(colorized, f'{i}', (int(x + 20), int(y)), font,  fontScale, color, thickness, cv2.LINE_AA)
             # colorized = cv2.resize(colorized, (500, 500), cv2.INTER_AREA)
-        except:
-            pass
+        # except:
+            # pass
         # cv2.imshow("colorized seg", colorized)
         # cv2.imshow("yolo drawing", self.img_front_objects)
 
@@ -170,6 +171,6 @@ class WorldModel(object):
         zones = []
         for p in self.global_map:
             if p['type'] == 'Polygon':
-                if is_point_in_polygon(lat, lon, p['coordinates'][0]): # and self.cur_path_point > 2:
+                if is_point_in_polygon(lat, lon, p['coordinates'][0]):
                     zones.append(p)
         return zones

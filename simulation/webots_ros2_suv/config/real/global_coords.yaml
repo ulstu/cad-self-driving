@@ -12,7 +12,7 @@ scale_x: 15
 scale_y: 6
 
 bev_orientation: -0.33
-change_point_dist: 0.7
+change_point_dist: 1
 bev_obstacle_ratio: 2
 
 kalman_path_planning_noise_scale: 0.05
@@ -26,6 +26,6 @@ bezier_num_points: 20
 ackerman_angle_correction: 0.0
 ackerman_proportional_coef: 1.2
 turn_angle_num_path_points: 7
-default_speed: 10
+default_speed: 7
 
 

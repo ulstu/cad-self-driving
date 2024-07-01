@@ -138,18 +138,23 @@ class PathPlanningWorker(AbstractWorker):
         for p in points:
             dists.append(calc_dist_point(p, world_model.get_current_position()))
         self.__cur_path_point = world_model.cur_path_point
-        if self.__cur_path_point < len(points) - 1:
-            x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
-            dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
-            world_model.params["point_dist"] = dist
-            if dist < self.config['change_point_dist']:
-                # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
-                self.__cur_path_point = self.__cur_path_point + 1
-                self.plan_a_star(world_model)
-            world_model.params['dist_point'] = dist
-            # self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
-        else:
-            self.__cur_path_point = len(points) - 1
+        while True:
+            if self.__cur_path_point < len(points) - 1:
+                x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
+                dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
+                world_model.params["point_dist"] = dist
+                if dist < self.config['change_point_dist']:
+                    # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
+                    self.__cur_path_point = self.__cur_path_point + 1
+                    if (world_model.goal_point):
+                        self.plan_a_star(world_model)
+                else:
+                    break
+                world_model.params['dist_point'] = dist
+                # self.log(f"[MovingState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+            else:
+                self.__cur_path_point = len(points) - 1
+                break
         world_model.cur_path_point = self.__cur_path_point
 
         x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], 
@@ -189,10 +194,10 @@ class PathPlanningWorker(AbstractWorker):
     #@timeit
     def on_data(self, world_model):
         # try:
-        thread = Thread(target = self.plan_path, args = (world_model,))
-        thread.start()
+        # thread = Thread(target = self.plan_path, args = (world_model,))
+        # thread.start()
         world_model = self.plan_path(world_model)
-        pass
+        # pass
 
         # except  Exception as err:
         #     super().error(''.join(traceback.TracebackException.from_exception(err).format()))

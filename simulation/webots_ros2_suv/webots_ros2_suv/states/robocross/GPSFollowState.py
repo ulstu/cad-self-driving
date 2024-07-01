@@ -17,6 +17,10 @@ class GPSFollowState(AbstractState):
         self.runs = 0
         self.__cur_path_point = 1
         self.sc = pg.display.set_mode((800, 800))
+        self.prev_target_angle = 0
+        pg.font.init()
+        self.sysfont = pg.font.SysFont("Arial", 20)
+        self.params = {}
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -183,6 +187,7 @@ class GPSFollowState(AbstractState):
         orientation -= 1.5
         car_position = self.gps_to_rect(lat, lon)
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
+        difference = None
 
         while True:
             points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
@@ -195,7 +200,7 @@ class GPSFollowState(AbstractState):
                 path_square_points.append(self.gps_to_rect(point[0], point[1]))
 
             if len(path_square_points) > 1:
-                nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.7)
+                nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.75)
                 difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
 
                 dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
@@ -203,7 +208,6 @@ class GPSFollowState(AbstractState):
                 conf = self.config['change_point_dist']
             else:
                 break
-
             if dist < self.config['change_point_dist']:
                 self.__cur_path_point += 1
                 world_model.cur_path_point = self.__cur_path_point
@@ -213,6 +217,18 @@ class GPSFollowState(AbstractState):
         if len(path_square_points) > 1:            
             difference_angle = -self.AngleOfVectors(car_vector, difference)
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
+            diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * 0.2
+            world_model.gps_car_turn_angle = world_model.gps_car_turn_angle + diff_angle
+            self.logi(f"diff = {self.prev_target_angle - world_model.gps_car_turn_angle} new = {world_model.gps_car_turn_angle}, old ={self.prev_target_angle}")
+            
+            self.params["diff"] = self.prev_target_angle - world_model.gps_car_turn_angle
+            self.params["new"] = world_model.gps_car_turn_angle
+            self.params["old"] = self.prev_target_angle
+            self.params["prevzone"] = world_model.previous_zone
+            self.params["hardware_state"] = world_model.hardware_state
+            self.params["software_state"] = world_model.software_state
+
+            self.prev_target_angle = world_model.gps_car_turn_angle
         else:
             world_model.gps_car_turn_angle = 0.0
         pg.event.get()
@@ -225,6 +241,11 @@ class GPSFollowState(AbstractState):
             pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
         for point in path_square_points:
             pg.draw.circle(self.sc, (255,0,0), move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
+        y = 10
+        for k, v in self.params.items():
+            text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
+            self.sc.blit(text_reward, (0, y))
+            y += 15
         pg.display.update()
 
         event = None
@@ -239,9 +260,13 @@ class GPSFollowState(AbstractState):
                 world_model.cur_turn_polygon = zone['coordinates'][0]
                 self.__cur_path_point = 0
                 event = 'turn'
-            elif zone['name'] == 'terminal':
+            elif zone['name'] == 'terminal' and self.__cur_path_point > 10:
+                self.logi(f"{world_model.previous_zone}")
+                self.logi(f"Inside terminal")
+                world_model.previous_zone = zone['name']
                 speed = 0
-                # self.__cur_path_point = 0
+                world_model.cur_path_point = 0
+                self.__cur_path_point = 0
                 event = 'pause'
             elif zone['name'] == 'traffic_light':
                 if world_model.traffic_light_state == 'red':
@@ -258,6 +283,9 @@ class GPSFollowState(AbstractState):
                 event = 'stop'
             elif zone['name'].startswith('speed'):
                 speed = float(zone['name'].split('speed')[1])
+            else:
+                self.logi(f"{world_model.previous_zone} go out")
+                world_model.previous_zone = None
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
         #     event = 'start_move'

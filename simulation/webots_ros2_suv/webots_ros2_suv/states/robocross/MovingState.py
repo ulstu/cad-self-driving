@@ -146,7 +146,6 @@ class MovingState(AbstractState):
                 conf = self.config['change_point_dist']
             else:
                 break
-
             if dist < self.config['change_point_dist']:
                 self.__cur_gps_point += 1
             else:
@@ -177,6 +176,14 @@ class MovingState(AbstractState):
                                                                                    pos=world_model.get_current_position(),
                                                                                    pov_point=world_model.pov_point)
             pg.draw.circle(self.sc, (255,255,0, 0.5), bev_position, 10)
+        gps_points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+        for point in gps_points:
+            bev_position = world_model.coords_transformer.get_relative_coordinates(point[0], 
+                                                                                   point[1], 
+                                                                                   pos=world_model.get_current_position(),
+                                                                                   pov_point=world_model.pov_point)
+            
+            pg.draw.circle(self.sc, (0,255,0, 0.5), bev_position, 3)
         pg.display.update()
 
         event = None

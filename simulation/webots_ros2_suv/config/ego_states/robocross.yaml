@@ -22,15 +22,16 @@ workerstates:
   start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
   moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
   lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
-  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] #, "pathplanning"]
   stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
   paused: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
   turn: ["semanticsegmentation", "ipm", "lanelinedetection", "roadmarkingdetection", "reedsshepp"]
   emergency: []
 transitions:
   start:
-    start_move: ["moving"] # "gpsfollow"
+    start_move: ["gpsfollow"] # "gpsfollow"
     stop: ["stopped"]
+    pause: ["paused"]
   gpsfollow:
     # start_move: ["moving"]
     # start_gps_follow: ["gpsfollow"] 
@@ -49,9 +50,9 @@ transitions:
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   paused:
-    start_move: ["moving"]
+    start_move: ["gpsfollow"]
   stopped:
-    start_move: ["moving"]
+    start_move: ["gpsfollow"]
   emergency:
     reset: ["start"]
   turn:

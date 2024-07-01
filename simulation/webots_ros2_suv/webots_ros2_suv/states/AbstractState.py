@@ -4,20 +4,15 @@ import pathlib
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from ackermann_msgs.msg import AckermannDrive
-
+from webots_ros2_suv.lib.config_loader import ConfigLoader
 class AbstractState:
     def __init__(self, node=None) -> None:
         self.node = node
-        package_dir = get_package_share_directory('webots_ros2_suv')
-        config_path = os.path.join(package_dir,
-                                    pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
-        self.config = None
-        with open(config_path) as file:
-            self.config = yaml.full_load(file)
-            self.ackerman_correction = self.config['ackerman_angle_correction']
-            self.ackerman_proportional_coef = self.config['ackerman_proportional_coef']
-            self.turn_angle_num_path_points = self.config['turn_angle_num_path_points']
-            self.default_speed = self.config['default_speed']
+        self.config = ConfigLoader("global_coords").data
+        self.ackerman_correction = self.config['ackerman_angle_correction']
+        self.ackerman_proportional_coef = self.config['ackerman_proportional_coef']
+        self.turn_angle_num_path_points = self.config['turn_angle_num_path_points']
+        self.default_speed = self.config['default_speed']
         
         self.old_speed = 0
         self.old_angle = 0

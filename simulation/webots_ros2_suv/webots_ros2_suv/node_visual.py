@@ -67,7 +67,7 @@ class NodeVisual(Node):
     def __on_image_message(self, data):
         # if (datetime.now() - self.__last_image_time).total_seconds() < 1 / FPS:
         #     return
-        self.__last_image_time = datetime.now()
+        # self.__last_image_time = datetime.now()
         image = data.data
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         analyze_image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)

@@ -259,9 +259,9 @@ def draw_lines(images, batch_curves, palette=default_palette, thickness=4):
         for idx, lane_line in enumerate(mask_curves):
             color = palette[lane_line.label % len(palette)]
             color = (color[2], color[1], color[0])
-            for id in range(1, len(lane_line.points)):
-                cv2.line(image, lane_line.points[id - 1], lane_line.points[id], color, thickness=thickness)
-
+            norm_points = (lane_line.points_n * np.array(image.shape[:2])[::-1]).astype(int)
+            for id in range(1, len(norm_points)):
+                cv2.line(image, norm_points[id - 1], norm_points[id], color, thickness=thickness)
 
 def draw_labels(
         images, 
@@ -662,8 +662,11 @@ def get_line_contour(
                     else:
                         line = [(points[moving_point1_id] + points[moving_point2_id]) / 2] + line
         
+        points_line = np.array(line, dtype=np.int32)
+        points_n_line = points_line / mask.orig_shape
+
         t2 = time.time()
-        mask_lines.append(LaneLine(np.array(line, dtype=np.int32), mask.label, t2-t1, len(line)))
+        mask_lines.append(LaneLine(points_line, mask.label, points_n_line, t2-t1, len(line)))
 
     return mask_lines
         

@@ -47,6 +47,8 @@ class NodeEgoController(Node):
         try:
             super().__init__('node_ego_controller')
             self._logger.info(f'Node Ego Started')
+            if os.environ.get("CONFIG_DIRECTORY") is None:
+                self._logger.error('\033[91mConfig enviroment var not found :(\033[0m')
             self._logger.info(os.environ.get("CONFIG_DIRECTORY"))
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
@@ -69,6 +71,7 @@ class NodeEgoController(Node):
 
             # Примеры событий
             # self.__fsm.on_event(None)
+            # self.__fsm.on_event("pause")
             self.__fsm.on_event("start_move")
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
@@ -88,6 +91,8 @@ class NodeEgoController(Node):
             udp_server_thread.setDaemon(True)
             udp_server_thread.start()
 
+            self._logger.info(f"udp_server_thread: {udp_server_thread}")
+
             # self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
@@ -104,16 +109,18 @@ class NodeEgoController(Node):
 
     def start_udp_server(self):
         socket_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        socket_recv.bind((UDP_RECV_IP, UDP_RECV_PORT))
+        socket_recv.connect((UDP_RECV_IP, UDP_RECV_PORT))
         socket_recv.setblocking(0)
-
+        self._logger.info(f"Before Cyrcle")
+        # socket_recv.listen(1)
+        # conn, addr = socket_recv.accept()
         while True:
-            is_data_available = select.select([socket_recv], [], [])
+            data = socket_recv.recv(1024)
 
-            if is_data_available[0]:
-                data, _ = socket_recv.recv(RECV_BUFFER_SIZE)
+            if data:
                 data_dict = json.loads(data)
-
+                self._logger.info(f"DATA DICT: {data_dict}")
+                
                 match data_dict['params']['current_control_mode']:
                     case 'E-Stop':
                         self.__world_model.hardware_state = 'E-Stop'
@@ -121,9 +128,9 @@ class NodeEgoController(Node):
                         self.__world_model.hardware_state = 'Manual'
                     case 'Auto':
                         self.__world_model.hardware_state = 'Auto'
-
-                        if self.__world_model.software_state != 'Pause':
-                            self.__fsm.on_event('start_move')
+                        # if self.__world_model.software_state != 'Pause':
+                        self._logger.info("Set Auto")
+                        self.__fsm.on_event('start_move')
                     case 'Pause':
                         self.__world_model.hardware_state = 'Pause'
 
@@ -131,6 +138,35 @@ class NodeEgoController(Node):
                             self.__fsm.on_event('pause')
                     case 'Disabled':
                         self.__world_model.hardware_state = 'Disabled'
+        socket_recv.close()
+        # while True:
+        #     self._logger.info(f"In Cyrcle")
+        #     is_data_available, _, _ = select.select([socket_recv], [], [])
+        #     self._logger.info(f"After Select")
+
+        #     if is_data_available[0]:
+        #         self._logger.info(f"In {is_data_available[0]}")
+        #         data, _ = socket_recv.recv(RECV_BUFFER_SIZE)
+        #         data_dict = json.loads(data)
+        #         self._logger.info(f"DATA DICT: {data_dict}")
+                
+        #         match data_dict['params']['current_control_mode']:
+        #             case 'E-Stop':
+        #                 self.__world_model.hardware_state = 'E-Stop'
+        #             case 'Manual':
+        #                 self.__world_model.hardware_state = 'Manual'
+        #             case 'Auto':
+        #                 self.__world_model.hardware_state = 'Auto'
+        #                 # if self.__world_model.software_state != 'Pause':
+        #                 self._logger.info("Set Auto")
+        #                 self.__fsm.on_event('start_move')
+        #             case 'Pause':
+        #                 self.__world_model.hardware_state = 'Pause'
+
+        #                 if self.__world_model.software_state != 'Pause':
+        #                     self.__fsm.on_event('pause')
+        #             case 'Disabled':
+        #                 self.__world_model.hardware_state = 'Disabled'
 
     def __on_lidar_message(self, data):
         pass

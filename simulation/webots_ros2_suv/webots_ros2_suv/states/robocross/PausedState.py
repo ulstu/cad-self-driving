@@ -7,9 +7,7 @@ class PausedState(AbstractState):
 
     def on_event(self, event, world_model=None):
         world_model.software_state = 'Pause'
-
+        self.logi(f"Paused State event {event}")
         self.drive(world_model, speed=0.0)
-
-        if world_model.hardware_state == 'Auto':
-            return 'start_move'
-        return None
+        return 'start_move'
+            
