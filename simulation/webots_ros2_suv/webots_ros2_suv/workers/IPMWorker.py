@@ -206,13 +206,14 @@ class IPMWorker(AbstractWorker):
                 #     cv2.drawContours(image_to_draw, [np.array(front_edge).astype(int)], contourIdx=-1, color=(220, 220, 220), thickness=-1)
 
                 #     cv2.rectangle(image_to_draw, front_p1, front_p2, color=(255, 0, 0), thickness=2)
-            scale = lidardata_config["visual_scale"]
-            for box in world_model.obstacles:
-                xmin, xmax, ymin, ymax = box[8], box[9], box[10], box[11]
-                xmin, xmax = (xmin  + lidardata_config["zed_x"]) * scale + world_model.pov_point[0], (xmax + lidardata_config["zed_x"]) * scale + world_model.pov_point[0]
-                ymin, ymax = world_model.pov_point[1] - (ymin  + lidardata_config["zed_y"]) * scale, world_model.pov_point[1] - (ymax + lidardata_config["zed_y"]) * scale 
-                self.logi(f"{xmin} {ymin} {xmax} {ymax}")
-                world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
+            
+            # scale = lidardata_config["visual_scale"]
+            # for box in world_model.obstacles:
+            #     xmin, xmax, ymin, ymax = box[8], box[9], box[10], box[11]
+            #     xmin, xmax = (xmin  + lidardata_config["zed_x"]) * scale + world_model.pov_point[0], (xmax + lidardata_config["zed_x"]) * scale + world_model.pov_point[0]
+            #     ymin, ymax = world_model.pov_point[1] - (ymin  + lidardata_config["zed_y"]) * scale, world_model.pov_point[1] - (ymax + lidardata_config["zed_y"]) * scale 
+            #     self.logi(f"{xmin} {ymin} {xmax} {ymax}")
+            #     world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
 
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             world_model.img_front_objects_prj = image_to_draw
