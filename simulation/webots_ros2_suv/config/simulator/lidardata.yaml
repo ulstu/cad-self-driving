@@ -1,4 +1,4 @@
-visualize: True
+visualize: False
 visual_scale: 15
 lidar_reversed: False
 orthogonal_boxes: True

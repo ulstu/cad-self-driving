@@ -7,10 +7,6 @@ import pygame as pg
 import numpy as np
 
 
-def move_screen(x, y):
-    return [int(400 + x * 60), int(400 + y * 60)]
-
-
 class GPSFollowState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
@@ -154,6 +150,9 @@ class GPSFollowState(AbstractState):
 
         return [E / 5, -N / 5]
 
+    def move_screen(self, x, y):
+        return [int(400 + x * 60), int(400 + y * 60)]
+
     def AngleOfReference(self, v):
         return self.NormalizeAngle(math.atan2(v[1], v[0]) / math.pi * 180)
 
@@ -237,11 +236,11 @@ class GPSFollowState(AbstractState):
 
         pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
-        pg.draw.line(self.sc, (255,0,0), move_screen(0, 0), move_screen(car_vector[0], car_vector[1]))
+        pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:
-            pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
+            pg.draw.line(self.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
         for point in path_square_points:
-            pg.draw.circle(self.sc, (255,0,0), move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
+            pg.draw.circle(self.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
         y = 10
         
 

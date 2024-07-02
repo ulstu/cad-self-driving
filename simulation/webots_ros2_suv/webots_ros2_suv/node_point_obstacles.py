@@ -33,7 +33,7 @@ from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 from geographiclib.geodesic import Geodesic
 from .lib.param_loader import ParamLoader
-from .lib.config_loader import GlobalConfigLoader
+from .lib.config_loader import ConfigLoader
 
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y, lidar_reversed):
@@ -83,7 +83,7 @@ class NodePointObstacles(Node):
             # self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             
             # загружаем локальные конфигурацтлнные файлы
-            self.lidardata = GlobalConfigLoader("lidardata").data
+            self.lidardata = ConfigLoader("lidardata").data
             
             # with open("webots_ros2_suv/config/lidardata.yaml", "r") as file:
                 # self.lidardata = yaml.safe_load(file)

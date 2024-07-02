@@ -14,10 +14,10 @@ bev_orientation: 0.0
 
 
 change_point_dist: 0.3
-bev_obstacle_ratio: 1
+bev_obstacle_ratio: 3
 
 kalman_path_planning_noise_scale: 0.05
-robot_radius: 10
+robot_radius: 15
 a_star_step_size: 30
 dubins_sample_size: 5
 dubins_turning_radius: 10
