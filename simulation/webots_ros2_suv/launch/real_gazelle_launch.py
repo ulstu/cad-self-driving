@@ -40,6 +40,14 @@ def get_ros2_nodes(*args):
         # ]
     )
 
+    node_lmp_sender = Node(
+        package=PACKAGE_NAME,
+        executable='node_lmp_sender',
+        name='node_lmp_sender',
+        output='screen',
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
     node_visual = Node(
         package=PACKAGE_NAME,
         executable='node_visual',

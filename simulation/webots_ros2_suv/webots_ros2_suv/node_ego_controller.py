@@ -47,8 +47,6 @@ class NodeEgoController(Node):
         try:
             super().__init__('node_ego_controller')
             self._logger.info(f'Node Ego Started')
-            if os.environ.get("CONFIG_DIRECTORY") is None:
-                self._logger.error('\033[91mConfig enviroment var not found :(\033[0m')
             self._logger.info(os.environ.get("CONFIG_DIRECTORY"))
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
@@ -70,9 +68,7 @@ class NodeEgoController(Node):
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
-            # self.__fsm.on_event(None)
-            # self.__fsm.on_event("pause")
-            self.__fsm.on_event("start_move")
+            self.__fsm.on_event(None)
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
 
@@ -84,6 +80,7 @@ class NodeEgoController(Node):
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             self.__control_unit_publisher = self.create_publisher(String, 'cmd_control_unit', 1)
+            self.__lmp_sender_publisher = self.create_publisher(String, 'cmd_lmp_send', 1)
 
             self.start_web_server()
 
@@ -91,9 +88,7 @@ class NodeEgoController(Node):
             udp_server_thread.setDaemon(True)
             udp_server_thread.start()
 
-            self._logger.info(f"udp_server_thread: {udp_server_thread}")
-
-            # self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
+            self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
             # self.__fsm.on_event('start_move')
@@ -108,65 +103,29 @@ class NodeEgoController(Node):
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
 
     def start_udp_server(self):
-        socket_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        socket_recv.connect((UDP_RECV_IP, UDP_RECV_PORT))
-        socket_recv.setblocking(0)
-        self._logger.info(f"Before Cyrcle")
-        # socket_recv.listen(1)
-        # conn, addr = socket_recv.accept()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # создаем сокет
+        sock.bind((UDP_RECV_IP, UDP_RECV_PORT))  # связываем сокет с портом, где он будет ожидать сообщения
+        sock.setblocking(0)
+        sock.listen(1)  # указываем сколько может сокет принимать соединений
+        print('Server is running, please, press ctrl+c to stop')
         while True:
-            data = socket_recv.recv(1024)
-
+            conn, addr = sock.accept()  # начинаем принимать соединения
+            print('connected:', addr)  # выводим информацию о подключении
+            data = conn.recv(RECV_BUFFER_SIZE)  # принимаем данные от клиента, по 1024 байт
+            
             if data:
                 data_dict = json.loads(data)
-                self._logger.info(f"DATA DICT: {data_dict}")
-                
-                match data_dict['params']['current_control_mode']:
-                    case 'E-Stop':
-                        self.__world_model.hardware_state = 'E-Stop'
-                    case 'Manual':
-                        self.__world_model.hardware_state = 'Manual'
-                    case 'Auto':
-                        self.__world_model.hardware_state = 'Auto'
-                        # if self.__world_model.software_state != 'Pause':
-                        self._logger.info("Set Auto")
-                        self.__fsm.on_event('start_move')
-                    case 'Pause':
-                        self.__world_model.hardware_state = 'Pause'
 
-                        if self.__world_model.software_state != 'Pause':
-                            self.__fsm.on_event('pause')
-                    case 'Disabled':
-                        self.__world_model.hardware_state = 'Disabled'
-        socket_recv.close()
-        # while True:
-        #     self._logger.info(f"In Cyrcle")
-        #     is_data_available, _, _ = select.select([socket_recv], [], [])
-        #     self._logger.info(f"After Select")
-
-        #     if is_data_available[0]:
-        #         self._logger.info(f"In {is_data_available[0]}")
-        #         data, _ = socket_recv.recv(RECV_BUFFER_SIZE)
-        #         data_dict = json.loads(data)
-        #         self._logger.info(f"DATA DICT: {data_dict}")
-                
-        #         match data_dict['params']['current_control_mode']:
-        #             case 'E-Stop':
-        #                 self.__world_model.hardware_state = 'E-Stop'
-        #             case 'Manual':
-        #                 self.__world_model.hardware_state = 'Manual'
-        #             case 'Auto':
-        #                 self.__world_model.hardware_state = 'Auto'
-        #                 # if self.__world_model.software_state != 'Pause':
-        #                 self._logger.info("Set Auto")
-        #                 self.__fsm.on_event('start_move')
-        #             case 'Pause':
-        #                 self.__world_model.hardware_state = 'Pause'
-
-        #                 if self.__world_model.software_state != 'Pause':
-        #                     self.__fsm.on_event('pause')
-        #             case 'Disabled':
-        #                 self.__world_model.hardware_state = 'Disabled'
+                self.__world_model.lmp_data['TransmissionState'] = data_dict['params']['TransmissionState']
+                self.__world_model.lmp_data['SteeringRotation'] = data_dict['params']['SteeringRotation']
+                self.__world_model.lmp_data['RequestedAcceleratorPower'] = data_dict['params']['RequestedAcceleratorPower']
+                self.__world_model.lmp_data['RequestedBrakePower'] = data_dict['params']['RequestedBrakePower']
+                self.__world_model.lmp_data['Velocity']['LeftFront'] = data_dict['params']['Velocity']
+                self.__world_model.lmp_data['Velocity']['RightFront'] = data_dict['params']['Velocity']
+                self.__world_model.lmp_data['Velocity']['LeftRear'] = data_dict['params']['Velocity']
+                self.__world_model.lmp_data['Velocity']['RightRear'] = data_dict['params']['Velocity']
+                self.__world_model.lmp_data['TurnSignalState'] = data_dict['params']['TurnSignalState']
+        conn.close()  # закрываем соединение
 
     def __on_lidar_message(self, data):
         pass
@@ -181,11 +140,14 @@ class NodeEgoController(Node):
 
     def drive(self):
         if self.__world_model:
-            software_state = String()
+            software_state, lmp_data = String()
+
             software_state.data = self.__world_model.software_state
+            lmp_data.data = json.dumps(self.__world_model.lmp_data)
 
             self.__ackermann_publisher.publish(self.__world_model.command_message)
             self.__control_unit_publisher.publish(software_state)
+            self.__lmp_sender_publisher.publish(lmp_data)
 
     #@timeit
     def __on_image_message(self, data):
@@ -228,14 +190,15 @@ class NodeEgoController(Node):
     
     def __on_obstacles_message(self, data):
          # в data.data находится наша строка, парсим её
-        obstacles_dict = json.loads(data.data);
+        obstacles_dict = json.loads(data.data)
+        self.__world_model.lmp_data['ObjectData'] = obstacles_dict
         # если прилетели данные от переднего лидара
         if 'obstacles' in obstacles_dict:
-            obst_list = obstacles_dict['obstacles'];
+            obst_list = obstacles_dict['obstacles']
             self.__world_model.obstacles = obst_list
         # если прилетели данные от заднего лидара
         if 'obstacles_rear' in obstacles_dict:
-            obst_list = obstacles_dict['obstacles_rear'];
+            obst_list = obstacles_dict['obstacles_rear']
         self.__world_model.lidar_bounding_boxes = []
         
         # Обходим все обнаруженные препятствия
