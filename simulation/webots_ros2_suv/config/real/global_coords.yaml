@@ -28,4 +28,5 @@ ackerman_proportional_coef: 1.2
 turn_angle_num_path_points: 7
 default_speed: 7
 
-
+obstacle_stop_distance: 4
+treshold_angle: 20

@@ -165,8 +165,7 @@ def generate_launch_description():
     vehicle_driver = WebotsController(
         robot_name='vehicle',
         parameters=[
-            {'robot_description':     os.environ['CONFIG_DIRECTORY'] = CONFIG_DIRECTORY
-robot_description_path}
+            {'robot_description': robot_description_path}
         ],
         respawn=True
     )

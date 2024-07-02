@@ -213,7 +213,9 @@ class IPMWorker(AbstractWorker):
                 xmin, xmax = (xmin  + self.lidardata_config["zed_x"]) * scale + world_model.pov_point[0], (xmax + self.lidardata_config["zed_x"]) * scale + world_model.pov_point[0]
                 ymin, ymax = world_model.pov_point[1] - (ymin  + self.lidardata_config["zed_y"]) * scale, world_model.pov_point[1] - (ymax + self.lidardata_config["zed_y"]) * scale 
                 # self.logi(f"{xmin} {ymin} {xmax} {ymax}")
-                world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
+                
+                # комментируем, если симулятор
+                #  world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
 
             #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             world_model.img_front_objects_prj = image_to_draw

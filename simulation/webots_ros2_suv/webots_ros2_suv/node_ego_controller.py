@@ -87,11 +87,11 @@ class NodeEgoController(Node):
 
             self.start_web_server()
 
-            udp_server_thread = threading.Thread(target=self.start_udp_server)
-            udp_server_thread.setDaemon(True)
-            udp_server_thread.start()
+            # udp_server_thread = threading.Thread(target=self.start_udp_server)
+            # udp_server_thread.setDaemon(True)
+            # udp_server_thread.start()
 
-            self._logger.info(f"udp_server_thread: {udp_server_thread}")
+            # self._logger.info(f"udp_server_thread: {udp_server_thread}")
 
             # self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
@@ -236,6 +236,7 @@ class NodeEgoController(Node):
         # если прилетели данные от заднего лидара
         if 'obstacles_rear' in obstacles_dict:
             obst_list = obstacles_dict['obstacles_rear'];
+        
         self.__world_model.lidar_bounding_boxes = []
         
         # Обходим все обнаруженные препятствия

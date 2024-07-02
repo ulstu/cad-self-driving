@@ -79,8 +79,8 @@ class PointCloudMapper : public rclcpp::Node
       //Публикаторы данных о препятствиях
       json_publisher = this->create_publisher<std_msgs::msg::String>("obstacles",10);
       lidar_subscriber = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        // "lidar",
-        "/ch64w/lslidar_point_cloud", 
+        "lidar",
+        // "/ch64w/lslidar_point_cloud", 
         10, 
         std::bind(&PointCloudMapper::lidar_callback, this, std::placeholders::_1)\
       );

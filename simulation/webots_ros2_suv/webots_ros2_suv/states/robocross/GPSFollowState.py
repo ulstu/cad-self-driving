@@ -227,6 +227,7 @@ class GPSFollowState(AbstractState):
             self.params["prevzone"] = world_model.previous_zone
             self.params["hardware_state"] = world_model.hardware_state
             self.params["software_state"] = world_model.software_state
+            self.params["has_obstacle"] = self.has_obstacle(world_model)
 
             self.prev_target_angle = world_model.gps_car_turn_angle
         else:
@@ -242,11 +243,7 @@ class GPSFollowState(AbstractState):
         for point in path_square_points:
             pg.draw.circle(self.sc, (255,0,0), move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
         y = 10
-        for k, v in self.params.items():
-            text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
-            self.sc.blit(text_reward, (0, y))
-            y += 15
-        pg.display.update()
+        
 
         event = None
         zones = world_model.get_current_zones()
@@ -254,7 +251,7 @@ class GPSFollowState(AbstractState):
         # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
         speed = self.config['default_speed']
-
+        zones_names = []
         for zone in zones:
             if zone['name'] == 'turn':
                 world_model.cur_turn_polygon = zone['coordinates'][0]
@@ -283,16 +280,38 @@ class GPSFollowState(AbstractState):
                 event = 'stop'
             elif zone['name'].startswith('speed'):
                 speed = float(zone['name'].split('speed')[1])
+            elif zone["name"] == "obstacle_stop":
+                if self.has_obstacle(world_model):
+                    speed = 0
             else:
                 self.logi(f"{world_model.previous_zone} go out")
                 world_model.previous_zone = None
+            zones_names.append(zone["name"])
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
         #     event = 'start_move'
         # if world_model.is_lane_road():
         #     event = 'start_lane_follow'
+        self.params["zones"] = zones_names
+
+        for k, v in self.params.items():
+            text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
+            self.sc.blit(text_reward, (0, y))
+            y += 15
+        pg.display.update()
+
         if event:
             world_model.path = None
         world_model.set_speed(speed)
         self.drive(world_model, speed=speed)
         return event
+    
+    def has_obstacle(self, world_model):
+        for obstacle in world_model.obstacles:
+            mean_obstacle_position = [(obstacle[8] + obstacle[9]) / 2, (obstacle[10] + obstacle[11]) / 2]
+            obstacle_angle = abs(self.AngleOfReference(mean_obstacle_position))
+            self.logi(f"position {mean_obstacle_position} angle {obstacle_angle}")
+            if obstacle[1] < self.config["obstacle_stop_distance"] and obstacle_angle < self.config["treshold_angle"]:
+                return True
+        return False
+
