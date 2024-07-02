@@ -87,11 +87,11 @@ class NodeEgoController(Node):
 
             self.start_web_server()
 
-            udp_server_thread = threading.Thread(target=self.start_udp_server)
-            udp_server_thread.setDaemon(True)
-            udp_server_thread.start()
+            # udp_server_thread = threading.Thread(target=self.start_udp_server)
+            # udp_server_thread.setDaemon(True)
+            # udp_server_thread.start()
 
-            self._logger.info(f"udp_server_thread: {udp_server_thread}")
+            # self._logger.info(f"udp_server_thread: {udp_server_thread}")
 
             # self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 

@@ -1,4 +1,3 @@
-
 import rclpy
 import numpy as np
 import traceback
@@ -33,7 +32,7 @@ from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 from geographiclib.geodesic import Geodesic
 from .lib.param_loader import ParamLoader
-from .lib.config_loader import GlobalConfigLoader
+from .lib.config_loader import ConfigLoader
 
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y, lidar_reversed):
@@ -73,6 +72,11 @@ class NodePointObstacles(Node):
             # Инициализация узла
             super().__init__('node_point_obstacles')
             self._logger.info('Node Point Obstacles Started')
+            self.__world_model = WorldModel()
+
+            self.declare_parameter('start_position')
+            self.start_position =  self.get_parameter('start_position').get_parameter_value().integer_value
+            self._logger.info(f'Start pos {self.start_position}')
 
 
             qos = qos_profile_sensor_data
@@ -80,10 +84,13 @@ class NodePointObstacles(Node):
             param = ParamLoader()
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
+            # Подписка на GPS данные
+            self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
+
             # self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             
             # загружаем локальные конфигурацтлнные файлы
-            self.lidardata = GlobalConfigLoader("lidardata").data
+            self.lidardata = ConfigLoader("lidardata").data
             
             # with open("webots_ros2_suv/config/lidardata.yaml", "r") as file:
                 # self.lidardata = yaml.safe_load(file)
@@ -94,6 +101,22 @@ class NodePointObstacles(Node):
             self.geocoords = []
             self.rear_figures = []
             self.front_figures = []
+            self.lanes = [
+                (1, (52.00017417781055,55.819496316835284), (52.00016336515546,55.81918191164732)),
+                (2, (52.00023570097983,55.819495394825935), (52.000227738171816,55.819173362106085)),
+                (3, (52.00026570819318,55.8192917983979), (52.00153447687626,55.81927880644798)),
+                (4, (52.000262858346105,55.81925357691944), (52.001535231247544,55.819244692102075)),
+                (5, (52.00026554055512,55.81920571625233), (52.001631036400795,55.81919758580625)),
+                (6, (52.000265372917056,55.819171350449324), (52.00162634253502,55.819161711260676)),
+                (7, (52.00099409557879,55.81931132823229), (52.000998202711344,55.81940118223429)),
+                (8, (52.001060312613845,55.81930956803262), (52.00106198899448,55.819392297416925)),
+                (9, (52.00156440027058,55.819683484733105), (52.001558281481266,55.81923111341894)),
+                (10, (52.001620307564735,55.81922432407737), (52.00163631699979,55.81968960352242)),
+                (11, (52.001538164913654,55.81953763961792), (52.000093292444944,55.819550547748804)),
+                (12, (52.00153699144721,55.81949941813946), (52.00017778202891,55.81951509229839)),
+                (13, (52.00012547895312,55.81951668485999), (52.00011181645095,55.81918937154114))
+            ]
+            self.object_data = {"ObjectData": []}
 
             # Вот это нужно получать с odom!!!
             self.lat = 53.0
@@ -104,17 +127,115 @@ class NodePointObstacles(Node):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
         
 
+        
+    def add_lane(self, lane_num, pt1, pt2):
+        self.lanes.append((lane_num, pt1, pt2))
+
+
+    def calc_intermediate(self, pt1, pt2, cnt):
+        lons = np.linspace(pt1[0], pt2[0], cnt) # В списке широта и долгота идут наоборот
+        lats = np.linspace(pt1[1], pt2[1], cnt) # 
+        wp_list = []
+
+        for i in range(lats.size):
+            wp_list.append((lats[i], lons[i]))
+
+        return wp_list
+        
+
+    def is_in_lane(self, lane, pt):
+        geod = Geodesic.WGS84
+        dlat = geod.Direct(pt[0], pt[1], 0, 1.9)['lat2'] - pt[0]
+        dlon = geod.Direct(pt[0], pt[1], 90, 1.9)['lon2'] - pt[1]
+
+        points = self.calc_intermediate(lane[1], lane[2], 1000)
+        for p in points:
+            if p[0] - dlat < pt[0] and p[0] + dlat > pt[0] and p[1] - dlon < pt[1] and p[1] + dlon > pt[1]:
+                return True
+        return False
+
+
+    def get_lane_number(self, pt):
+        for l in self.lanes:
+            # self._logger.info(str(l))
+            if self.is_in_lane(l, pt):
+                return l[0]
+        return None
+
+
+    def __on_gps_message(self, data):
+        if self.__world_model:
+            roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
+            yaw = math.degrees(yaw)
+            self._logger.info(f"yaw: {yaw}")
+            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            self.lat, self.lon, self.ang = lon, lat, yaw # Широта и долгота перепутаны!
+        pass
+
+
+
     def __on_image_message(self, data):
         image = data.data
         self.backimage = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         self.backimage = cv2.cvtColor(self.backimage, cv2.COLOR_RGBA2RGB)
         
-    
+    def get_corner_coords(self, pt1, pt2, pt3, pt4, is_rear):
+        # 1, 4, 2, 3 - по часовой стрелке
+        geocoords1 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt1[0],  pt1[1], is_rear)
+        geocoords2 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt2[0],  pt2[1], is_rear)
+        geocoords3 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt3[0],  pt3[1], is_rear)
+        geocoords4 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt4[0],  pt4[1], is_rear)
+        geocoordsD = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (pt1[0] + pt4[0]) / 2,  (pt1[1] + pt4[1]) / 2, is_rear)
 
+        max = pt1[0] ** 2 + pt1[1] ** 2
+        first = 1;
+        if  pt2[0] ** 2 + pt2[1] ** 2 > max:
+            max = pt2[0] ** 2 + pt2[1] ** 2
+            first = 2;
+        if  pt3[0] ** 2 + pt3[1] ** 2 > max:
+            max = pt3[0] ** 2 + pt3[1] ** 2
+            first = 3;
+        if  pt4[0] ** 2 + pt4[1] ** 2 > max:
+            max = pt4[0] ** 2 + pt4[1] ** 2
+            first = 4;
+        if first == 1:
+            return {"C": [geocoords1['lat2'], geocoords1['lon2']], 
+                    "I": [geocoords4['lat2'], geocoords4['lon2']], 
+                    "J": [geocoords2['lat2'], geocoords2['lon2']], 
+                    "K": [geocoords3['lat2'], geocoords3['lon2']], 
+                    "D": [geocoordsD['lat2'], geocoordsD['lon2']]}
+        if first == 2:
+            return {"C": [geocoords2['lat2'], geocoords2['lon2']], 
+                    "I": [geocoords3['lat2'], geocoords3['lon2']], 
+                    "J": [geocoords1['lat2'], geocoords1['lon2']], 
+                    "K": [geocoords4['lat2'], geocoords4['lon2']], 
+                    "D": [geocoordsD['lat2'], geocoordsD['lon2']]}
+        if first == 3:
+            return {"C": [geocoords3['lat2'], geocoords3['lon2']], 
+                    "I": [geocoords1['lat2'], geocoords1['lon2']], 
+                    "J": [geocoords4['lat2'], geocoords4['lon2']], 
+                    "K": [geocoords2['lat2'], geocoords2['lon2']], 
+                    "D": [geocoordsD['lat2'], geocoordsD['lon2']]}
+        return {"C": [geocoords4['lat2'], geocoords4['lon2']], 
+                "I": [geocoords2['lat2'], geocoords2['lon2']], 
+                "J": [geocoords3['lat2'], geocoords3['lon2']], 
+                "K": [geocoords1['lat2'], geocoords1['lon2']], 
+                "D": [geocoordsD['lat2'], geocoordsD['lon2']]}
+
+    def count_angle(self, p1, p2, p3):
+        v1 = (p2[0] - p1[0], p2[1] - p1[1])
+        v2 = (p3[0] - p2[0], p3[1] - p2[1])
+        angle = math.atan2(v2[1], v2[0]) - math.atan2(v1[1], v1[0])
+        angle = math.degrees(angle)%180
+        # если нужен острый угол
+        # return min(180 - angle, angle)
+        return angle
 
 
     # Функция вызывается, когда прилетает JSON от pcl_map_node
     def __on_obstacles_message(self, data):
+        
+        
         # в data.data находится наша строка, парсим её
         obstacles_dict = json.loads(data.data);
         # если прилетели данные от переднего лидара
@@ -130,25 +251,7 @@ class NodePointObstacles(Node):
         p3 = [0, 0]
         p4 = [0, 0]
         # Обходим все обнаруженные препятствия
-        self.geocoords = []
         for p in obst_list:
-            # Геокоординаты 4-х точек - углов препятствия
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[4][1],  p[4][0], self.LIDAR_REVERSED)
-            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[5][1],  p[4][0], self.LIDAR_REVERSED)
-            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[6][1],  p[4][0], self.LIDAR_REVERSED)
-            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, p[7][1],  p[4][0], self.LIDAR_REVERSED)
-            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-            # Геокоординаты середины диагонали препятствия
-            pgeocoords = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (p[4][1] + p[7][1]) / 2,  (p[4][0] + p[7][0]) / 2, self.LIDAR_REVERSED) 
-            self.geocoords.append([pgeocoords['lat2'], pgeocoords['lon2']])
-                
-
-
-
-
             if self.lidardata['visualize']:
                 # здесь будут координаты углов препятствий
 
@@ -176,6 +279,41 @@ class NodePointObstacles(Node):
                     self.rear_figures.append([p[4], p[5], p[6], p[7], False, p[0], p[1], p[2], p[3], pclass])
 
         self.all_figures = self.front_figures + self.rear_figures
+
+
+        # Построение элемента словаря для публикации
+        for figure in self.all_figures:
+            object_data_item = {"BC": figure[6]} # Дистанция до препятствия
+
+            # Считаем угол alpha - между машиной и центром препятствия
+            # (p[4][1] + p[7][1]) / 2,  (p[4][0] + p[7][0]) / 2
+            
+            pt1 = (0, 1)
+            pt2 = (0, 0)
+            if figure[4]:
+                pt3 = ((figure[0][0] + figure[3][0]) / 2,  (figure[0][1] + figure[3][1]) / 2)
+            else:
+                pt3 = ((figure[0][1] + figure[3][1]) / -2,  (figure[0][0] + figure[3][0]) / 2)
+
+            object_data_item["alpha"] = self.count_angle(pt1, pt2, pt3)
+            p_coords = self.get_corner_coords(figure[0], figure[1], figure[2], figure[3], not figure[4])
+
+            object_data_item["L"] = self.get_lane_number((p_coords['D'][0], p_coords['D'][1])) # Здесь нужно выдавать номер полосы, в которой находится препятствие
+            object_data_item["ObjectType"] = "Car" if figure[9] == "C" else "Person"
+            object_data_item["Coordinates"] = p_coords
+
+            self.object_data["ObjectData"].append(object_data_item)
+            
+        
+        # self._logger.info("JSON: " + json.dumps(self.object_data))
+
+
+
+
+
+
+
+
         # self._logger.info(str(self.geocoords))
 
         if self.lidardata['visualize']:
@@ -215,16 +353,21 @@ class NodePointObstacles(Node):
                     p2[0] = int(512.0 + figure[2][0] * scale)
                     p3[1] = int(512.0 - figure[3][1] * scale)
                     p3[0] = int(512.0 + figure[3][0] * scale)
+                p_coords = self.get_corner_coords(figure[0], figure[1], figure[2], figure[3], not figure[4])
 
-                
+                lanenum = self.get_lane_number((p_coords['D'][0], p_coords['D'][1])) # Здесь нужно выдавать номер полосы, в которой находится препятствие
+
                 # Рисуем текст - номер препятствия
-                cv2.putText(self.img, f"[{figure[9]}]Fig #{figure[5]}, d={figure[6]}, hmin={figure[7]}, hmax={figure[8]}", (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0));
+                cv2.putText(self.img, f"[{figure[9]}][{lanenum}]Fig #{figure[5]}, d={figure[6]}, hmin={figure[7]}, hmax={figure[8]}", (p1[0], p1[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0));
                 # Рисуем рамку препятствия
                 cv2.line(self.img, (p1[0], p1[1]), (p2[0], p2[1]), (255,255,255), 1);
                 cv2.line(self.img, (p2[0], p2[1]), (p3[0], p3[1]), (255,255,255), 1);
                 cv2.line(self.img, (p3[0], p3[1]), (p4[0], p4[1]), (255,255,255), 1);
                 cv2.line(self.img, (p4[0], p4[1]), (p1[0], p1[1]), (255,255,255), 1);
-        
+                
+                cv2.circle(self.img, (p3[0], p3[1]), 3, (255, 255, 0), 1)
+            car_lane = self.get_lane_number((self.lat, self.lon))
+            cv2.putText(self.img, f"Lane: {car_lane}, lat: {self.lat}, lon: {self.lon}", (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0));    
             cv2.imshow('NPO', self.img)  # Отображаем окно
             cv2.waitKey(1) # Нужно для работы окна
 

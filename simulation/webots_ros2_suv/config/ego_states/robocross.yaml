@@ -29,7 +29,7 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["gpsfollow"] # "gpsfollow"
+    start_move: ["moving"] # "gpsfollow"
     stop: ["stopped"]
     pause: ["paused"]
   gpsfollow:
@@ -124,3 +124,9 @@ map-elements:
     name: !!str Зона скорости 40
     ol-type: !!str Polygon
     color: !!str fe00cf
+    
+  - element:
+    id: "obstacle_stop"
+    name: !!str Зона остановки перед препядствием
+    ol-type: !!str Polygon
+    color: !!str 804030
