@@ -141,7 +141,6 @@ class MovingState(AbstractState):
         return [first[0] * k + second[0] * (1 - k), first[1] * k + second[1] * (1 - k)]
 
     def draw_box(self, screen, bounds, color):
-        self.loge(f"bounds {bounds}")
         pg.draw.line(screen,
                     color,
                     self.move_screen(bounds[0][0], bounds[0][1]),
@@ -163,7 +162,6 @@ class MovingState(AbstractState):
     def on_event(self, event, world_model=None):
         world_model.software_state = 'Auto'
         self.runs = self.runs + 1
-        self.log("gps follow state")
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -206,8 +204,7 @@ class MovingState(AbstractState):
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
             diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * 0.2
             world_model.gps_car_turn_angle = world_model.gps_car_turn_angle + diff_angle
-            self.logi(f"diff = {self.prev_target_angle - world_model.gps_car_turn_angle} new = {world_model.gps_car_turn_angle}, old ={self.prev_target_angle}")
-            
+
             self.params["diff"] = self.prev_target_angle - world_model.gps_car_turn_angle
             self.params["new"] = world_model.gps_car_turn_angle
             self.params["old"] = self.prev_target_angle
@@ -222,8 +219,6 @@ class MovingState(AbstractState):
 
         event = None
         zones = world_model.get_current_zones()
-
-        # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
         speed = self.config['default_speed']
         zones_names = []
@@ -259,7 +254,6 @@ class MovingState(AbstractState):
                 if self.has_obstacle(world_model):
                     speed = 0
             else:
-                self.logi(f"{world_model.previous_zone} go out")
                 world_model.previous_zone = None
             zones_names.append(zone["name"])
 
@@ -286,10 +280,10 @@ class MovingState(AbstractState):
                                [obstacle[9], obstacle[10]],
                                [obstacle[9], obstacle[11]],
                                [obstacle[8], obstacle[11]]]
-            inflated_obstacles = [[obstacle[8], obstacle[10] - 10],
-                                  [obstacle[9], obstacle[10]],
-                                  [obstacle[9], obstacle[11]],
-                                  [obstacle[8], obstacle[11]]]
+            inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
+                                  [obstacle[9] + 10, obstacle[10]],
+                                  [obstacle[9] + 10, obstacle[11]],
+                                  [obstacle[8] - 10, obstacle[11]]]
             
             rotated_obstacle = []
             rotated_inflated_obstacle = []
@@ -316,7 +310,6 @@ class MovingState(AbstractState):
         for obstacle in world_model.obstacles:
             mean_obstacle_position = [(obstacle[8] + obstacle[9]) / 2, (obstacle[10] + obstacle[11]) / 2]
             obstacle_angle = abs(self.AngleOfReference(mean_obstacle_position))
-            self.logi(f"position {mean_obstacle_position} angle {obstacle_angle}")
             if obstacle[1] < self.config["obstacle_stop_distance"] and obstacle_angle < self.config["treshold_angle"]:
                 return True
         return False
