@@ -79,15 +79,15 @@ class PointCloudMapper : public rclcpp::Node
       //Публикаторы данных о препятствиях
       json_publisher = this->create_publisher<std_msgs::msg::String>("obstacles",10);
       lidar_subscriber = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-          // "lidar",
+          // "____lidar",
         "/ch64w/lslidar_point_cloud", 
         10, 
         std::bind(&PointCloudMapper::lidar_callback, this, std::placeholders::_1)\
       );
       auto qos = rclcpp::QoS(1);
       lidar_subscriber_rear = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-        // "/points", 
-        "/lidar_rear",
+        "/points", 
+        // "/lidar_rear",
         qos.best_effort(), 
         std::bind(&PointCloudMapper::lidar_callback_rear_2, this, std::placeholders::_1)\
       );
@@ -329,8 +329,8 @@ class PointCloudMapper : public rclcpp::Node
               
               //dist+=0.1;
             } else {
-              double pdist1 = calc_distance(-1 * cluster_point.y, cluster_point.x + lidar_y, vehicle_corner3_x + lidar_x, vehicle_corner3_y + lidar_y);
-              double pdist2 = calc_distance(-1 * cluster_point.y, cluster_point.x + lidar_y, vehicle_corner4_x + lidar_x, vehicle_corner4_y + lidar_y);
+              double pdist1 = calc_distance(cluster_point.x, cluster_point.y, lidar_x, lidar_y + vehicle_corner3_x);
+              double pdist2 = calc_distance(cluster_point.x, cluster_point.y, lidar_x, lidar_y + vehicle_corner4_x);
               //double pdist3 = calc_distance(-1 * cluster_point.y + lidar_x, cluster_point.x + lidar_y, vehicle_corner1_x, vehicle_corner1_y);
               //double pdist4 = calc_distance(-1 * cluster_point.y + lidar_x, cluster_point.x + lidar_y, vehicle_corner2_x, vehicle_corner2_y);
               double pdist3 = pdist1;
@@ -349,9 +349,9 @@ class PointCloudMapper : public rclcpp::Node
           {
             continue;
           }
-          if (is_rear && xmin < 0 && dist < 3) {
-            continue;
-          }
+          // if (is_rear && xmin < 0 && dist < 3) {
+          //  continue;
+          //}
 
 
           //Минимальные и максимальные значения координат
@@ -447,12 +447,14 @@ class PointCloudMapper : public rclcpp::Node
 
     // Обработка сообщения с переднего лидара
     void lidar_callback(const sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg) {
+      //RCLCPP_INFO(this->get_logger(), "Data from front recieved!!!!");
       json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles", false, front_lidar_x, front_lidar_y, front_lidar_z, 
       front_lidar_x_angle, front_lidar_y_angle, front_lidar_z_angle));
     }
 
     // Обработка сообщения с заднего лидара
     void lidar_callback_rear_2(const sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg) {
+      //RCLCPP_INFO(this->get_logger(), "Data from back recieved!!!!");
       json_publisher->publish(make_json_obstacles(cloud_msg, "obstacles_rear", true, rear_lidar_x, rear_lidar_y, rear_lidar_z, 
                               rear_lidar_x_angle, rear_lidar_y_angle, rear_lidar_z_angle));
     }

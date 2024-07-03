@@ -8,8 +8,8 @@ front_lidar_z: 1.37
 front_lidar_x_angle: -5.5
 front_lidar_y_angle: 0.0
 front_lidar_z_angle: 0.0
-rear_lidar_x: -0.05
-rear_lidar_y: -5.45
+rear_lidar_x: 0.0
+rear_lidar_y: 0.0
 rear_lidar_z: 0.0
 rear_lidar_x_angle: 0.0
 rear_lidar_y_angle: -5.5
@@ -19,7 +19,7 @@ segmentation_threshold: 0.3
 cluster_tolerance: 0.5
 min_cluster_size: 5
 max_cluster_size: 20000
-rear_filter_leaf_size: 0.001
+rear_filter_leaf_size: 0.1
 rear_segmentation_threshold: 0.5
 rear_cluster_tolerance: 0.5
 rear_min_cluster_size: 10
@@ -41,6 +41,7 @@ min_axis_distance: 1.0
 max_distance: 20.0
 gps_shift_x: -0.05
 gps_shift_y: -2.4
+gps_shift_y_back: -3.1
 zed_x: -0.12
 zed_y: 0.93
 zed_z: -2.0

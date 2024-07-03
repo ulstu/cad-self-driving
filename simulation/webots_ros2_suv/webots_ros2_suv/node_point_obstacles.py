@@ -35,7 +35,7 @@ from .lib.param_loader import ParamLoader
 from .lib.config_loader import ConfigLoader
 
 
-def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint_y, lidar_reversed):
+def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, geosensor_y_back, newpoint_x, newpoint_y, lidar_reversed):
     """
     Функция вычисления географических координат точки
     На вход подаются:
@@ -49,12 +49,17 @@ def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, newpoint_x, newpoint
     """
     geod = Geodesic.WGS84
     # Считаем координаты точки относительно GPS-сенсора
-    corr_x = newpoint_x - geosensor_x; 
-    corr_y = newpoint_y - geosensor_y;
+
     # Вычисляем азимут требуемой точки
     if lidar_reversed:
-        azimuth = angle - math.degrees(math.atan(corr_y / corr_x))
+        corr_x = newpoint_x + geosensor_y_back; 
+        corr_y = newpoint_y - geosensor_x;
+        azimuth = 180 - (math.degrees(math.atan(corr_y / corr_x)) - angle)
+        #azimuth = math.degrees(math.atan(corr_x / corr_y)) + angle
     else:
+        corr_x = newpoint_x - geosensor_x; 
+        corr_y = newpoint_y - geosensor_y;
+        
         azimuth = math.degrees(math.atan(corr_x / corr_y)) + angle
     # Вычисляем расстоние до требуемой точки
     shift = math.sqrt(corr_x ** 2 + corr_y ** 2)
@@ -97,6 +102,7 @@ class NodePointObstacles(Node):
             self.MAP_SCALE = self.lidardata['visual_scale']
             self.GPS_SHIFT_X = self.lidardata['gps_shift_x']
             self.GPS_SHIFT_Y = self.lidardata['gps_shift_y']
+            self.GPS_SHIFT_Y_BACK = self.lidardata['gps_shift_y_back']
             self.LIDAR_REVERSED = self.lidardata['lidar_reversed']
             self.geocoords = []
             self.rear_figures = []
@@ -181,11 +187,11 @@ class NodePointObstacles(Node):
         
     def get_corner_coords(self, pt1, pt2, pt3, pt4, is_rear):
         # 1, 4, 2, 3 - по часовой стрелке
-        geocoords1 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt1[0],  pt1[1], is_rear)
-        geocoords2 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt2[0],  pt2[1], is_rear)
-        geocoords3 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt3[0],  pt3[1], is_rear)
-        geocoords4 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, pt4[0],  pt4[1], is_rear)
-        geocoordsD = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, (pt1[0] + pt4[0]) / 2,  (pt1[1] + pt4[1]) / 2, is_rear)
+        geocoords1 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, self.GPS_SHIFT_Y_BACK, pt1[0],  pt1[1], is_rear)
+        geocoords2 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, self.GPS_SHIFT_Y_BACK, pt2[0],  pt2[1], is_rear)
+        geocoords3 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, self.GPS_SHIFT_Y_BACK, pt3[0],  pt3[1], is_rear)
+        geocoords4 = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, self.GPS_SHIFT_Y_BACK, pt4[0],  pt4[1], is_rear)
+        geocoordsD = calc_geo_pos(self.lat, self.lon, self.ang, self.GPS_SHIFT_X, self.GPS_SHIFT_Y, self.GPS_SHIFT_Y_BACK, (pt1[0] + pt4[0]) / 2,  (pt1[1] + pt4[1]) / 2, is_rear)
 
         max = pt1[0] ** 2 + pt1[1] ** 2
         first = 1;

@@ -235,7 +235,7 @@ class NodeEgoController(Node):
             self.__world_model.obstacles = obst_list
         # если прилетели данные от заднего лидара
         if 'obstacles_rear' in obstacles_dict:
-            obst_list = obstacles_dict['obstacles_rear'];
+            obst_list= obstacles_dict['obstacles_rear'];
         self.__world_model.lidar_bounding_boxes = []
         
         # Обходим все обнаруженные препятствия
