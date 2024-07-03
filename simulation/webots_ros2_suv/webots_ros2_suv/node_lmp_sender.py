@@ -13,14 +13,14 @@ class NodeLMPSender(Node):
     def __init__(self):
         try:
             super().__init__('node_lmp_sender')
-            self.create_subscription(String, 'cmd_lmp_send', self.__cmd_lmp_send_callback, 1)
+            self.create_subscription(String, 'lmp_send', self.__lmp_send_callback, 1)
             self.socket_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.lmp_data = None
         except Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
-    def __cmd_lmp_send_callback(self, lmp_data):
-        self.lmp_data = json.dumps(lmp_data.data)
+    def lmp_send_callback(self, lmp_data):
+        self.lmp_data = lmp_data.data
 
 def main(args=None):
     try:
@@ -32,6 +32,7 @@ def main(args=None):
                 rclpy.spin_once(lmp_sender, timeout_sec=0.5)
 
                 if lmp_sender.lmp_data:
+                    # print(lmp_sender.lmp_data)
                     lmp_sender.socket_send.sendto(lmp_sender.lmp_data.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
             except KeyboardInterrupt:
                 pass

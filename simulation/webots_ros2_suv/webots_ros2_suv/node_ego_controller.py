@@ -77,10 +77,11 @@ class NodeEgoController(Node):
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
+            self.create_subscription(String, 'object_data', self.__on_object_data_message, qos) 
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             self.__control_unit_publisher = self.create_publisher(String, 'cmd_control_unit', 1)
-            self.__lmp_sender_publisher = self.create_publisher(String, 'cmd_lmp_send', 1)
+            self.__lmp_sender_publisher = self.create_publisher(String, 'lmp_send', 1)
 
             self.start_web_server()
 
@@ -107,10 +108,10 @@ class NodeEgoController(Node):
         sock.bind((UDP_RECV_IP, UDP_RECV_PORT))  # связываем сокет с портом, где он будет ожидать сообщения
         sock.setblocking(0)
         sock.listen(1)  # указываем сколько может сокет принимать соединений
-        print('Server is running, please, press ctrl+c to stop')
+        self._logger.info(f"Server is running, please, press ctrl+c to stop")
         while True:
             conn, addr = sock.accept()  # начинаем принимать соединения
-            print('connected:', addr)  # выводим информацию о подключении
+            self._logger.info(f"connected: {addr}") # выводим информацию о подключении
             data = conn.recv(RECV_BUFFER_SIZE)  # принимаем данные от клиента, по 1024 байт
             
             if data:
@@ -220,6 +221,11 @@ class NodeEgoController(Node):
         #         self.__world_model.lidar_bounding_boxes.append(box_edges)
         #     else:
         #         pass #TODO
+
+
+    def __on_object_data_message(self, data):
+        obstacles_list = json.loads(data.data)
+        self.__world_model.lmp_data['ObjectData'] = obstacles_list
 
 def main(args=None):
     try:
