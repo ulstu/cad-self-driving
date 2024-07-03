@@ -576,7 +576,7 @@ class ImageAnalyzer:
         traffic_light_state = "none" # HERE GOES YOUR CODE!!!!!!!!!!!
 
         if self.project_settings_config["use_traffic_light_detection"]:
-            result = self.tld_model.predict([image])[0]
+            result = self.tld_model.predict([image], verbose=False)[0]
             if result.boxes is not None:
                 if len(result.boxes) > 0:
                     closest_traffic_light_id = self.find_closest_traffic_light_id(result)
