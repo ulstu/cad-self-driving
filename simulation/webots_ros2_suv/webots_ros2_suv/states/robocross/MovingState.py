@@ -6,6 +6,8 @@ import time
 import pygame as pg
 import numpy as np
 
+screen_scale = 15
+
 class MovingState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
@@ -129,14 +131,14 @@ class MovingState(AbstractState):
         N = I + II * (Lon - Lon0) ** 2 + III * (Lon - Lon0) ** 4 + IIIA * (Lon - Lon0) ** 6
         E = E0 + IV * (Lon - Lon0) + V * (Lon - Lon0) ** 3 + VI * (Lon - Lon0) ** 5
 
-        return [E / 5, -N / 5]
+        return [E, -N]
 
     def rotate_point(self, center, target, angle):
         return [math.cos(angle) * (target[0] - center[0]) - math.sin(angle) * (target[1] - center[1]) + center[0],
                 math.sin(angle) * (target[0] - center[0]) + math.cos(angle) * (target[1] - center[1]) + center[1]]
 
     def move_screen(self, x, y):
-        return [int(400 + x * 60), int(400 + y * 60)]
+        return [int(400 + x * screen_scale), int(400 + y * screen_scale)]
 
     def AngleOfReference(self, v):
         return self.NormalizeAngle(math.atan2(v[1], v[0]) / math.pi * 180)
@@ -203,25 +205,33 @@ class MovingState(AbstractState):
             for point in points:
                 path_square_points.append(self.gps_to_rect(point[0], point[1]))
             
-            for obstacle in world_model.obstacles:
-                inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
-                                      [obstacle[9] + 10, obstacle[10]],
-                                      [obstacle[9] + 10, obstacle[11]],
-                                      [obstacle[8] - 10, obstacle[11]]]
-                x_dif = -obstacle[8] + obstacle[9]
-                y_dif = obstacle[11] - obstacle[10]
-                if x_dif < 1:
-                    x_dif = 1
-                if y_dif < 1:
-                    y_dif = 1
-                obstacle_rect = pg.Rect(-obstacle[9], obstacle[10] - 10, x_dif, y_dif + 20)
-                for i in range(1, min(self.__cur_path_point + 10),  len(path_square_points) - 1):
-                    difference_vector = [path_square_points[0] - car_position[0], path_square_points[1] - car_position[1]]
-                    self.rotate_point([0, 0], difference_vector, orientation)
-                    if obstacle_rect.collidepoint(difference_vector[0], difference_vector[1]):
-                        if self.road_offsets[i] == 0:
-                            self.road_offsets[i] = 1
-
+            for i in range(1, min(self.__cur_path_point + 10,  len(path_square_points) - 1)):
+                if self.road_offsets[i] == 0:
+                    difference_vector = [path_square_points[i][0] - car_position[0], path_square_points[i][1] - car_position[1]]
+                    difference_vector = self.rotate_point([0, 0], difference_vector, orientation)
+                    for obstacle in world_model.obstacles:
+                        inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
+                                                [obstacle[9] + 10, obstacle[10]],
+                                                [obstacle[9] + 10, obstacle[11]],
+                                                [obstacle[8] - 10, obstacle[11]]]
+                        x_dif = -obstacle[8] + obstacle[9]
+                        y_dif = obstacle[11] - obstacle[10]
+                        if x_dif < 1:
+                            x_dif = 1
+                        if y_dif < 1:
+                            y_dif = 1
+                        obstacle_rect = pg.Rect(-obstacle[9], obstacle[10] - 10, x_dif, y_dif + 20)
+                        
+                        if obstacle_rect.collidepoint(difference_vector[0], difference_vector[1]):
+                            if self.road_offsets[i] == 0:
+                                self.road_offsets[i] = 1
+                                break
+                if self.road_offsets[i] != 0:
+                    previous_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
+                    next_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
+                    points_angle = self.AngleOfReference([next_point[0] - previous_point[0], next_point[1] - previous_point[1]]) + math.pi / 2
+                    path_square_points[i][0] += math.cos(points_angle) * 4
+                    path_square_points[i][1] += math.sin(points_angle) * 4
 
             path_square_points = path_square_points[self.__cur_path_point:]
 
@@ -308,8 +318,6 @@ class MovingState(AbstractState):
         pg.event.get()
         self.sc.fill((0, 0, 0))
 
-        pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
-
         pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:
             pg.draw.line(self.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
@@ -317,22 +325,28 @@ class MovingState(AbstractState):
             pg.draw.circle(self.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
 
         for obstacle in world_model.obstacles:
-            obstacle_points = [[obstacle[8], obstacle[10]],
-                               [obstacle[9], obstacle[10]],
-                               [obstacle[9], obstacle[11]],
-                               [obstacle[8], obstacle[11]]]
-            inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
-                                  [obstacle[9] + 10, obstacle[10]],
-                                  [obstacle[9] + 10, obstacle[11]],
-                                  [obstacle[8] - 10, obstacle[11]]]
+            obstacle_points = [[-obstacle[8], obstacle[10]],
+                               [-obstacle[9], obstacle[10]],
+                               [-obstacle[9], obstacle[11]],
+                               [-obstacle[8], obstacle[11]]]
+            inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
+                                  [-obstacle[9] + 10, obstacle[10]],
+                                  [-obstacle[9] + 10, obstacle[11]],
+                                  [-obstacle[8] - 10, obstacle[11]]]
+            
+            x_dif = -obstacle[8] + obstacle[9]
+            y_dif = obstacle[11] - obstacle[10]
+            if x_dif < 1:
+                x_dif = 1
+            if y_dif < 1:
+                y_dif = 1
             
             rotated_obstacle = []
             rotated_inflated_obstacle = []
             for i in range(4):
-                rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=orientation))
-                rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=orientation))
+                rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
+                rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
             self.draw_box(self.sc, rotated_obstacle, (255, 255, 0))
-            # self.draw_box(self.sc, rotated_inflated_obstacle, (255, 0, 0))
 
         for lane in self.lane_coords:
             begin = self.gps_to_rect(lane[1][0], lane[1][1])

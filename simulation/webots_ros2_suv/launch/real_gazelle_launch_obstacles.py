@@ -148,7 +148,7 @@ def get_ros2_nodes(*args):
     return [
         state_publisher_node,
         node_sensors_gazelle,
-        node_ego_controller,
+        # node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
         # node_visual,
