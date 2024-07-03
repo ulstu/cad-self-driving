@@ -173,7 +173,7 @@ class NodePointObstacles(Node):
         if self.__world_model:
             roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
             yaw = math.degrees(yaw)
-            self._logger.info(f"yaw: {yaw}")
+            # self._logger.info(f"yaw: {yaw}")
             lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
             self.lat, self.lon, self.ang = lon, lat, yaw # Широта и долгота перепутаны!
         pass
