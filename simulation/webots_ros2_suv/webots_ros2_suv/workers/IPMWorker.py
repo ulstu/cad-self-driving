@@ -85,7 +85,8 @@ class IPMWorker(AbstractWorker):
             
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
 
-            image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes)
+            # image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes) # if you want to remove objects
+            image_seg[image_seg == 0] = 100 # if you want to left the objects (which should work better for new the yolo model)
             world_model.ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False, log=self.log)
             world_model.ipm_image = self.__map_builder.crop_ipm(world_model.ipm_image, log=self.log)
             tbs, widths = self.__map_builder.transform_boxes(cboxes)

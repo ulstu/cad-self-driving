@@ -135,7 +135,7 @@ class LaneLineDetectionWorker(AbstractWorker):
                         draw_lines([world_model.ipm_colorized_lines], line_batches_bev, palette=[(0, 0, 255)], thickness=4)
                     else:
                         world_model.img_front_objects_prj_lines = image_to_draw
-                        world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+                        
                     
                     world_model.img_front_objects_prj_lines = image_to_draw
 
@@ -143,4 +143,5 @@ class LaneLineDetectionWorker(AbstractWorker):
                 super().error(''.join(traceback.TracebackException.from_exception(err).format()))
         else:
             world_model.img_front_objects_prj_lines = np.copy(world_model.img_front_objects_prj)
+            world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
         return world_model

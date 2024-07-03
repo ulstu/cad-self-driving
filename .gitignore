@@ -18,6 +18,7 @@ simulation/webots_ros2_suv/resource/yolov8l_barrels.pt
 simulation/webots_ros2_suv/resource/weights/model-ep50-signs16/model.h5
 simulation/webots_ros2_suv/resource/RCm
 simulation/webots_ros2_suv/resource/RMm
+simulation/webots_ros2_suv/resource/TLDm
 
 
 # Byte-compiled / optimized / DLL files
