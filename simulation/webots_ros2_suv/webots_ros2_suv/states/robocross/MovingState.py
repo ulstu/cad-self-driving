@@ -6,7 +6,6 @@ import time
 import pygame as pg
 import numpy as np
 
-
 class MovingState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
@@ -193,13 +192,36 @@ class MovingState(AbstractState):
 
         while True:
             points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+            
+            # TODO: add collecting of segment points
+            
+            if len(points) > 0 and len(self.road_offsets) == 0:
+                self.road_offsets = np.zeros(len(points))
+
             world_model.gps_path = points
             path_square_points = []
             for point in points:
                 path_square_points.append(self.gps_to_rect(point[0], point[1]))
             
-            for i in range(len(path_square_points)):
-                pass
+            for obstacle in world_model.obstacles:
+                inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
+                                      [obstacle[9] + 10, obstacle[10]],
+                                      [obstacle[9] + 10, obstacle[11]],
+                                      [obstacle[8] - 10, obstacle[11]]]
+                x_dif = -obstacle[8] + obstacle[9]
+                y_dif = obstacle[11] - obstacle[10]
+                if x_dif < 1:
+                    x_dif = 1
+                if y_dif < 1:
+                    y_dif = 1
+                obstacle_rect = pg.Rect(-obstacle[9], obstacle[10] - 10, x_dif, y_dif + 20)
+                for i in range(1, min(self.__cur_path_point + 10),  len(path_square_points) - 1):
+                    difference_vector = [path_square_points[0] - car_position[0], path_square_points[1] - car_position[1]]
+                    self.rotate_point([0, 0], difference_vector, orientation)
+                    if obstacle_rect.collidepoint(difference_vector[0], difference_vector[1]):
+                        if self.road_offsets[i] == 0:
+                            self.road_offsets[i] = 1
+
 
             path_square_points = path_square_points[self.__cur_path_point:]
 
