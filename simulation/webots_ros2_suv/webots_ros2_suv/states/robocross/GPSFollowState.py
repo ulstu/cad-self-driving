@@ -6,10 +6,7 @@ import time
 import pygame as pg
 import numpy as np
 
-
-def move_screen(x, y):
-    return [int(400 + x * 60), int(400 + y * 60)]
-
+screen_scale = 15
 
 class GPSFollowState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
@@ -51,41 +48,6 @@ class GPSFollowState(AbstractState):
         return True
 
     def find_next_goal_point(self, world_model):
-        '''
-
-        if not world_model.global_map:
-            return (0, 0)
-
-        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
-        dists = []
-
-        for point in points:
-            dists.append(calc_dist_point(point, world_model.get_current_position()))
-        self.__cur_path_point = world_model.cur_path_point
-
-        if self.__cur_path_point < len(points) - 1:
-            x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
-            dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
-
-            if dist < self.config['change_point_dist'] or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
-                self.__cur_path_point = self.__cur_path_point + 1
-            self.log(f"[GPSFollowState] DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
-        else:
-            self.__cur_path_point = len(points) - 1
-
-        world_model.cur_path_point = self.__cur_path_point
-
-        x, y = world_model.coords_transformer.get_relative_coordinates(
-            points[self.__cur_path_point][0], 
-            points[self.__cur_path_point][1], 
-            pos=world_model.get_current_position(),
-            pov_point=world_model.pov_point
-        )
-
-        return (x, y)
-
-        '''
-
         if not world_model.global_map:
             return (0, 0)
 
@@ -152,7 +114,14 @@ class GPSFollowState(AbstractState):
         N = I + II * (Lon - Lon0) ** 2 + III * (Lon - Lon0) ** 4 + IIIA * (Lon - Lon0) ** 6
         E = E0 + IV * (Lon - Lon0) + V * (Lon - Lon0) ** 3 + VI * (Lon - Lon0) ** 5
 
-        return [E / 5, -N / 5]
+        return [E, -N]
+    
+    def rotate_point(self, center, target, angle):
+        return [math.cos(angle) * (target[0] - center[0]) - math.sin(angle) * (target[1] - center[1]) + center[0],
+                math.sin(angle) * (target[0] - center[0]) + math.cos(angle) * (target[1] - center[1]) + center[1]]
+
+    def move_screen(self, x, y):
+        return [int(400 + x * screen_scale), int(400 + y * screen_scale)]
 
     def AngleOfReference(self, v):
         return self.NormalizeAngle(math.atan2(v[1], v[0]) / math.pi * 180)
@@ -236,17 +205,51 @@ class GPSFollowState(AbstractState):
 
         pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
-        pg.draw.line(self.sc, (255,0,0), move_screen(0, 0), move_screen(car_vector[0], car_vector[1]))
+        is_obstacle_in_area = True
+        rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
+
+        self.has_obstacle = False
+        for obstacle in world_model.obstacles:
+            obstacle_points = [[-obstacle[8], obstacle[10]],
+                               [-obstacle[9], obstacle[10]],
+                               [-obstacle[9], obstacle[11]],
+                               [-obstacle[8], obstacle[11]]]
+            inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
+                                  [-obstacle[9] + 10, obstacle[10]],
+                                  [-obstacle[9] + 10, obstacle[11]],
+                                  [-obstacle[8] - 10, obstacle[11]]]
+            
+            x_dif = -obstacle[8] + obstacle[9]
+            y_dif = obstacle[11] - obstacle[10]
+            if x_dif < 1:
+                x_dif = 1
+            if y_dif < 1:
+                y_dif = 1
+            rect2 = pg.Rect(-obstacle[9], obstacle[10], x_dif, y_dif)
+            # self.draw_rect(self.sc, (rect2), orientation, (255, 255, 255))
+            color = (255, 255, 0)
+            if rect1.colliderect(rect2):
+                color = (255, 0, 0)
+                self.has_obstacle = True
+
+            rotated_obstacle = []
+            rotated_inflated_obstacle = []
+            for i in range(4):
+                rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
+                rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
+            self.draw_box(self.sc, rotated_obstacle, color)
+            # self.draw_box(self.sc, rotated_inflated_obstacle, (255, 0, 0))
+
+        pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:
-            pg.draw.line(self.sc, (0,255,0), move_screen(0, 0), move_screen(difference[0], difference[1]))
+            pg.draw.line(self.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
         for point in path_square_points:
-            pg.draw.circle(self.sc, (255,0,0), move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
-        y = 10
-        for k, v in self.params.items():
-            text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
-            self.sc.blit(text_reward, (0, y))
-            y += 15
-        pg.display.update()
+            pg.draw.circle(self.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
+        self.draw_rect(self.sc, pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"]), orientation, (255, 255, 255))
+        rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
+        
+        self.draw_rect(self.sc, (rect1), orientation, (255, 255, 255))
+        self.params["has_obstacle"] = self.has_obstacle
 
         event = None
         zones = world_model.get_current_zones()
@@ -254,7 +257,7 @@ class GPSFollowState(AbstractState):
         # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
         speed = self.config['default_speed']
-
+        zones_names = []
         for zone in zones:
             if zone['name'] == 'turn':
                 world_model.cur_turn_polygon = zone['coordinates'][0]
@@ -283,16 +286,81 @@ class GPSFollowState(AbstractState):
                 event = 'stop'
             elif zone['name'].startswith('speed'):
                 speed = float(zone['name'].split('speed')[1])
+            elif zone["name"] == "obstacle_stop":
+                if self.has_obstacle:
+                    speed = 0
             else:
                 self.logi(f"{world_model.previous_zone} go out")
                 world_model.previous_zone = None
+            zones_names.append(zone["name"])
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
         #     event = 'start_move'
         # if world_model.is_lane_road():
         #     event = 'start_lane_follow'
+        self.params["zones"] = zones_names
+        self.params["speed"] = speed
+        
+        y = 10
+        for k, v in self.params.items():
+            text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
+            self.sc.blit(text_reward, (0, y))
+            y += 15
+        pg.display.update()
+
         if event:
             world_model.path = None
         world_model.set_speed(speed)
         self.drive(world_model, speed=speed)
         return event
+    
+    def draw_box(self, screen, bounds, color):
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[0][0], bounds[0][1]),
+                    self.move_screen(bounds[1][0], bounds[1][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[1][0], bounds[1][1]),
+                    self.move_screen(bounds[2][0], bounds[2][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[2][0], bounds[2][1]),
+                    self.move_screen(bounds[3][0], bounds[3][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[3][0], bounds[3][1]),
+                    self.move_screen(bounds[0][0], bounds[0][1]))
+
+    def draw_rect(self, screen, rect : pg.Rect, orientation, color):
+        orientation -= math.pi / 2
+        bounds = [
+            self.rotate_point((0, 0), (rect.left, rect.bottom), orientation),
+            self.rotate_point((0, 0), (rect.right, rect.bottom), orientation),
+            self.rotate_point((0, 0), (rect.right, rect.top), orientation),
+            self.rotate_point((0, 0), (rect.left, rect.top), orientation),
+        ]
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[0][0], bounds[0][1]),
+                    self.move_screen(bounds[1][0], bounds[1][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[1][0], bounds[1][1]),
+                    self.move_screen(bounds[2][0], bounds[2][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[2][0], bounds[2][1]),
+                    self.move_screen(bounds[3][0], bounds[3][1]))
+        pg.draw.line(screen,
+                    color,
+                    self.move_screen(bounds[3][0], bounds[3][1]),
+                    self.move_screen(bounds[0][0], bounds[0][1]))
+        
+    # def has_obstacle(self, world_model):
+    #     rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
+    #     for obstacle in world_model.obstacles:
+    #         rect2 = pg.Rect(int(obstacle[8]), int(obstacle[10]), int(obstacle[9] - obstacle[8]), int(obstacle[11] - obstacle[10]))
+    #         if rect1.colliderect(rect2):
+    #             return True
+    #     return False

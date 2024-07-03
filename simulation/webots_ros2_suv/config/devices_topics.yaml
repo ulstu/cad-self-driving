@@ -8,5 +8,5 @@ navsatfix_topicname: "/vehicle/gps_nav"
 odom_topicname: "/odom"
 fsm_config: "/config/ego_states/robocross.yaml"
 
-gnss_port: "/dev/ttyUSB0"
+gnss_port: "/dev/serial/by-id/usb-ООО_“ЛМП”_ЛМАП.468351.003_FT6UU2WR-if00-port0"
 gnss_baudrate: 3000000

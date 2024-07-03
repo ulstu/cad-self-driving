@@ -74,15 +74,20 @@ import tensorflow as tf
 from fastseg import MobileV3Large
 from webots_ros2_suv.lib.cnn import CNN
 from sklearn.preprocessing import OneHotEncoder
+from ament_index_python.packages import get_package_share_directory
 import numpy as np
 from PIL import Image
 import time
-import uuid
+from ultralytics import YOLO
+from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 HOST = "192.168.1.188"  # Standard loopback interface address (localhost)
 PORT = 65432
+PACKAGE_NAME = 'webots_ros2_suv'
+
+package_dir = get_package_share_directory(PACKAGE_NAME)
 
 class ImageAnalyzer:
     def __init__(self, 
@@ -109,6 +114,10 @@ class ImageAnalyzer:
         self.traffic_light_state = "none"
         self.traffic_light_queue = [self.traffic_light_state] * traffic_light_queue_length
         self.sign_queue = [-1] * sign_queue_length
+        self.project_settings_config = GlobalConfigLoader("project_settings").data
+
+        tld_model_path = os.path.join(package_dir, "resource/TLDm/model.pt")
+        self.tld_model = YOLO(tld_model_path)
 
         if self.is_video:
             self.cap = cv2.VideoCapture(video_dir)
@@ -532,6 +541,19 @@ class ImageAnalyzer:
         
         return traffic_sign_mask, traffic_sign_images, sign_rects, found_signs
 
+    def find_closest_traffic_light_id(self, result):
+        max_area = 0
+        max_area_idx = -1
+        for idx, box in enumerate(result.boxes):
+            width = box.xywhn[0][2]
+            height = box.xywhn[0][3]
+            area = width * height
+
+            if area > max_area:
+                max_area = area
+                max_area_idx = idx
+        return max_area_idx
+            
 
     def plot_predictions(self, image, yolo_detected_objects, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -541,15 +563,31 @@ class ImageAnalyzer:
         else:
             labels = self.seg_model.predict_one(np.array(analyze_image))
 
-        traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
+        # traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
         traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
 
         # if len(traffic_sign_images) > 0:
         #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
 
-        traffic_light_state = "none"
-        if len(traffic_light_images) > 0:
-            traffic_light_state = self.classify_traffic_light(traffic_light_images)
+        # traffic_light_state = "none"
+        # if len(traffic_light_images) > 0:
+        #     traffic_light_state = self.classify_traffic_light(traffic_light_images)
+
+        traffic_light_state = "none" # HERE GOES YOUR CODE!!!!!!!!!!!
+
+        if self.project_settings_config["use_traffic_light_detection"]:
+            result = self.tld_model.predict([image], verbose=False)[0]
+            if result.boxes is not None:
+                if len(result.boxes) > 0:
+                    closest_traffic_light_id = self.find_closest_traffic_light_id(result)
+                    traffic_light_int_label = int(result.boxes[closest_traffic_light_id].cls)
+                    traffic_light_label = self.tld_model.names[traffic_light_int_label]
+
+                    if traffic_light_label == "redtrafficlight":
+                        traffic_light_state = "red"
+                    elif traffic_light_label == "greentrafficlight":
+                        traffic_light_state = "green"
+
         
         if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
@@ -563,9 +601,10 @@ class ImageAnalyzer:
         # self.draw_mask(image, traffic_light_mask, [255, 0, 0])
         # self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
         self.draw_signs(image, sign_rects, found_signs)
-        self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
-                                           self.traffic_light_state == "green",
-                                           self.traffic_light_state == "none"])
+        if self.project_settings_config["use_traffic_light_detection"]:
+            self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
+                                            self.traffic_light_state == "green",
+                                            self.traffic_light_state == "none"])
         return image
         
 

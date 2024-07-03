@@ -17,6 +17,7 @@ from nav2_common.launch import RewrittenYaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
+CONFIG_DIRECTORY = "obstacles"
 
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
@@ -69,13 +70,13 @@ def get_ros2_nodes(*args):
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
-    
+    package = get_package_share_directory("webots_ros2_suv")
     pcl_map_node = Node(
         package="pcl_maps",
         executable='pcl_map_node',
         name='pcl_map_node',
         output='screen' ,
-        parameters=[{'use_sim_time': USE_SIM_TIME}]
+        parameters=[{'use_sim_time': USE_SIM_TIME, "config_dir": os.path.join(package, "config", CONFIG_DIRECTORY)}]
     )
     
     driver_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'params', 'lslidar_ch64w.yaml')
@@ -147,10 +148,10 @@ def get_ros2_nodes(*args):
     return [
         state_publisher_node,
         node_sensors_gazelle,
-        node_ego_controller,
+        # node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
-        node_visual,
+        # node_visual,
         # rviz_node,
         # node_bev_builder,
         node_point_obstacles,
@@ -173,6 +174,7 @@ def generate_launch_description():
             '/launch/driver_launch.py'
         ])
     )
+    os.environ['CONFIG_DIRECTORY'] = CONFIG_DIRECTORY
     return LaunchDescription([
         zed_wrapper_launch,
         ouster_wrapper_launch,

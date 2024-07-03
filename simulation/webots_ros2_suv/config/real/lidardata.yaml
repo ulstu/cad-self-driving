@@ -1,4 +1,4 @@
-visualize: False
+visualize: True
 visual_scale: 15
 lidar_reversed: False
 orthogonal_boxes: True
@@ -41,6 +41,7 @@ min_axis_distance: 1
 max_distance: 100.0
 gps_shift_x: 0.0
 gps_shift_y: 0.0
+gps_shift_y_back: -3.1
 zed_x: -0.12
 zed_y: 0.93
 zed_z: -2.0
