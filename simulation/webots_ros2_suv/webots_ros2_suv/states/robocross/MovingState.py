@@ -13,10 +13,11 @@ class MovingState(AbstractState):
         self.runs = 0
         self.__cur_path_point = 1
         self.sc = pg.display.set_mode((800, 800))
-        self.prev_target_angle = 0
         pg.font.init()
+        self.prev_target_angle = 0
         self.sysfont = pg.font.SysFont("Arial", 20)
         self.params = {}
+        self.road_offsets = []
 
         self.lane_coords = [
             [1, [52.00017417781055,55.819496316835284], [52.00016336515546,55.81918191164732]],
@@ -192,13 +193,15 @@ class MovingState(AbstractState):
 
         while True:
             points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
-            points_offset = self.__cur_path_point
-            points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
             world_model.gps_path = points
-
             path_square_points = []
             for point in points:
                 path_square_points.append(self.gps_to_rect(point[0], point[1]))
+            
+            for i in range(len(path_square_points)):
+                pass
+
+            path_square_points = path_square_points[self.__cur_path_point:]
 
             if len(path_square_points) > 1:
                 nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.75)
