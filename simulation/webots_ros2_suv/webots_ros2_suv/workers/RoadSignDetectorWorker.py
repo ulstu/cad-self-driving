@@ -49,6 +49,8 @@ class RoadSignDetectorWorker(AbstractWorker):
             self.detector.plot_predictions(img, world_model.yolo_detected_objects, image_to_draw, update_traffic_light_state=True)
 
             world_model.img_front_objects_prj_lines_signs = image_to_draw
+
+            
             
             #world_model.traffic_light_state = "red" if self.detector.is_red else "green"
             world_model.traffic_light_state = self.detector.traffic_light_state

@@ -1,3 +1,4 @@
 use_gpu: True
-use_line_detection: True
-use_road_marking_detection: True
+use_line_detection: False
+use_road_marking_detection: False
+use_traffic_light_detection: True
