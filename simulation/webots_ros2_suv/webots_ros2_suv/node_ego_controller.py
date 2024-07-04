@@ -77,7 +77,7 @@ class NodeEgoController(Node):
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
             self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
-            self.create_subscription(String, 'object_data', self.__on_object_data_message, qos) 
+            self.create_subscription(String, 'obstacles_json', self.__on_object_data_message, qos) 
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             self.__control_unit_publisher = self.create_publisher(String, 'cmd_control_unit', 1)
@@ -85,9 +85,9 @@ class NodeEgoController(Node):
 
             self.start_web_server()
 
-            # udp_server_thread = threading.Thread(target=self.start_udp_server)
-            # udp_server_thread.setDaemon(True)
-            # udp_server_thread.start()
+            udp_server_thread = threading.Thread(target=self.start_udp_server)
+            udp_server_thread.setDaemon(True)
+            udp_server_thread.start()
 
             # Примеры событий
             # self.__fsm.on_event('start_move')
@@ -190,7 +190,6 @@ class NodeEgoController(Node):
     def __on_obstacles_message(self, data):
          # в data.data находится наша строка, парсим её
         obstacles_dict = json.loads(data.data)
-        self.__world_model.lmp_data['ObjectData'] = obstacles_dict
         # если прилетели данные от переднего лидара
         if 'obstacles' in obstacles_dict:
             obst_list = obstacles_dict['obstacles']

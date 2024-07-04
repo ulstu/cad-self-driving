@@ -55,7 +55,8 @@ setup(
             'node_point_obstacles = webots_ros2_suv.node_point_obstacles:main',
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
             'node_visual = webots_ros2_suv.node_visual:main',
-            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main'
+            'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main',
+            "node_lmp_sender = webots_ros2_suv.node_lmp_sender:main"
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

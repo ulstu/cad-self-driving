@@ -70,6 +70,15 @@ def get_ros2_nodes(*args):
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME}]
     )
+
+    node_lmp_sender = Node(
+        package=PACKAGE_NAME,
+        executable='node_lmp_sender',
+        name='node_lmp_sender',
+        output='screen',
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
+
     package = get_package_share_directory("webots_ros2_suv")
     pcl_map_node = Node(
         package="pcl_maps",
@@ -148,9 +157,10 @@ def get_ros2_nodes(*args):
     return [
         state_publisher_node,
         node_sensors_gazelle,
-        # node_ego_controller,
+        node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
+        node_lmp_sender,
         # node_visual,
         # rviz_node,
         # node_bev_builder,
