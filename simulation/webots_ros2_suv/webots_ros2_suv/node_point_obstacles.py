@@ -34,6 +34,7 @@ from geographiclib.geodesic import Geodesic
 from .lib.param_loader import ParamLoader
 from .lib.config_loader import ConfigLoader
 
+import os
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, geosensor_y_back, newpoint_x, newpoint_y, lidar_reversed):
     """
@@ -97,6 +98,8 @@ class NodePointObstacles(Node):
             
             # загружаем локальные конфигурацтлнные файлы
             self.lidardata = ConfigLoader("lidardata").data
+            self._logger.info(f"CONFIG_DIRECTORY: " + os.environ.get("CONFIG_DIRECTORY"))
+
             
             # with open("webots_ros2_suv/config/lidardata.yaml", "r") as file:
                 # self.lidardata = yaml.safe_load(file)
@@ -122,9 +125,9 @@ class NodePointObstacles(Node):
                 (10, (52.001620307564735,55.81922432407737), (52.00163631699979,55.81968960352242), 2.0),
                 (11, (52.001538164913654,55.81953763961792), (52.000093292444944,55.819550547748804), 2.0),
                 (12, (52.00153699144721,55.81949941813946), (52.00017778202891,55.81951509229839), 2.0),
-                (13, (52.000130005180836,55.81953453831375), (52.00012690387666,55.8191829174757), 2.0),
-                (14, (52.000158336013556,55.819165064021945), (52.00162877328694,55.81915215589106), 2.0),
-                (15, (52.00167269445956,55.81916967406869), (52.00167923234403,55.81962615251541), 2.0)
+                (13, (52.000130005180836,55.81953453831375), (52.00012690387666,55.8191829174757), 0.8),
+                (14, (52.000158336013556,55.819165064021945), (52.00162877328694,55.81915215589106), 0.8),
+                (15, (52.00167269445956,55.81916967406869), (52.00167923234403,55.81962615251541), 0.8)
             ]
             self.object_data = {"ObjectData": []}
 
@@ -166,7 +169,7 @@ class NodePointObstacles(Node):
 
 
     def get_lane_number(self, pt):
-        for l in self.lanes:
+        for l in self.lanes[::-1]:
             # self._logger.info(str(l))
             if self.is_in_lane(l, pt):
                 return l[0]
@@ -209,11 +212,11 @@ class NodePointObstacles(Node):
         for p in self.obst_dict:
             p_coords = self.get_corner_coords(p[0], p[1], p[2], p[3], not p[4])
             p_lane = self.get_lane_number((p_coords['D'][0], p_coords['D'][1]))
-            self._logger.info(f"add_obst: dist {self.get_obst_dist(p, obst) }, lane {lane_obst}")
+            # self._logger.info(f"add_obst: dist {self.get_obst_dist(p, obst) }, lane {lane_obst}")
             if self.get_obst_dist(p, obst) < 1.5 and p_lane == lane_obst and p[9] == obst[9]:
                 closer = True
         if not closer and lane_obst != None:
-            self._logger.info(f"add_obst: lane {lane_obst}")
+            # self._logger.info(f"add_obst: lane {lane_obst}")
             self.obst_dict.append(obst)
         
         
