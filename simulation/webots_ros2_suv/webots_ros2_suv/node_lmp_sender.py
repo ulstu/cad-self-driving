@@ -19,7 +19,7 @@ class NodeLMPSender(Node):
         except Exception as err:
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
-    def lmp_send_callback(self, lmp_data):
+    def __lmp_send_callback(self, lmp_data):
         self.lmp_data = lmp_data.data
 
 def main(args=None):
@@ -32,7 +32,7 @@ def main(args=None):
                 rclpy.spin_once(lmp_sender, timeout_sec=0.5)
 
                 if lmp_sender.lmp_data:
-                    # print(lmp_sender.lmp_data)
+                    print(lmp_sender.lmp_data)
                     lmp_sender.socket_send.sendto(lmp_sender.lmp_data.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
             except KeyboardInterrupt:
                 pass

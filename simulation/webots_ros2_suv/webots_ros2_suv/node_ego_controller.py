@@ -36,9 +36,9 @@ from robot_interfaces.srv import PoseService
 from robot_interfaces.msg import EgoPose
 import json
 
-RECV_BUFFER_SIZE = 256
+RECV_BUFFER_SIZE = 512
 SENSOR_DEPTH = 40
-UDP_RECV_IP = '0.0.0.0' # 192.168.1.100
+UDP_RECV_IP = '0.0.0.0'
 UDP_RECV_PORT = 9090
 
 
@@ -102,15 +102,10 @@ class NodeEgoController(Node):
         threading.Thread(target=start_web_server, args=[self.__ws]).start()
 
     def start_udp_server(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # создаем сокет
-        sock.bind((UDP_RECV_IP, UDP_RECV_PORT))  # связываем сокет с портом, где он будет ожидать сообщения
-        sock.setblocking(0)
-        sock.listen(1)  # указываем сколько может сокет принимать соединений
-        self._logger.info(f"Server is running, please, press ctrl+c to stop")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((UDP_RECV_IP, UDP_RECV_PORT))
         while True:
-            conn, addr = sock.accept()  # начинаем принимать соединения
-            self._logger.info(f"connected: {addr}") # выводим информацию о подключении
-            data = conn.recv(RECV_BUFFER_SIZE)  # принимаем данные от клиента, по 1024 байт
+            data = sock.recv(RECV_BUFFER_SIZE)
             
             if data:
                 data_dict = json.loads(data)
@@ -119,12 +114,14 @@ class NodeEgoController(Node):
                 self.__world_model.lmp_data['SteeringRotation'] = data_dict['params']['SteeringRotation']
                 self.__world_model.lmp_data['RequestedAcceleratorPower'] = data_dict['params']['RequestedAcceleratorPower']
                 self.__world_model.lmp_data['RequestedBrakePower'] = data_dict['params']['RequestedBrakePower']
+                self.__world_model.lmp_data['Velocity'] = {}
                 self.__world_model.lmp_data['Velocity']['LeftFront'] = data_dict['params']['Velocity']
                 self.__world_model.lmp_data['Velocity']['RightFront'] = data_dict['params']['Velocity']
                 self.__world_model.lmp_data['Velocity']['LeftRear'] = data_dict['params']['Velocity']
                 self.__world_model.lmp_data['Velocity']['RightRear'] = data_dict['params']['Velocity']
                 self.__world_model.lmp_data['TurnSignalState'] = data_dict['params']['TurnSignalState']
-        conn.close()  # закрываем соединение
+
+            time.sleep(0.5)
 
     def __on_lidar_message(self, data):
         pass
@@ -139,7 +136,7 @@ class NodeEgoController(Node):
 
     def drive(self):
         if self.__world_model:
-            software_state, lmp_data = String()
+            software_state, lmp_data = String(), String()
 
             software_state.data = self.__world_model.software_state
             lmp_data.data = json.dumps(self.__world_model.lmp_data)
@@ -223,7 +220,7 @@ class NodeEgoController(Node):
 
     def __on_object_data_message(self, data):
         obstacles_list = json.loads(data.data)
-        self.__world_model.lmp_data['ObjectData'] = obstacles_list
+        self.__world_model.lmp_data['ObjectData'] = obstacles_list['ObjectData']
 
 def main(args=None):
     try:
