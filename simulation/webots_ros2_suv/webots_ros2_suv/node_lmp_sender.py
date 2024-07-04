@@ -6,7 +6,7 @@ from std_msgs.msg import String
 import traceback
 
 UDP_SEND_IP = '192.168.95.1'
-UDP_SEND_PORT = 90
+UDP_SEND_PORT = 5015
 
 
 class NodeLMPSender(Node):
@@ -32,7 +32,7 @@ def main(args=None):
                 rclpy.spin_once(lmp_sender, timeout_sec=0.5)
 
                 if lmp_sender.lmp_data:
-                    print(lmp_sender.lmp_data)
+                    # print(lmp_sender.lmp_data)
                     lmp_sender.socket_send.sendto(lmp_sender.lmp_data.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
             except KeyboardInterrupt:
                 pass

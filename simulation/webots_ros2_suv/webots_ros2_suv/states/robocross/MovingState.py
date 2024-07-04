@@ -207,7 +207,7 @@ class MovingState(AbstractState):
             for point in points:
                 path_square_points.append(self.gps_to_rect(point[0], point[1]))
             
-            for i in range(1, min(self.__cur_path_point + 10,  len(path_square_points) - 1)):
+            for i in range(1, min(self.__cur_path_point + 5,  len(path_square_points) - 1)):
                 if self.road_offsets[i] == 0:
                     difference_vector = [path_square_points[i][0] - car_position[0], path_square_points[i][1] - car_position[1]]
                     difference_vector = self.rotate_point([0, 0], difference_vector, orientation)
@@ -231,7 +231,7 @@ class MovingState(AbstractState):
                 if self.road_offsets[i] != 0:
                     previous_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
                     next_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
-                    points_angle = self.AngleOfReference([next_point[0] - previous_point[0], next_point[1] - previous_point[1]]) + math.pi / 2
+                    points_angle = self.AngleOfReference([next_point[0] - previous_point[0], next_point[1] - previous_point[1]]) - math.pi / 2
                     path_square_points[i][0] += math.cos(points_angle) * 4
                     path_square_points[i][1] += math.sin(points_angle) * 4
 

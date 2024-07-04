@@ -121,8 +121,6 @@ class NodeEgoController(Node):
                 self.__world_model.lmp_data['Velocity']['RightRear'] = data_dict['params']['Velocity']
                 self.__world_model.lmp_data['TurnSignalState'] = data_dict['params']['TurnSignalState']
 
-            time.sleep(0.5)
-
     def __on_lidar_message(self, data):
         pass
 
