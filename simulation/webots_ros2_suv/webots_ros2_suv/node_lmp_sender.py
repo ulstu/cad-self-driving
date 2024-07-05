@@ -5,8 +5,8 @@ import socket
 from std_msgs.msg import String
 import traceback
 
-UDP_SEND_IP = '192.168.95.1'
-UDP_SEND_PORT = 5015
+UDP_SEND_IP = '192.168.95.248'
+UDP_SEND_PORT = 5666
 
 
 class NodeLMPSender(Node):
@@ -20,7 +20,11 @@ class NodeLMPSender(Node):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     def __lmp_send_callback(self, lmp_data):
+        # print("CallBack")
         self.lmp_data = lmp_data.data
+        self.lmp_data = (str(len(lmp_data.data)).zfill(6)) + lmp_data.data
+
+
 
 def main(args=None):
     try:
@@ -32,8 +36,9 @@ def main(args=None):
                 rclpy.spin_once(lmp_sender, timeout_sec=0.5)
 
                 if lmp_sender.lmp_data:
-                    # print(lmp_sender.lmp_data)
+                    # print(len(lmp_sender.lmp_data), lmp_sender.lmp_data)
                     lmp_sender.socket_send.sendto(lmp_sender.lmp_data.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
+                    lmp_sender.lmp_data = {}
             except KeyboardInterrupt:
                 pass
             

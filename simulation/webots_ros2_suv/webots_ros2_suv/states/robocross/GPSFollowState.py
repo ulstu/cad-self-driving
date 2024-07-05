@@ -18,6 +18,7 @@ class GPSFollowState(AbstractState):
         pg.font.init()
         self.sysfont = pg.font.SysFont("Arial", 20)
         self.params = {}
+        self.timer = 0
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -146,6 +147,7 @@ class GPSFollowState(AbstractState):
         world_model.software_state = 'Auto'
         self.runs = self.runs + 1
         self.log("gps follow state")
+        
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -157,9 +159,17 @@ class GPSFollowState(AbstractState):
         car_position = self.gps_to_rect(lat, lon)
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
         difference = None
-
+        # self.logi(f"{world_model.global_map}")
         while True:
-            points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+            direction_forward = True
+            points = []
+            for e in world_model.global_map:
+                # if 'seg_num' in e:
+                    # self.logi(f"{e['name']}: {e['seg_num']} cur: {world_model.cur_path_segment}")
+                if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment:
+                    direction_forward = e['name'] == 'moving'
+                    points = e['coordinates']
+                    break
             points_offset = self.__cur_path_point
             points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
             world_model.gps_path = points
@@ -183,11 +193,19 @@ class GPSFollowState(AbstractState):
             else:
                 break
 
-        if len(path_square_points) > 1:            
-            difference_angle = -self.AngleOfVectors(car_vector, difference)
-            world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
-            diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * 0.2
-            world_model.gps_car_turn_angle = world_model.gps_car_turn_angle + diff_angle
+        if len(path_square_points) > 1:        
+            res_car_vector = car_vector
+            if not direction_forward:
+                res_car_vector = [-car_vector[0], -car_vector[1]]
+            difference_angle = -self.AngleOfVectors(res_car_vector, difference)
+            Pk = 45
+            Ik = 0.2
+            if not direction_forward:
+                Pk = 27
+                Ik = 0.2
+            world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / Pk)))
+            diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * Ik
+            world_model.gps_car_turn_angle = (world_model.gps_car_turn_angle + diff_angle ) * self.get_directrion(direction_forward)
             self.logi(f"diff = {self.prev_target_angle - world_model.gps_car_turn_angle} new = {world_model.gps_car_turn_angle}, old ={self.prev_target_angle}")
             
             self.params["diff"] = self.prev_target_angle - world_model.gps_car_turn_angle
@@ -256,7 +274,7 @@ class GPSFollowState(AbstractState):
 
         # self.logi(f'ipm {world_model.ipm_colorized.shape}')
 
-        speed = self.config['default_speed']
+        speed = self.config['default_speed']  * self.get_directrion(direction_forward)
         zones_names = []
         for zone in zones:
             if zone['name'] == 'turn':
@@ -285,13 +303,17 @@ class GPSFollowState(AbstractState):
                 self.__cur_path_point = 0
                 event = 'stop'
             elif zone['name'].startswith('speed'):
-                speed = float(zone['name'].split('speed')[1])
+                speed = float(zone['name'].split('speed')[1]) * self.get_directrion(direction_forward)
             elif zone["name"] == "obstacle_stop":
-                if self.has_obstacle:
+                if self.has_obstacle and self.config["stop_obstacles"]:
+                    print("stop")
                     speed = 0
-            else:
-                self.logi(f"{world_model.previous_zone} go out")
-                world_model.previous_zone = None
+            elif zone["name"] == "next_segment" and world_model.previous_zone != zone["name"]:
+                world_model.cur_path_segment += 1
+                self.__cur_path_point = 0
+                self.timer = 30
+                speed = 0
+            world_model.previous_zone = zone["name"]
             zones_names.append(zone["name"])
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
@@ -300,14 +322,17 @@ class GPSFollowState(AbstractState):
         #     event = 'start_lane_follow'
         self.params["zones"] = zones_names
         self.params["speed"] = speed
-        
+        self.params["timer"] = self.timer
+        self.params["segment"] = world_model.cur_path_segment
         y = 10
         for k, v in self.params.items():
             text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
             self.sc.blit(text_reward, (0, y))
             y += 15
         pg.display.update()
-
+        if self.timer > 0:
+            self.timer -= 1
+            speed = 0
         if event:
             world_model.path = None
         world_model.set_speed(speed)
@@ -357,6 +382,9 @@ class GPSFollowState(AbstractState):
                     self.move_screen(bounds[3][0], bounds[3][1]),
                     self.move_screen(bounds[0][0], bounds[0][1]))
         
+    def get_directrion(self, dir) -> int:
+        return 1 if dir else -1
+    
     # def has_obstacle(self, world_model):
     #     rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
     #     for obstacle in world_model.obstacles:

@@ -68,7 +68,7 @@ class NodeEgoController(Node):
             self.__fsm = FiniteStateMachine(f'{package_dir}{param.get_param("fsm_config")}', self)
 
             # Примеры событий
-            self.__fsm.on_event(None)
+            self.__fsm.on_event("start_move")
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
 
@@ -142,6 +142,7 @@ class NodeEgoController(Node):
             self.__ackermann_publisher.publish(self.__world_model.command_message)
             self.__control_unit_publisher.publish(software_state)
             self.__lmp_sender_publisher.publish(lmp_data)
+
 
     #@timeit
     def __on_image_message(self, data):

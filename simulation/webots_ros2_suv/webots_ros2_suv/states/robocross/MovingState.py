@@ -1,5 +1,6 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
+from webots_ros2_suv.lib.config_loader import ConfigLoader
 import math
 import time
 
@@ -23,20 +24,21 @@ class MovingState(AbstractState):
         self.lane_coords = [
             (1, (52.00017417781055,55.819496316835284), (52.00016336515546,55.81918191164732), 2.0),
                 (2, (52.00023570097983,55.819495394825935), (52.000227738171816,55.819173362106085), 2.0),
-                (3, (52.00026570819318,55.8192917983979), (52.00153447687626,55.81927880644798), 2.0),
-                (4, (52.000262858346105,55.81925357691944), (52.001535231247544,55.819244692102075), 2.0),
-                (5, (52.00026554055512,55.81920571625233), (52.001631036400795,55.81919758580625), 2.0),
-                (6, (52.000265372917056,55.819171350449324), (52.00162634253502,55.819161711260676), 2.0),
-                (7, (52.00099409557879,55.81931132823229), (52.000998202711344,55.81940118223429), 2.0),
-                (8, (52.001060312613845,55.81930956803262), (52.00106198899448,55.819392297416925), 2.0),
-                (9, (52.00156440027058,55.819683484733105), (52.001558281481266,55.81923111341894), 2.0),
-                (10, (52.001620307564735,55.81922432407737), (52.00163631699979,55.81968960352242), 2.0),
+                (3, (52.00025984086096,55.81929858773947), (52.00153338722885,55.81928760744631), 2.0),
+                (4, (52.00026176869869,55.81926195882261), (52.00153389014304,55.81925022415817), 2.0),
+                (5, (52.000258415937424,55.819214936345816), (52.00163120403886,55.81920521333814), 2.0),
+                (6, (52.000255482271314,55.819178810343146), (52.00162433087826,55.81916824914515), 2.0),
+                (7, (52.00099811889231,55.81940218806267),(52.00099552050233,55.819310573861), 2.0),
+                (8, (52.00106048025191,55.81930789165199), (52.001059809699655,55.819395147264004), 2.0),
+                (9, (52.001574877649546,55.819640066474676), (52.00156431645155,55.819229101762176), 2.0),
+                (10, (52.001626091077924,55.81922935321927), (52.00163631699979,55.81968960352242), 2.0),
                 (11, (52.001538164913654,55.81953763961792), (52.000093292444944,55.819550547748804), 2.0),
                 (12, (52.00153699144721,55.81949941813946), (52.00017778202891,55.81951509229839), 2.0),
                 (13, (52.000130005180836,55.81953453831375), (52.00012690387666,55.8191829174757), 0.8),
                 (14, (52.000158336013556,55.819165064021945), (52.00162877328694,55.81915215589106), 0.8),
                 (15, (52.00167269445956,55.81916967406869), (52.00167923234403,55.81962615251541), 0.8)
         ]
+        self.lidar_config = ConfigLoader("lidardata").data
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -69,8 +71,8 @@ class MovingState(AbstractState):
     def find_next_goal_point(self, world_model):
         if not world_model.global_map:
             return (0, 0)
-
-        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+        
+        points = [e['coordinates'] for e in world_model.global_map if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
         points = points[self.__cur_path_point:]
         world_model.gps_path = points
 
@@ -193,60 +195,65 @@ class MovingState(AbstractState):
         car_position = self.gps_to_rect(lat, lon)
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
         difference = None
-
+        points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
+        path_source = []
+        for point in points:
+            path_source.append(self.gps_to_rect(point[0], point[1]))
+        # TODO: add collecting of segment points
+        if len(points) > 0 and len(self.road_offsets) == 0:
+            self.road_offsets = np.zeros(len(points))
         while True:
-            points = [e['coordinates'] for e in world_model.global_map if e['name'] == 'moving' and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment][0]
-            
-            # TODO: add collecting of segment points
-            
-            if len(points) > 0 and len(self.road_offsets) == 0:
-                self.road_offsets = np.zeros(len(points))
-
             world_model.gps_path = points
             path_square_points = []
-            for point in points:
-                path_square_points.append(self.gps_to_rect(point[0], point[1]))
             
-            for i in range(1, min(self.__cur_path_point + 5,  len(path_square_points) - 1)):
+            path_square_points = path_source.copy()
+            for i in range(1, min(self.__cur_path_point + 10,  len(path_source) - 1)):
                 if self.road_offsets[i] == 0:
-                    difference_vector = [path_square_points[i][0] - car_position[0], path_square_points[i][1] - car_position[1]]
-                    difference_vector = self.rotate_point([0, 0], difference_vector, orientation)
+                    # self.logw(f"n = {i} {self.road_offsets[i]}")
+                    difference_vector = world_model.coords_transformer.get_relative_coordinates_f(
+                        points[i][0], 
+                        points[i][1], 
+                        pos=world_model.get_current_position(),
+                        pov_point=[0, 0]
+                    )
+                    # difference_vector = [path_source[i][0] - car_position[0], path_source[i][1] - car_position[1]]
+                    # difference_vector = self.rotate_point([0, 0], difference_vector, orientation - math.pi / 2)
                     for obstacle in world_model.obstacles:
-                        inflated_obstacles = [[obstacle[8] - 10, obstacle[10]],
-                                                [obstacle[9] + 10, obstacle[10]],
-                                                [obstacle[9] + 10, obstacle[11]],
-                                                [obstacle[8] - 10, obstacle[11]]]
-                        x_dif = -obstacle[8] + obstacle[9]
-                        y_dif = obstacle[11] - obstacle[10]
+                        x_dif = (-obstacle[8] + obstacle[9]) * 15
+                        y_dif = (obstacle[11] - obstacle[10] + 20) * 15
                         if x_dif < 1:
                             x_dif = 1
                         if y_dif < 1:
                             y_dif = 1
-                        obstacle_rect = pg.Rect(-obstacle[9], obstacle[10] - 10, x_dif, y_dif + 20)
+                        # obstacle_rect = pg.Rect(-obstacle[9], obstacle[10] - 10, x_dif, y_dif + 20)
+                        obstacle_rect = pg.Rect(-obstacle[9] * 15, (obstacle[10] - 10) * 15, x_dif, y_dif)
                         
-                        if obstacle_rect.collidepoint(difference_vector[0], difference_vector[1]):
+                        log_rect = [-obstacle[9], obstacle[10], x_dif, y_dif]
+                        # self.logi(f"vector {difference_vector} log_rect {log_rect}")
+                        
+                        if obstacle_rect.collidepoint(difference_vector[0], -difference_vector[1]):
                             if self.road_offsets[i] == 0:
                                 self.road_offsets[i] = 1
                                 break
                 if self.road_offsets[i] != 0:
-                    previous_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
-                    next_point = [path_square_points[i - 1][0] - car_position[0], path_square_points[i - 1][1] - car_position[1]]
-                    points_angle = self.AngleOfReference([next_point[0] - previous_point[0], next_point[1] - previous_point[1]]) - math.pi / 2
-                    path_square_points[i][0] += math.cos(points_angle) * 4
-                    path_square_points[i][1] += math.sin(points_angle) * 4
+                    point_vector = [path_source[i + 1][0] - path_source[i + 1][0], path_source[i + 1][0] - path_source[i + 1][0]]
+                    points_angle = self.AngleOfReference(point_vector) + math.pi / 2
+                    path_square_points[i][0] += math.sin(points_angle) * 4
+                    path_square_points[i][1] += math.cos(points_angle) * 4
 
+            # path_source = path_source[self.__cur_path_point:]
             path_square_points = path_square_points[self.__cur_path_point:]
 
             if len(path_square_points) > 1:
-                nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.75)
+                nearest_point = self.MedianVector(path_square_points[0], path_square_points[1], 0.75)
                 difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
 
                 dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
-
-                conf = self.config['change_point_dist']
             else:
                 break
             if dist < self.config['change_point_dist']:
+                change_dist = self.config['change_point_dist']
+                self.loge(f"point ++ {dist} < {change_dist}")
                 self.__cur_path_point += 1
                 world_model.cur_path_point = self.__cur_path_point
             else:
@@ -256,7 +263,7 @@ class MovingState(AbstractState):
             difference_angle = -self.AngleOfVectors(car_vector, difference)
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / 45)))
             diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * 0.2
-            world_model.gps_car_turn_angle = world_model.gps_car_turn_angle + diff_angle
+            world_model.gps_car_turn_angle = (world_model.gps_car_turn_angle + diff_angle)
 
             self.params["diff"] = self.prev_target_angle - world_model.gps_car_turn_angle
             self.params["new"] = world_model.gps_car_turn_angle
@@ -306,6 +313,9 @@ class MovingState(AbstractState):
             elif zone["name"] == "obstacle_stop":
                 if self.has_obstacle(world_model):
                     speed = 0
+            elif zone["name"] == "to_gpsfollow":
+                world_model.cur_path_segment += 1
+                event = 'start_gps_follow'
             else:
                 world_model.previous_zone = None
             zones_names.append(zone["name"])
@@ -316,6 +326,7 @@ class MovingState(AbstractState):
         #     event = 'start_lane_follow'
         self.params["zones"] = zones_names
         self.params["speed"] = speed
+        self.params["current"] = self.__cur_path_point
 
         pg.event.get()
         self.sc.fill((0, 0, 0))
@@ -323,18 +334,27 @@ class MovingState(AbstractState):
         pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:
             pg.draw.line(self.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
-        for point in path_square_points:
-            pg.draw.circle(self.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
-
-        for obstacle in world_model.obstacles:
+        for i in range(len(path_square_points)):
+            color = (255, 0, 0)
+            if self.road_offsets[i + 1] != 0:
+                color = (0, 255, 0)
+            pg.draw.circle(self.sc, color, self.move_screen(path_square_points[i][0] - car_position[0], path_square_points[i][1] - car_position[1]), 4)
+        local_obstacles = world_model.obstacles.copy()
+        for obstacle in local_obstacles:
+            # x_offset = self.lidar_config["gps_shift_x"]
+            # y_offset = self.lidar_config["gps_shift_x"]
+            # obstacle[8] -= x_offset
+            # obstacle[9] -= x_offset
+            # obstacle[10] -= y_offset
+            # obstacle[11] -= y_offset
             obstacle_points = [[-obstacle[8], obstacle[10]],
                                [-obstacle[9], obstacle[10]],
                                [-obstacle[9], obstacle[11]],
                                [-obstacle[8], obstacle[11]]]
-            inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
-                                  [-obstacle[9] + 10, obstacle[10]],
-                                  [-obstacle[9] + 10, obstacle[11]],
-                                  [-obstacle[8] - 10, obstacle[11]]]
+            inflated_obstacles = [[-obstacle[8], obstacle[10] - 10],
+                                  [-obstacle[9], obstacle[10] + 10],
+                                  [-obstacle[9], obstacle[11] + 10],
+                                  [-obstacle[8], obstacle[11] - 10]]
             
             x_dif = -obstacle[8] + obstacle[9]
             y_dif = obstacle[11] - obstacle[10]
@@ -349,6 +369,7 @@ class MovingState(AbstractState):
                 rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
                 rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
             self.draw_box(self.sc, rotated_obstacle, (255, 255, 0))
+            # self.draw_box(self.sc, rotated_inflated_obstacle, (255, 0, 255))
 
         for lane in self.lane_coords:
             begin = self.gps_to_rect(lane[1][0], lane[1][1])
@@ -357,13 +378,31 @@ class MovingState(AbstractState):
             end_relative = [end[0] - car_position[0], end[1] - car_position[1]]
             pg.draw.line(self.sc, (0,255,0), self.move_screen(begin_relative[0], begin_relative[1]), self.move_screen(end_relative[0], end_relative[1]))
             text_lane = self.sysfont.render(f"{lane[0]}", False, (255, 225, 255))
-            self.sc.blit(text_lane, (begin_relative[0], begin_relative[1] - 15))
+            self.sc.blit(text_lane, self.move_screen(begin_relative[0], begin_relative[1]))
 
         y = 10
         for k, v in self.params.items():
             text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
             self.sc.blit(text_reward, (0, y))
             y += 20
+
+        # for obstacle in world_model.obstacles:
+        #     x_dif = (-obstacle[8] + obstacle[9]) * 15
+        #     y_dif = (obstacle[11] - obstacle[10]) * 15
+            
+        #     obstacle_rect = pg.Rect((-obstacle[9]) * 15 + 400, 800 - (obstacle[10]) * 15 - y_dif, x_dif, y_dif)
+        #     pg.draw.rect(self.sc, (255, 255, 255), obstacle_rect)
+
+        # for i in range(1, min(self.__cur_path_point + 10,  len(path_source) - 1)):
+        #     difference_vector = world_model.coords_transformer.get_relative_coordinates_f(
+        #         points[i][0], 
+        #         points[i][1], 
+        #         pos=world_model.get_current_position(),
+        #         pov_point=[0, 0]
+        #     )
+        #     # self.log(f"vector {i} {difference_vector}")
+        #     pg.draw.circle(self.sc, (0, 255, 255), (-difference_vector[0] + 400, 800 + difference_vector[1]), 4)
+
         pg.display.update()
 
         if event:
@@ -379,3 +418,6 @@ class MovingState(AbstractState):
             if obstacle[1] < self.config["obstacle_stop_distance"] and obstacle_angle < self.config["treshold_angle"]:
                 return True
         return False
+
+    def get_directrion(dir) -> int:
+        return 1 if dir else -1

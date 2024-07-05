@@ -33,3 +33,4 @@ treshold_angle: 20
 
 obstacle_stop_distance: 8
 treshold_angle: 20
+stop_obstacles: False

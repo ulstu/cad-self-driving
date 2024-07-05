@@ -6,6 +6,24 @@
 # lon: 56.335206573823854
 # mapfile: robocross.geojson
 
-lat: 52.000441437135855
-lon: 55.81957703977085
-mapfile: terminal.geojson
+# lat: 52.000441437135855
+# lon: 55.81957703977085
+# mapfile: terminal.geojson
+
+# lat: 52.056359044407195
+# lon: 55.83791784298242
+# mapfile: test.geojson
+
+# lat: 52.023696731776
+# lon: 55.85129206068814
+# mapfile: test2.geojson
+
+# lat: 51.99936364777386
+# lon: 55.81939263269305
+# mapfile: test3.geojson
+
+lat: 51.99949172325432
+lon: 55.81937695853412
+mapfile: parking.geojson
+
+

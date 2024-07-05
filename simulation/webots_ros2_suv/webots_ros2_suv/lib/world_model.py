@@ -66,7 +66,8 @@ class WorldModel(object):
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = []                 # Данные о препятствиях с лидара
-        self.lmp_data = {}                  # Словарь данных о БПТС для отправки ЛМП
+        self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
+        self.previous_zone = None                
 
     def load_map(self, mapyaml):
         self.global_map = []

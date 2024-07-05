@@ -29,7 +29,7 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["gpsfollow"] # "gpsfollow"
+    start_move: ["moving"] # "gpsfollow"
     stop: ["stopped"]
     pause: ["paused"]
   gpsfollow:
@@ -40,7 +40,7 @@ transitions:
     stop: ["stopped", "emergency"]
     turn: ["turn"]
   moving:
-    # start_gps_follow: ["gpsfollow"]
+    start_gps_follow: ["gpsfollow"]
     start_lane_follow: ["lanefollow"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
@@ -85,6 +85,11 @@ map-elements:
     ol-type: !!str LineString
     color: !!str 0000ff
   - element:
+    id: "moving_back"
+    name: !!str Путь следования задом
+    ol-type: !!str LineString
+    color: !!str 00ff00
+  - element:
     id: "terminal"
     name: !!str Зона терминала
     ol-type: !!str Polygon
@@ -98,7 +103,7 @@ map-elements:
     id: "crosswalk"
     name: !!str Зона пешеходного перехода
     ol-type: !!str Polygon
-    color: !!str 40a8f7
+    color: !!str ffffff
   - element:
     id: "stop"
     name: !!str Зона остановки
@@ -124,9 +129,18 @@ map-elements:
     name: !!str Зона скорости 40
     ol-type: !!str Polygon
     color: !!str fe00cf
-
   - element:
     id: "obstacle_stop"
     name: !!str Зона остановки перед препядствием
     ol-type: !!str Polygon
     color: !!str 804030
+  - element:
+    id: "next_segment"
+    name: !!str Зона следующего сегмента
+    ol-type: !!str Polygon
+    color: !!str ff00ff
+  - element:
+    id: "to_gpsfollow"
+    name: !!str Зона пеерхода следования по GPS
+    ol-type: !!str Polygon
+    color: !!str 40a8f7`
