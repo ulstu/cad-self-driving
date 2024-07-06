@@ -38,7 +38,7 @@ min_hmax: 0.2
 max_hmin: 0.4
 max_hmax: 3.5
 min_axis_distance: 1.0
-max_distance: 22.0
+max_distance: 50.0
 gps_shift_x: -0.05
 gps_shift_y: -2.4
 gps_shift_y_back: -3.1
