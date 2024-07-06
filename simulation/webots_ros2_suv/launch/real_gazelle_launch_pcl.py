@@ -136,7 +136,7 @@ def get_ros2_nodes(*args):
         node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
-        node_visual,
+        # node_visual,
         # rviz_node,
         # node_bev_builder,
         node_point_obstacles,
