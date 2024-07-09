@@ -5,6 +5,7 @@ import pathlib
 import yaml
 import numpy as np
 import math
+import pygame as pg
 from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 from .coords_transformer import CoordsTransformer
@@ -67,7 +68,9 @@ class WorldModel(object):
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = []                 # Данные о препятствиях с лидара
         self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
-        self.previous_zone = None                
+        self.previous_zone = None   
+                     
+        self.sc = pg.display.set_mode((800, 800))
 
     def load_map(self, mapyaml):
         self.global_map = []

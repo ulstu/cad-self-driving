@@ -20,7 +20,7 @@ workers:
   roadmarkingdetection: "RoadMarkingDetectionWorker.py"
 workerstates:
   start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
-  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] # "pathplanning"
   lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
   gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] #, "pathplanning"]
   stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
@@ -33,7 +33,7 @@ transitions:
     stop: ["stopped"]
     pause: ["paused"]
   gpsfollow:
-    # start_move: ["moving"]
+    start_move: ["moving"]
     # start_gps_follow: ["gpsfollow"] 
     # start_lane_follow: ["lanefollow"]
     pause: ["paused"]
@@ -110,8 +110,8 @@ map-elements:
     ol-type: !!str Polygon
     color: !!str 800080
   - element:
-    id: "speed10"
-    name: !!str Зона скорости 10
+    id: "speed7"
+    name: !!str Зона скорости 7
     ol-type: !!str Polygon
     color: !!str fe00f0
   - element:
@@ -143,4 +143,14 @@ map-elements:
     id: "to_gpsfollow"
     name: !!str Зона пеерхода следования по GPS
     ol-type: !!str Polygon
-    color: !!str 40a8f7`
+    color: !!str 40a8f7
+  - element:
+    id: "to_obstacles"
+    name: !!str Зона пеерхода на объезд пряпядствий 
+    ol-type: !!str Polygon
+    color: !!str 83eb34
+  - element:
+    id: "pause_tick_50"
+    name: !!str Зона паузы на 50 тиков 
+    ol-type: !!str Polygon
+    color: !!str 40524e

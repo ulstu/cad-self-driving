@@ -95,7 +95,7 @@ class ImageAnalyzer:
                  path_to_seg_model,
                  path_to_icons,
                  is_red=False,
-                 traffic_light_queue_length=5,
+                 traffic_light_queue_length=10,
                  sign_queue_length=5,
                  delay=5, 
                  is_viz=True, 
@@ -572,8 +572,7 @@ class ImageAnalyzer:
         # traffic_light_state = "none"
         # if len(traffic_light_images) > 0:
         #     traffic_light_state = self.classify_traffic_light(traffic_light_images)
-
-        traffic_light_state = "none" # HERE GOES YOUR CODE!!!!!!!!!!!
+        traffic_light_state = self.traffic_light_state # HERE GOES YOUR CODE!!!!!!!!!!!
 
         if self.project_settings_config["use_traffic_light_detection"]:
             result = self.tld_model.predict([image], verbose=False)[0]

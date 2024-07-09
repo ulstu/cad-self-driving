@@ -68,11 +68,11 @@ class FiniteStateMachine:
             new_event = state.on_event(event, world_model)
             if new_event:
                 event = new_event
-            # print(f'type(state).__name__} {new_event} {event}')
+            # self.node._logger.info(f'{type(state).__name__} {new_event} {event}')
             if (new_states is None or len(new_states) == 0) and event:
                 #state_name = state.__qualname__.lower().replace('state', '')
                 state_name = type(state).__name__.lower().replace('state', '')
-                # print(f'{"#" * 30} {state_name} {event}')
+                self.node._logger.info(f"STATE_NAME: {state_name} EVENT: {event}" )
                 if event in self.transitions[state_name]:
                     for s in self.transitions[state_name][event]:
                         new_states[s] = self.states[s] 

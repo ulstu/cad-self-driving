@@ -33,7 +33,7 @@ from robot_interfaces.msg import EgoPose
 from geographiclib.geodesic import Geodesic
 from .lib.param_loader import ParamLoader
 from .lib.config_loader import ConfigLoader
-
+from .lib.coords_transformer import CoordsTransformer
 import os
 
 def calc_geo_pos(lat, lon, angle, geosensor_x, geosensor_y, geosensor_y_back, newpoint_x, newpoint_y, lidar_reversed):
@@ -77,7 +77,7 @@ class NodePointObstacles(Node):
             # Инициализация узла
             super().__init__('node_point_obstacles')
             self._logger.info('Node Point Obstacles Started')
-            self.__world_model = WorldModel()
+            self.__world_model = CoordsTransformer()
 
             self.declare_parameter('start_position')
             self.start_position =  self.get_parameter('start_position').get_parameter_value().integer_value
@@ -202,8 +202,8 @@ class NodePointObstacles(Node):
         if self.__world_model:
             roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
             yaw = math.degrees(yaw)
-            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-            self._logger.info(f"yaw: [{lat},{lon}]")
+            lat, lon, orientation = self.__world_model.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+            # self._logger.info(f"yaw: [{lat},{lon}]")
 
             self.lat, self.lon, self.ang = lon, lat, yaw # Широта и долгота перепутаны!
         pass

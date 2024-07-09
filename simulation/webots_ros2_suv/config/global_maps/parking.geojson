@@ -1,1 +1,1106 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [[43.63925228114837, 56.33520384573774]]}, "properties": {"id": "start", "geometry_": null, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#00ff00", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [[51.99957955238758, 55.81917870277235]]}, "properties": {"id": "start", "geometry_": null, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(0,255,0,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#00ff00", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#00ff00", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[52.00173488818109, 55.819547194987535], [52.00173522345722, 55.8195317722857], [52.001735642552376, 55.81951475702226], [52.00173589400947, 55.81949749030173], [52.001736061647534, 55.819481145590544], [52.0017359778285, 55.81946614198387], [52.00173572637141, 55.81943755969405], [52.001735558733344, 55.819420628249645], [52.00173723511398, 55.819394728168845], [52.00173648074269, 55.81936723552644], [52.001735642552376, 55.819339994341135], [52.00173472054303, 55.81931300461292], [52.00174016878009, 55.81929766573012], [52.00175047852099, 55.81928802654147], [52.00176523067057, 55.81927570514381], [52.001780988648534, 55.81926103681326], [52.00178869999945, 55.81925081089139], [52.001793812960386, 55.81923714838922], [52.00179163366556, 55.819209991022944], [52.00179171748459, 55.81918962299824], [52.00179171748459, 55.81918962299824], [52.00179171748459, 55.81918962299824], [52.00179171748459, 55.81918962299824]]}, "properties": {"seg_num": "0", "id": "moving", "geometry_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#0000ff", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[52.00172131574056, 55.81924284749442], [52.00172274147889, 55.81919639426977], [52.00184392924188, 55.81919639426977], [52.00184392924188, 55.81924204657756], [52.00172131574056, 55.81924284749442]]]}, "properties": {"seg_num": 0, "id": "next_segment", "geometry_": null, "fill_": {"color_": "rgba(255,0,255,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(255,0,255,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#ff00ff", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#ff00ff", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#ff00ff", "lineDash_": null, "width_": 8}, "text_": null}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[52.001785933971405, 55.819185096770525], [52.001786353066564, 55.81920823082328], [52.001787358894944, 55.81923119723797], [52.00178853236139, 55.81924980506301], [52.00179104693234, 55.81928098574281], [52.00179247185588, 55.819305796176195], [52.00179289095104, 55.819327840581536], [52.001793310046196, 55.819347873330116], [52.001793310046196, 55.819347873330116], [52.001793310046196, 55.819347873330116]]}, "properties": {"id": "moving_back", "geometry_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "image_": {"opacity_": 1, "rotateWithView_": false, "rotation_": 0, "scale_": 1, "scaleArray_": [1, 1], "displacement_": [0, 0], "canvas_": {}, "hitDetectionCanvas_": null, "fill_": {"color_": "rgba(0,0,255,0.2)"}, "origin_": [0, 0], "points_": null, "radius_": 8, "angle_": 0, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "size_": [24, 24], "renderOptions_": {"strokeStyle": "#0000ff", "strokeWidth": 8, "size": 24, "lineDash": null, "lineJoin": "round", "miterLimit": 10}}, "renderer_": null, "hitDetectionRenderer_": null, "stroke_": {"color_": "#0000ff", "lineDash_": null, "width_": 8}, "text_": null, "seg_num": "1"}}]}
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            52.006749697021746,
+                            55.824936129798715
+                        ],
+                        [
+                            52.00694363706086,
+                            55.82489767288618
+                        ],
+                        [
+                            52.006931177681636,
+                            55.82468214451984
+                        ],
+                        [
+                            52.00664387248509,
+                            55.82469368228962
+                        ],
+                        [
+                            52.00666960822888,
+                            55.82493439867977
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": 0,
+                "id": "to_obstacles",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(131,235,52,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(131,235,52,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#83eb34",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#83eb34",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#83eb34",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    [
+                        51.99957955238758,
+                        55.81917870277235
+                    ]
+                ]
+            },
+            "properties": {
+                "id": "start",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(0,255,0,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(0,255,0,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#00ff00",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#00ff00",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#00ff00",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    [
+                        43.63925228114837,
+                        56.33520384573774
+                    ]
+                ]
+            },
+            "properties": {
+                "id": "start",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(0,255,0,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(0,255,0,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#00ff00",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#00ff00",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#00ff00",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        52.001785933971405,
+                        55.819185096770525
+                    ],
+                    [
+                        52.001786353066564,
+                        55.81920823082328
+                    ],
+                    [
+                        52.001787358894944,
+                        55.81923119723797
+                    ],
+                    [
+                        52.00178853236139,
+                        55.81924980506301
+                    ],
+                    [
+                        52.00179104693234,
+                        55.81928098574281
+                    ],
+                    [
+                        52.00179247185588,
+                        55.819305796176195
+                    ],
+                    [
+                        52.00179289095104,
+                        55.819327840581536
+                    ],
+                    [
+                        52.001793310046196,
+                        55.819347873330116
+                    ],
+                    [
+                        52.001793310046196,
+                        55.819347873330116
+                    ],
+                    [
+                        52.001793310046196,
+                        55.819347873330116
+                    ]
+                ]
+            },
+            "properties": {
+                "id": "moving_back",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(0,0,255,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(0,0,255,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#0000ff",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#0000ff",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#0000ff",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null,
+                "seg_num": "5"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        52.00173488818109,
+                        55.819547194987535
+                    ],
+                    [
+                        52.00173522345722,
+                        55.8195317722857
+                    ],
+                    [
+                        52.001735642552376,
+                        55.81951475702226
+                    ],
+                    [
+                        52.00173589400947,
+                        55.81949749030173
+                    ],
+                    [
+                        52.001736061647534,
+                        55.819481145590544
+                    ],
+                    [
+                        52.0017359778285,
+                        55.81946614198387
+                    ],
+                    [
+                        52.00173572637141,
+                        55.81943755969405
+                    ],
+                    [
+                        52.001735558733344,
+                        55.819420628249645
+                    ],
+                    [
+                        52.00173723511398,
+                        55.819394728168845
+                    ],
+                    [
+                        52.00173648074269,
+                        55.81936723552644
+                    ],
+                    [
+                        52.001735642552376,
+                        55.819339994341135
+                    ],
+                    [
+                        52.00173472054303,
+                        55.81931300461292
+                    ],
+                    [
+                        52.00174016878009,
+                        55.81929766573012
+                    ],
+                    [
+                        52.00175047852099,
+                        55.81928802654147
+                    ],
+                    [
+                        52.00176523067057,
+                        55.81927570514381
+                    ],
+                    [
+                        52.001780988648534,
+                        55.81926103681326
+                    ],
+                    [
+                        52.00178869999945,
+                        55.81925081089139
+                    ],
+                    [
+                        52.001793812960386,
+                        55.81923714838922
+                    ],
+                    [
+                        52.00179163366556,
+                        55.819209991022944
+                    ],
+                    [
+                        52.00179171748459,
+                        55.81918962299824
+                    ],
+                    [
+                        52.00179171748459,
+                        55.81918962299824
+                    ],
+                    [
+                        52.00179171748459,
+                        55.81918962299824
+                    ],
+                    [
+                        52.00179171748459,
+                        55.81918962299824
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": "3",
+                "id": "moving",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(0,0,255,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(0,0,255,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#0000ff",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#0000ff",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#0000ff",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            52.00172131574056,
+                            55.81924284749442
+                        ],
+                        [
+                            52.00172274147889,
+                            55.81919639426977
+                        ],
+                        [
+                            52.00184392924188,
+                            55.81919639426977
+                        ],
+                        [
+                            52.00184392924188,
+                            55.81924204657756
+                        ],
+                        [
+                            52.00172131574056,
+                            55.81924284749442
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": 0,
+                "id": "next_segment",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(255,0,255,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(255,0,255,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#ff00ff",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#ff00ff",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#ff00ff",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            52.001706681671436,
+                            55.819584443627264
+                        ],
+                        [
+                            52.00170339580431,
+                            55.81953691322869
+                        ],
+                        [
+                            52.001784721015596,
+                            55.81953783614955
+                        ],
+                        [
+                            52.0017765063478,
+                            55.81958536654702
+                        ],
+                        [
+                            52.001706681671436,
+                            55.819584443627264
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": 0,
+                "id": "pause_tick_50",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(64,82,78,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(64,82,78,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#40524e",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#40524e",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#40524e",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        52.00584336183965,
+                        55.819745510816574
+                    ],
+                    [
+                        52.00584336183965,
+                        55.819745510816574
+                    ],
+                    [
+                        52.00584336183965,
+                        55.819745510816574
+                    ],
+                    [
+                        52.00584336183965,
+                        55.819745510816574
+                    ],
+                    [
+                        52.00584336183965,
+                        55.819745510816574
+                    ],
+                    [
+                        52.005780413746834,
+                        55.81967493519187
+                    ],
+                    [
+                        52.005677400156856,
+                        55.81963973119855
+                    ],
+                    [
+                        52.00561562553048,
+                        55.819635121151805
+                    ],
+                    [
+                        52.00555318035185,
+                        55.819635121151805
+                    ],
+                    [
+                        52.00548939406872,
+                        55.819635624065995
+                    ],
+                    [
+                        52.00543633662164,
+                        55.81963637843728
+                    ],
+                    [
+                        52.00535318814218,
+                        55.819637551903725
+                    ],
+                    [
+                        52.005280600860715,
+                        55.81963914446533
+                    ],
+                    [
+                        52.00520575046539,
+                        55.81964073702693
+                    ],
+                    [
+                        52.00512830168009,
+                        55.81964232958853
+                    ],
+                    [
+                        52.005048003047705,
+                        55.8196440897882
+                    ],
+                    [
+                        52.00496468693018,
+                        55.81964559853077
+                    ],
+                    [
+                        52.004878940060735,
+                        55.81964693963528
+                    ],
+                    [
+                        52.00479160062969,
+                        55.81964811310172
+                    ],
+                    [
+                        52.00470367446542,
+                        55.81964945420623
+                    ],
+                    [
+                        52.00463326647878,
+                        55.81965054385364
+                    ],
+                    [
+                        52.00452782213688,
+                        55.819652220234275
+                    ],
+                    [
+                        52.00444073416293,
+                        55.81965347751975
+                    ],
+                    [
+                        52.00437183491886,
+                        55.8196543995291
+                    ],
+                    [
+                        52.0042710006237,
+                        55.81965540535748
+                    ],
+                    [
+                        52.00419061817229,
+                        55.819656075909734
+                    ],
+                    [
+                        52.004129346460104,
+                        55.819656662642956
+                    ],
+                    [
+                        52.004038067534566,
+                        55.8196578361094
+                    ],
+                    [
+                        52.00396145693958,
+                        55.81965892575681
+                    ],
+                    [
+                        52.00388476252556,
+                        55.81965976394713
+                    ],
+                    [
+                        52.003809325397015,
+                        55.819660602137446
+                    ],
+                    [
+                        52.00373933650553,
+                        55.8196612726897
+                    ],
+                    [
+                        52.003687620162964,
+                        55.81966177560389
+                    ],
+                    [
+                        52.00364135205746,
+                        55.81966219469905
+                    ],
+                    [
+                        52.00358301401138,
+                        55.819662529975176
+                    ],
+                    [
+                        52.003501038998365,
+                        55.81966278143227
+                    ],
+                    [
+                        52.00344840064645,
+                        55.819663032889366
+                    ],
+                    [
+                        52.00339333154261,
+                        55.81966320052743
+                    ],
+                    [
+                        52.003341782838106,
+                        55.8196631167084
+                    ],
+                    [
+                        52.003277745097876,
+                        55.8196631167084
+                    ],
+                    [
+                        52.00322711840272,
+                        55.819662949070334
+                    ],
+                    [
+                        52.003174144774675,
+                        55.81966278143227
+                    ],
+                    [
+                        52.00310306623578,
+                        55.819662446156144
+                    ],
+                    [
+                        52.00303299352527,
+                        55.81966211088002
+                    ],
+                    [
+                        52.002980690449476,
+                        55.81966211088002
+                    ],
+                    [
+                        52.00289821252227,
+                        55.8196628652513
+                    ],
+                    [
+                        52.00284196995199,
+                        55.81966370344162
+                    ],
+                    [
+                        52.002757312729955,
+                        55.81966504454613
+                    ],
+                    [
+                        52.002687407657504,
+                        55.81966605037451
+                    ],
+                    [
+                        52.002618089318275,
+                        55.81966697238386
+                    ],
+                    [
+                        52.00256461277604,
+                        55.81966772675514
+                    ],
+                    [
+                        52.00248682871461,
+                        55.819668816402555
+                    ],
+                    [
+                        52.0024252217263,
+                        55.8196697384119
+                    ],
+                    [
+                        52.002376690506935,
+                        55.819670241326094
+                    ],
+                    [
+                        52.00232841074467,
+                        55.819670828059316
+                    ],
+                    [
+                        52.002246268093586,
+                        55.819671750068665
+                    ],
+                    [
+                        52.002199245616794,
+                        55.819672252982855
+                    ],
+                    [
+                        52.00213151983917,
+                        55.81967292353511
+                    ],
+                    [
+                        52.00206555426121,
+                        55.8196734264493
+                    ],
+                    [
+                        52.002013167366385,
+                        55.81967359408736
+                    ],
+                    [
+                        52.00194292701781,
+                        55.81967535428703
+                    ],
+                    [
+                        52.00188098475337,
+                        55.819676108658314
+                    ],
+                    [
+                        52.0018260832876,
+                        55.81967091187835
+                    ],
+                    [
+                        52.00177453458309,
+                        55.819650711491704
+                    ],
+                    [
+                        52.001741862085595,
+                        55.819606667775275
+                    ],
+                    [
+                        52.001734468884564,
+                        55.81956836660686
+                    ],
+                    [
+                        52.001735290351384,
+                        55.81955083111956
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": "2",
+                "id": "moving",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(0,0,255,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(0,0,255,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#0000ff",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#0000ff",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#0000ff",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            52.00193502986025,
+                            55.81979176216933
+                        ],
+                        [
+                            52.001945740292136,
+                            55.819582793449314
+                        ],
+                        [
+                            52.00269645463014,
+                            55.8195579965772
+                        ],
+                        [
+                            52.00459379028414,
+                            55.81952867888191
+                        ],
+                        [
+                            52.004626390553106,
+                            55.81977787858733
+                        ],
+                        [
+                            52.00193502986025,
+                            55.81979176216933
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "seg_num": 0,
+                "id": "obstacle_stop",
+                "geometry_": null,
+                "fill_": {
+                    "color_": "rgba(128,64,48,0.2)"
+                },
+                "image_": {
+                    "opacity_": 1,
+                    "rotateWithView_": false,
+                    "rotation_": 0,
+                    "scale_": 1,
+                    "scaleArray_": [
+                        1,
+                        1
+                    ],
+                    "displacement_": [
+                        0,
+                        0
+                    ],
+                    "canvas_": {},
+                    "hitDetectionCanvas_": null,
+                    "fill_": {
+                        "color_": "rgba(128,64,48,0.2)"
+                    },
+                    "origin_": [
+                        0,
+                        0
+                    ],
+                    "points_": null,
+                    "radius_": 8,
+                    "angle_": 0,
+                    "stroke_": {
+                        "color_": "#804030",
+                        "lineDash_": null,
+                        "width_": 8
+                    },
+                    "size_": [
+                        24,
+                        24
+                    ],
+                    "renderOptions_": {
+                        "strokeStyle": "#804030",
+                        "strokeWidth": 8,
+                        "size": 24,
+                        "lineDash": null,
+                        "lineJoin": "round",
+                        "miterLimit": 10
+                    }
+                },
+                "renderer_": null,
+                "hitDetectionRenderer_": null,
+                "stroke_": {
+                    "color_": "#804030",
+                    "lineDash_": null,
+                    "width_": 8
+                },
+                "text_": null
+            }
+        }
+    ]
+}

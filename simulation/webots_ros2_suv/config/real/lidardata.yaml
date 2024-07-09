@@ -1,4 +1,4 @@
-visualize: True
+visualize: False
 visual_scale: 15
 lidar_reversed: False
 orthogonal_boxes: True
@@ -34,10 +34,10 @@ vehicle_corner3_x: -1.05
 vehicle_corner3_y: 5.55
 vehicle_corner4_x: 1.05
 vehicle_corner4_y: 5.55
-min_hmax: 0.3
-max_hmin: 1.0
+min_hmax: 1.0
+max_hmin: 1.3
 max_hmax: 3.5
-min_axis_distance: 1
+min_axis_distance: 0.3
 max_distance: 100.0
 gps_shift_x: -0.05
 gps_shift_y: -2.4

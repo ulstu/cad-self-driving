@@ -13,12 +13,13 @@ class GPSFollowState(AbstractState):
         super().__init__( *args, **kwargs)
         self.runs = 0
         self.__cur_path_point = 1
-        self.sc = pg.display.set_mode((800, 800))
         self.prev_target_angle = 0
         pg.font.init()
         self.sysfont = pg.font.SysFont("Arial", 20)
         self.params = {}
         self.timer = 0
+        self.allow_timer = False
+        self.next_seg = False
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -160,8 +161,13 @@ class GPSFollowState(AbstractState):
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
         difference = None
         # self.logi(f"{world_model.global_map}")
+        direction_forward = True
+        speed = self.config['default_GPS_speed'] 
+        zones = world_model.get_current_zones()
+        for zone in zones:
+            if zone['name'].startswith("speed"):
+                speed = int(zone['name'].split('speed')[1])  * self.get_directrion(direction_forward)
         while True:
-            direction_forward = True
             points = []
             for e in world_model.global_map:
                 # if 'seg_num' in e:
@@ -200,6 +206,9 @@ class GPSFollowState(AbstractState):
             difference_angle = -self.AngleOfVectors(res_car_vector, difference)
             Pk = 45
             Ik = 0.2
+            if speed > 10:
+                Pk = 90
+                Ik = 0.2
             if not direction_forward:
                 Pk = 27
                 Ik = 0.2
@@ -212,14 +221,12 @@ class GPSFollowState(AbstractState):
             self.params["new"] = world_model.gps_car_turn_angle
             self.params["old"] = self.prev_target_angle
             self.params["prevzone"] = world_model.previous_zone
-            self.params["hardware_state"] = world_model.hardware_state
-            self.params["software_state"] = world_model.software_state
 
             self.prev_target_angle = world_model.gps_car_turn_angle
         else:
             world_model.gps_car_turn_angle = 0.0
         pg.event.get()
-        self.sc.fill((0, 0, 0))
+        world_model.sc.fill((0, 0, 0))
 
         pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
@@ -244,7 +251,7 @@ class GPSFollowState(AbstractState):
             if y_dif < 1:
                 y_dif = 1
             rect2 = pg.Rect(-obstacle[9], obstacle[10], x_dif, y_dif)
-            # self.draw_rect(self.sc, (rect2), orientation, (255, 255, 255))
+            # self.draw_rect(world_model.sc, (rect2), orientation, (255, 255, 255))
             color = (255, 255, 0)
             if rect1.colliderect(rect2):
                 color = (255, 0, 0)
@@ -255,26 +262,24 @@ class GPSFollowState(AbstractState):
             for i in range(4):
                 rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
                 rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
-            self.draw_box(self.sc, rotated_obstacle, color)
-            # self.draw_box(self.sc, rotated_inflated_obstacle, (255, 0, 0))
+            self.draw_box(world_model.sc, rotated_obstacle, color)
+            # self.draw_box(world_model.sc, rotated_inflated_obstacle, (255, 0, 0))
 
-        pg.draw.line(self.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
+        pg.draw.line(world_model.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:
-            pg.draw.line(self.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
+            pg.draw.line(world_model.sc, (0,255,0), self.move_screen(0, 0), self.move_screen(difference[0], difference[1]))
         for point in path_square_points:
-            pg.draw.circle(self.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
-        self.draw_rect(self.sc, pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"]), orientation, (255, 255, 255))
-        rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
+            pg.draw.circle(world_model.sc, (255,0,0), self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
+        self.draw_rect(world_model.sc, pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"]), orientation, (255, 255, 255))
+        rect1 = pg.Rect(-1.5, 0, 3, self.config["obstacle_stop_distance"])
         
-        self.draw_rect(self.sc, (rect1), orientation, (255, 255, 255))
+        self.draw_rect(world_model.sc, (rect1), orientation, (255, 255, 255))
         self.params["has_obstacle"] = self.has_obstacle
 
         event = None
-        zones = world_model.get_current_zones()
 
         # self.logi(f'ipm {world_model.ipm_colorized.shape}')
-
-        speed = self.config['default_speed']  * self.get_directrion(direction_forward)
+        speed = speed  * self.get_directrion(direction_forward)
         zones_names = []
         for zone in zones:
             if zone['name'] == 'turn':
@@ -302,19 +307,33 @@ class GPSFollowState(AbstractState):
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'
-            elif zone['name'].startswith('speed'):
-                speed = float(zone['name'].split('speed')[1]) * self.get_directrion(direction_forward)
             elif zone["name"] == "obstacle_stop":
+                speed = 7
+                if self.has_obstacle and self.config["stop_obstacles"]:
+                    print("stop")
+                    speed = 0
+            elif zone["name"] == "traffic_light":
                 if self.has_obstacle and self.config["stop_obstacles"]:
                     print("stop")
                     speed = 0
             elif zone["name"] == "next_segment" and world_model.previous_zone != zone["name"]:
-                world_model.cur_path_segment += 1
-                self.__cur_path_point = 0
-                self.timer = 30
+                self.next_seg = True
+                self.timer = 40
+                self.allow_timer = True
                 speed = 0
-            world_model.previous_zone = zone["name"]
-            zones_names.append(zone["name"])
+            elif zone["name"] == "to_obstacles" and world_model.previous_zone != zone["name"]:
+                world_model.cur_path_segment += 1
+                world_model.cur_path_point = 0
+                self.__cur_path_point = 0
+                event = 'start_move'
+            elif zone['name'].startswith('pause_tick') and world_model.previous_zone != zone["name"]:
+                self.next_seg = True
+                self.timer = int(zone['name'].split('pause_tick_')[1])
+                self.allow_timer = True
+                speed = 0
+            if not zone['name'].startswith("speed"):
+                world_model.previous_zone = zone["name"]
+                zones_names.append(zone["name"])
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
         #     event = 'start_move'
@@ -323,16 +342,23 @@ class GPSFollowState(AbstractState):
         self.params["zones"] = zones_names
         self.params["speed"] = speed
         self.params["timer"] = self.timer
+        self.params["traficlight"] = world_model.traffic_light_state
         self.params["segment"] = world_model.cur_path_segment
+        self.params["event"] = event
         y = 10
         for k, v in self.params.items():
             text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
-            self.sc.blit(text_reward, (0, y))
+            world_model.sc.blit(text_reward, (0, y))
             y += 15
         pg.display.update()
-        if self.timer > 0:
+        if self.allow_timer and self.timer > 0:
             self.timer -= 1
             speed = 0
+        elif self.allow_timer and self.timer <= 0:
+            self.allow_timer = False
+            if self.next_seg:
+                world_model.cur_path_segment += 1
+                self.__cur_path_point = 0
         if event:
             world_model.path = None
         world_model.set_speed(speed)

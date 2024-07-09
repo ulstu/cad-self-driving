@@ -79,6 +79,13 @@ def get_ros2_nodes(*args):
         output='screen' ,
         parameters=[{'use_sim_time': USE_SIM_TIME, "config_dir": os.path.join(package, "config", CONFIG_DIRECTORY)}]
     )
+    node_lmp_sender = Node(
+        package=PACKAGE_NAME,
+        executable='node_lmp_sender',
+        name='node_lmp_sender',
+        output='screen',
+        parameters=[{'use_sim_time': USE_SIM_TIME}]
+    )
     
     driver_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'params', 'lslidar_ch64w.yaml')
     rviz_dir = os.path.join(get_package_share_directory('lslidar_driver'), 'rviz_cfg', 'lslidar_ch64w.rviz')
@@ -136,6 +143,7 @@ def get_ros2_nodes(*args):
         node_ego_controller,
         lidar_driver_node,
         node_drive_gazelle,
+        node_lmp_sender,
         # node_visual,
         # rviz_node,
         # node_bev_builder,

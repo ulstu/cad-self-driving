@@ -52,7 +52,7 @@ class NodeEgoController(Node):
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__ws = None
             self.__world_model = WorldModel()
-
+            
             package_dir = get_package_share_directory("webots_ros2_suv")
             config = ConfigLoader("map_config").data
             with open(f'{package_dir}/config/global_maps/{config["mapfile"]}') as mapdatafile:
