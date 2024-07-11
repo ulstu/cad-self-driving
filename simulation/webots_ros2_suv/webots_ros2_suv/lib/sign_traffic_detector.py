@@ -80,6 +80,8 @@ from PIL import Image
 import time
 from ultralytics import YOLO
 from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
+import easyocr
+import re
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -117,9 +119,14 @@ class ImageAnalyzer:
         self.traffic_light_queue = [self.traffic_light_state] * traffic_light_queue_length
         self.sign_queue = [-1] * sign_queue_length
         self.project_settings_config = GlobalConfigLoader("project_settings").data
+        self.reader = easyocr.Reader(['en'])
+        self.detected_signs = []
 
         tld_model_path = os.path.join(package_dir, "resource/TLDm/model.pt")
         self.tld_model = YOLO(tld_model_path)
+
+        tsd_model_path = os.path.join(package_dir, "resource/TSDm/model.pt")
+        self.tsd_model = YOLO(tsd_model_path)
 
         if self.is_video:
             self.cap = cv2.VideoCapture(video_dir)
@@ -591,6 +598,76 @@ class ImageAnalyzer:
                         traffic_light_state = "red"
                     elif traffic_light_label == "greentrafficlight":
                         traffic_light_state = "green"
+        
+
+        print()
+        print("Sign" * 20)
+        result = self.tsd_model.predict([image], verbose=False)[0]
+
+        detected_signs = []
+        if result.boxes is not None:
+            for box in result.boxes:
+                sign_int_label = int(box.cls)
+                sign_label = self.tsd_model.names[sign_int_label]
+                # detected_signs.append(sign_label)
+
+                if sign_label == "3_24":
+                    cx = int(box.xywh[0][0])
+                    cy = int(box.xywh[0][1])
+                    width = int(box.xywh[0][2])
+                    height = int(box.xywh[0][3])
+
+                    tlx = min(max(int(cx - width / 2), 0), image.shape[1])
+                    tly = min(max(int(cy - height / 2), 0), image.shape[0])
+                    brx = min(max(int(cx + width / 2), 0), image.shape[1])
+                    bry = min(max(int(cy + height / 2), 0), image.shape[0])
+
+
+                    # print([tlx, tly, brx, bry])
+
+                    sign_image = image[tly:bry, tlx:brx]
+
+                    # temp_save_path = "/home/spectre/Projects/PytesseractTestingDONTFORGETTODELETE/test_images/" + str()
+                    # temp_save_path += str(tly) + str(bry) + str(tlx) + str(brx) + ".png"
+                    # cv2.imwrite(temp_save_path, sign_image)
+                    # sign_image = image
+
+                    if sign_image.shape[0] < 50 or sign_image.shape[1] < 50:
+                        print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
+                        continue
+
+                    sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
+                    # sign_image = cv2.resize(sign_image, (50, 50))
+                
+                    results = self.reader.readtext(sign_image)
+
+
+                    if len(results) > 0:
+                        bbox, text, prob = results[0]
+
+                        numbers = re.findall(r'\d+', text)
+                        if len(numbers) < 0:
+                            continue
+
+                        speed_limit = int(numbers[0])
+
+                        sign_label = sign_label + "." + str(int(speed_limit / 10))
+
+                    print(f"len(results): {len(results)}")
+                    for (bbox, text, prob) in results:
+                        print(f"Detected text: {text} (confidence: {prob:.2f})")
+                
+                detected_signs.append(sign_label)
+        
+        print(f"Detected signs: {detected_signs}")
+
+        self.detected_signs = detected_signs.copy()
+
+
+        
+
+        print("Sign" * 20)
+        print()
 
         
         if update_traffic_light_state:

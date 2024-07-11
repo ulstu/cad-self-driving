@@ -55,6 +55,11 @@ class RoadSignDetectorWorker(AbstractWorker):
             image_to_draw = np.copy(world_model.img_front_objects_prj_lines)
             self.detector.plot_predictions(img, world_model.yolo_detected_objects, image_to_draw, update_traffic_light_state=True)
 
+            world_model.detected_signs = self.detector.detected_signs
+
+
+            print(f"DETECTED SIGNS FROM WORLD MODEL: {world_model.detected_signs}")
+
             world_model.img_front_objects_prj_lines_signs = image_to_draw
 
             #world_model.traffic_light_state = "red" if self.detector.is_red else "green"
