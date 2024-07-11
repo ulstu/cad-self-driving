@@ -93,6 +93,8 @@ class ImageAnalyzer:
     def __init__(self, 
                  path_to_cnn_model,
                  path_to_seg_model,
+                 path_to_tld_model,
+                 path_to_sign_model,
                  path_to_icons,
                  is_red=False,
                  traffic_light_queue_length=10,
@@ -564,7 +566,9 @@ class ImageAnalyzer:
             labels = self.seg_model.predict_one(np.array(analyze_image))
 
         # traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
-        traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
+        # traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
+
+        
 
         # if len(traffic_sign_images) > 0:
         #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
@@ -591,19 +595,21 @@ class ImageAnalyzer:
         if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
         
-        if update_sign_state:
-            self.to_update_sign_state(found_signs)
+        # if update_sign_state:
+        #     self.to_update_sign_state(found_signs)
 
         if image_to_plot_on is not None:
             image = image_to_plot_on
 
         # self.draw_mask(image, traffic_light_mask, [255, 0, 0])
         # self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
-        self.draw_signs(image, sign_rects, found_signs)
-        if self.project_settings_config["use_traffic_light_detection"]:
-            self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
-                                            self.traffic_light_state == "green",
-                                            self.traffic_light_state == "none"])
+
+        # self.draw_signs(image, sign_rects, found_signs)
+        # if self.project_settings_config["use_traffic_light_detection"]:
+        #     self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
+        #                                     self.traffic_light_state == "green",
+        #                                     self.traffic_light_state == "none"])
+        
         return image
         
 

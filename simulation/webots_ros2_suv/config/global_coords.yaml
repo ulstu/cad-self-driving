@@ -27,5 +27,5 @@ ackerman_angle_correction: 0.0
 ackerman_proportional_coef: 1.2
 turn_angle_num_path_points: 7
 default_speed: 10
-
+default_GPS_speed: 10
 
