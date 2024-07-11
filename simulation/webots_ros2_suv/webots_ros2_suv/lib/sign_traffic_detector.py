@@ -570,6 +570,7 @@ class ImageAnalyzer:
 
         
 
+
         # if len(traffic_sign_images) > 0:
         #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
 
