@@ -575,7 +575,7 @@ class ImageAnalyzer:
                 sign_label = self.tsd_model.names[sign_int_label]
                 # detected_signs.append(sign_label)
 
-                if sign_label == "3_24":
+                if sign_label == "3_24" or sign_label == "3_25":
                     cx = int(box.xywh[0][0])
                     cy = int(box.xywh[0][1])
                     width = int(box.xywh[0][2])
@@ -586,41 +586,22 @@ class ImageAnalyzer:
                     brx = min(max(int(cx + width / 2), 0), image.shape[1])
                     bry = min(max(int(cy + height / 2), 0), image.shape[0])
 
-
-                    # print([tlx, tly, brx, bry])
-
                     sign_image = image[tly:bry, tlx:brx]
+                    if sign_image.shape[0] >= 50 and sign_image.shape[1] >= 50:
+                        sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
+                        results = self.reader.readtext(sign_image)
 
-                    # temp_save_path = "/home/spectre/Projects/PytesseractTestingDONTFORGETTODELETE/test_images/" + str()
-                    # temp_save_path += str(tly) + str(bry) + str(tlx) + str(brx) + ".png"
-                    # cv2.imwrite(temp_save_path, sign_image)
-                    # sign_image = image
+                        if len(results) > 0:
+                            bbox, text, prob = results[0]
 
-                    if sign_image.shape[0] < 50 or sign_image.shape[1] < 50:
-                        # print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
-                        continue
+                            numbers = re.findall(r'\d+', text)
+                            if len(numbers) < 0:
+                                continue
 
-                    sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
-                    # sign_image = cv2.resize(sign_image, (50, 50))
-                
-                    results = self.reader.readtext(sign_image)
+                            speed_limit = int(numbers[0])
 
+                            sign_label = sign_label + "." + str(int(speed_limit / 10))
 
-                    if len(results) > 0:
-                        bbox, text, prob = results[0]
-
-                        numbers = re.findall(r'\d+', text)
-                        if len(numbers) < 0:
-                            continue
-
-                        speed_limit = int(numbers[0])
-
-                        sign_label = sign_label + "." + str(int(speed_limit / 10))
-
-                    # print(f"len(results): {len(results)}")
-                    # for (bbox, text, prob) in results:
-                    #     print(f"Detected text: {text} (confidence: {prob:.2f})")
-                
                 detected_signs.append(sign_label)
         return detected_signs
     
@@ -684,76 +665,11 @@ class ImageAnalyzer:
         # print("Sign" * 20)
         result = self.tsd_model.predict([image], verbose=False)[0]
         self.detected_signs = self.get_detected_sings(image, result)
-        self.found_sign = True
+        self.found_sign = True # Don't thik this should be always true. But for now, ok. ^0^
         
         self.detected_signs_queue.append(self.detected_signs)
         self.filtered_detected_signs = self.get_filtered_signs(self.detected_signs_queue, self.filtration_threshold)
-
-
-
-
-
-        # detected_signs = []
-        # if result.boxes is not None:
-        #     for box in result.boxes:
-        #         sign_int_label = int(box.cls)
-        #         sign_label = self.tsd_model.names[sign_int_label]
-        #         # detected_signs.append(sign_label)
-
-        #         if sign_label == "3_24":
-        #             cx = int(box.xywh[0][0])
-        #             cy = int(box.xywh[0][1])
-        #             width = int(box.xywh[0][2])
-        #             height = int(box.xywh[0][3])
-
-        #             tlx = min(max(int(cx - width / 2), 0), image.shape[1])
-        #             tly = min(max(int(cy - height / 2), 0), image.shape[0])
-        #             brx = min(max(int(cx + width / 2), 0), image.shape[1])
-        #             bry = min(max(int(cy + height / 2), 0), image.shape[0])
-
-
-        #             # print([tlx, tly, brx, bry])
-
-        #             sign_image = image[tly:bry, tlx:brx]
-
-        #             # temp_save_path = "/home/spectre/Projects/PytesseractTestingDONTFORGETTODELETE/test_images/" + str()
-        #             # temp_save_path += str(tly) + str(bry) + str(tlx) + str(brx) + ".png"
-        #             # cv2.imwrite(temp_save_path, sign_image)
-        #             # sign_image = image
-
-        #             if sign_image.shape[0] < 50 or sign_image.shape[1] < 50:
-        #                 # print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
-        #                 continue
-
-        #             sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
-        #             # sign_image = cv2.resize(sign_image, (50, 50))
-                
-        #             results = self.reader.readtext(sign_image)
-
-
-        #             if len(results) > 0:
-        #                 bbox, text, prob = results[0]
-
-        #                 numbers = re.findall(r'\d+', text)
-        #                 if len(numbers) < 0:
-        #                     continue
-
-        #                 speed_limit = int(numbers[0])
-
-        #                 sign_label = sign_label + "." + str(int(speed_limit / 10))
-
-        #             # print(f"len(results): {len(results)}")
-        #             # for (bbox, text, prob) in results:
-        #             #     print(f"Detected text: {text} (confidence: {prob:.2f})")
-                
-        #         detected_signs.append(sign_label)
         
-        # # print(f"Detected signs: {detected_signs}")
-
-        # self.detected_signs = detected_signs.copy()
-
-        # print("Sign" * 20)
-        # print()
         
         if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
