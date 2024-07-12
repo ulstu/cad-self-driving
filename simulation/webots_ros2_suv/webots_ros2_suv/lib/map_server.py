@@ -154,9 +154,13 @@ class MapWebServer(object):
     def get_sign_label(self):
         if self.world_model is None:
             return None
-        if self.world_model.found_sign is None:
-            return json.dumps({"detected": False, "sign": "знак не обнаружен"})
-        return json.dumps({"detected": True, "sign": str(self.world_model.detected_signs)})
+        # if self.world_model.found_sign is None:
+        #     return json.dumps({"detected": False, "sign": "знак не обнаружен"})
+        # return json.dumps({"detected": True, "sign": str(self.detected_signs)})
+        # test_text = f"What the hell: {str(self.detected_signs)}"
+        
+        # return json.dumps({"detected": True, "sign": "What the hell!?!?!?!"})
+        return json.dumps({"detected": True, "sign": str(self.world_model.filtered_detected_signs)})
 
     @cherrypy.expose
     def get_image(self, img_type, tm):

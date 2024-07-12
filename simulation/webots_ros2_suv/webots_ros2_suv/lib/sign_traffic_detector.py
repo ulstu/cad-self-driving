@@ -82,6 +82,7 @@ from ultralytics import YOLO
 from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
 import easyocr
 import re
+from collections import deque
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -121,6 +122,9 @@ class ImageAnalyzer:
         self.project_settings_config = GlobalConfigLoader("project_settings").data
         self.reader = easyocr.Reader(['en'])
         self.detected_signs = []
+        self.filtered_detected_signs = []
+        self.detected_signs_queue = deque(maxlen=10)
+        self.filtration_threshold = 0.5
 
         tld_model_path = os.path.join(package_dir, "resource/TLDm/model.pt")
         self.tld_model = YOLO(tld_model_path)
@@ -562,48 +566,8 @@ class ImageAnalyzer:
                 max_area = area
                 max_area_idx = idx
         return max_area_idx
-            
-
-    def plot_predictions(self, image, yolo_detected_objects, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
-        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        
-        if self.use_gpu == False:
-            labels = self.seg_model.predict_one(np.array(analyze_image), device='cpu')
-        else:
-            labels = self.seg_model.predict_one(np.array(analyze_image))
-
-        # traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
-        # traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
-
-        
-
-
-        # if len(traffic_sign_images) > 0:
-        #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
-
-        # traffic_light_state = "none"
-        # if len(traffic_light_images) > 0:
-        #     traffic_light_state = self.classify_traffic_light(traffic_light_images)
-        traffic_light_state = self.traffic_light_state # HERE GOES YOUR CODE!!!!!!!!!!!
-
-        if self.project_settings_config["use_traffic_light_detection"]:
-            result = self.tld_model.predict([image], verbose=False)[0]
-            if result.boxes is not None:
-                if len(result.boxes) > 0:
-                    closest_traffic_light_id = self.find_closest_traffic_light_id(result)
-                    traffic_light_int_label = int(result.boxes[closest_traffic_light_id].cls)
-                    traffic_light_label = self.tld_model.names[traffic_light_int_label]
-
-                    if traffic_light_label == "redtrafficlight":
-                        traffic_light_state = "red"
-                    elif traffic_light_label == "greentrafficlight":
-                        traffic_light_state = "green"
-        
-
-        # print()
-        # print("Sign" * 20)
-        result = self.tsd_model.predict([image], verbose=False)[0]
-
+    
+    def get_detected_sings(self, image, result):
         detected_signs = []
         if result.boxes is not None:
             for box in result.boxes:
@@ -658,10 +622,135 @@ class ImageAnalyzer:
                     #     print(f"Detected text: {text} (confidence: {prob:.2f})")
                 
                 detected_signs.append(sign_label)
-        
-        # print(f"Detected signs: {detected_signs}")
+        return detected_signs
+    
+    def get_filtered_signs(self, detected_signs_queue: deque, threshold=0.5):
+        sign_counts = dict()
 
-        self.detected_signs = detected_signs.copy()
+        for signs in detected_signs_queue:
+            for sign in signs:
+                if sign in sign_counts:
+                    sign_counts[sign] += 1
+                else:
+                    sign_counts[sign] = 1
+        
+        deque_len = len(detected_signs_queue)
+        filtered_signs = []
+
+        for sign_name, sign_count in sign_counts.items():
+            sign_proportion = sign_count / deque_len
+            if sign_proportion >= threshold:
+                filtered_signs.append(sign_name)
+        
+        return filtered_signs
+
+    def plot_predictions(self, image, yolo_detected_objects, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
+        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        
+        if self.use_gpu == False:
+            labels = self.seg_model.predict_one(np.array(analyze_image), device='cpu')
+        else:
+            labels = self.seg_model.predict_one(np.array(analyze_image))
+
+        # traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
+        # traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
+
+        
+
+
+        # if len(traffic_sign_images) > 0:
+        #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
+
+        # traffic_light_state = "none"
+        # if len(traffic_light_images) > 0:
+        #     traffic_light_state = self.classify_traffic_light(traffic_light_images)
+        traffic_light_state = self.traffic_light_state # HERE GOES YOUR CODE!!!!!!!!!!!
+
+        if self.project_settings_config["use_traffic_light_detection"]:
+            result = self.tld_model.predict([image], verbose=False)[0]
+            if result.boxes is not None:
+                if len(result.boxes) > 0:
+                    closest_traffic_light_id = self.find_closest_traffic_light_id(result)
+                    traffic_light_int_label = int(result.boxes[closest_traffic_light_id].cls)
+                    traffic_light_label = self.tld_model.names[traffic_light_int_label]
+
+                    if traffic_light_label == "redtrafficlight":
+                        traffic_light_state = "red"
+                    elif traffic_light_label == "greentrafficlight":
+                        traffic_light_state = "green"
+        
+
+        # print()
+        # print("Sign" * 20)
+        result = self.tsd_model.predict([image], verbose=False)[0]
+        self.detected_signs = self.get_detected_sings(image, result)
+        self.found_sign = True
+        
+        self.detected_signs_queue.append(self.detected_signs)
+        self.filtered_detected_signs = self.get_filtered_signs(self.detected_signs_queue, self.filtration_threshold)
+
+
+
+
+
+        # detected_signs = []
+        # if result.boxes is not None:
+        #     for box in result.boxes:
+        #         sign_int_label = int(box.cls)
+        #         sign_label = self.tsd_model.names[sign_int_label]
+        #         # detected_signs.append(sign_label)
+
+        #         if sign_label == "3_24":
+        #             cx = int(box.xywh[0][0])
+        #             cy = int(box.xywh[0][1])
+        #             width = int(box.xywh[0][2])
+        #             height = int(box.xywh[0][3])
+
+        #             tlx = min(max(int(cx - width / 2), 0), image.shape[1])
+        #             tly = min(max(int(cy - height / 2), 0), image.shape[0])
+        #             brx = min(max(int(cx + width / 2), 0), image.shape[1])
+        #             bry = min(max(int(cy + height / 2), 0), image.shape[0])
+
+
+        #             # print([tlx, tly, brx, bry])
+
+        #             sign_image = image[tly:bry, tlx:brx]
+
+        #             # temp_save_path = "/home/spectre/Projects/PytesseractTestingDONTFORGETTODELETE/test_images/" + str()
+        #             # temp_save_path += str(tly) + str(bry) + str(tlx) + str(brx) + ".png"
+        #             # cv2.imwrite(temp_save_path, sign_image)
+        #             # sign_image = image
+
+        #             if sign_image.shape[0] < 50 or sign_image.shape[1] < 50:
+        #                 # print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
+        #                 continue
+
+        #             sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
+        #             # sign_image = cv2.resize(sign_image, (50, 50))
+                
+        #             results = self.reader.readtext(sign_image)
+
+
+        #             if len(results) > 0:
+        #                 bbox, text, prob = results[0]
+
+        #                 numbers = re.findall(r'\d+', text)
+        #                 if len(numbers) < 0:
+        #                     continue
+
+        #                 speed_limit = int(numbers[0])
+
+        #                 sign_label = sign_label + "." + str(int(speed_limit / 10))
+
+        #             # print(f"len(results): {len(results)}")
+        #             # for (bbox, text, prob) in results:
+        #             #     print(f"Detected text: {text} (confidence: {prob:.2f})")
+                
+        #         detected_signs.append(sign_label)
+        
+        # # print(f"Detected signs: {detected_signs}")
+
+        # self.detected_signs = detected_signs.copy()
 
         # print("Sign" * 20)
         # print()

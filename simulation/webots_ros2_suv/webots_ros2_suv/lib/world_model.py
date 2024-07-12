@@ -45,6 +45,7 @@ class WorldModel(object):
         self.img_front_objects_prj_lines_signs_markings = None # изображение с камеры с детектированными объектами + линии дорожной разметки + знаки + дорожная разметка
         self.yolo_detected_objects = None   # объекты, обнаруженные на изображении с помощью YOLO
         self.detected_traffic_signs = None  # дорожные знаки, обнаруженные на изображении с помощью YOLO
+        self.filtered_detected_signs = None # отфильтроанные дорожные знаки, обнаруженные на изображении с помощью YOLO
         self.objects = None                 # объекты во фронтальной проекции   
         self.ipm_image = None               # BEV сегментированное изображение 
         self.ipm_colorized = None           # раскрашенное BEV сегментированное изображение
