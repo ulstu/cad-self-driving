@@ -600,8 +600,8 @@ class ImageAnalyzer:
                         traffic_light_state = "green"
         
 
-        print()
-        print("Sign" * 20)
+        # print()
+        # print("Sign" * 20)
         result = self.tsd_model.predict([image], verbose=False)[0]
 
         detected_signs = []
@@ -633,7 +633,7 @@ class ImageAnalyzer:
                     # sign_image = image
 
                     if sign_image.shape[0] < 50 or sign_image.shape[1] < 50:
-                        print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
+                        # print(f"The signs {sign_label} is too far away. Can't detect the exact speed limit.")
                         continue
 
                     sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
@@ -653,22 +653,18 @@ class ImageAnalyzer:
 
                         sign_label = sign_label + "." + str(int(speed_limit / 10))
 
-                    print(f"len(results): {len(results)}")
-                    for (bbox, text, prob) in results:
-                        print(f"Detected text: {text} (confidence: {prob:.2f})")
+                    # print(f"len(results): {len(results)}")
+                    # for (bbox, text, prob) in results:
+                    #     print(f"Detected text: {text} (confidence: {prob:.2f})")
                 
                 detected_signs.append(sign_label)
         
-        print(f"Detected signs: {detected_signs}")
+        # print(f"Detected signs: {detected_signs}")
 
         self.detected_signs = detected_signs.copy()
 
-
-        
-
-        print("Sign" * 20)
-        print()
-
+        # print("Sign" * 20)
+        # print()
         
         if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
