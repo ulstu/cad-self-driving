@@ -32,3 +32,4 @@ default_GPS_speed: 20
 obstacle_stop_distance: 10
 treshold_angle: 20
 stop_obstacles: True
+local_path: False
