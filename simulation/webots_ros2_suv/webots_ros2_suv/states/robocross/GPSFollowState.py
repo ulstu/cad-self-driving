@@ -162,7 +162,7 @@ class GPSFollowState(AbstractState):
         difference = None
         # self.logi(f"{world_model.global_map}")
         direction_forward = True
-        speed = self.config['default_GPS_speed'] 
+        speed = self.config['default_GPS_speed']
         zones = world_model.get_current_zones()
         for zone in zones:
             if zone['name'].startswith("speed"):
