@@ -301,8 +301,6 @@ class NodePointObstacles(Node):
 
     # Функция вызывается, когда прилетает JSON от pcl_map_node
     def __on_obstacles_message(self, data):
-        
-        
         # в data.data находится наша строка, парсим её
         obstacles_dict = json.loads(data.data);
         # если прилетели данные от переднего лидара

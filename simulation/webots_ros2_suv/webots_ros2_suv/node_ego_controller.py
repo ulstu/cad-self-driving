@@ -146,6 +146,8 @@ class NodeEgoController(Node):
 
     #@timeit
     def __on_image_message(self, data):
+        self.__world_model.params['camera_last_message_time'] = time.time()  # Секунды
+
         image = data.data
         image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
@@ -220,6 +222,7 @@ class NodeEgoController(Node):
     def __on_object_data_message(self, data):
         obstacles_list = json.loads(data.data)
         self.__world_model.lmp_data['ObjectData'] = obstacles_list['ObjectData']
+        self.__world_model.params['lidar_last_message_time'] = time.time()  # Секунды
 
 def main(args=None):
     try:

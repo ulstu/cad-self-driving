@@ -17,8 +17,10 @@ from nav2_common.launch import RewrittenYaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
+CONFIG_DIRECTORY = 'simulator'
 
 def get_ros2_nodes(*args):
+    package = get_package_share_directory('webots_ros2_suv')
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
 
     lane_follower = Node(
@@ -48,7 +50,7 @@ def get_ros2_nodes(*args):
         executable='pcl_map_node',
         name='pcl_map_node',
         output='screen' ,
-        parameters=[{'use_sim_time': USE_SIM_TIME}]
+        parameters=[{'use_sim_time': USE_SIM_TIME, "config_dir": os.path.join(package, "config", CONFIG_DIRECTORY)}]
     )
 
     node_globalmap = Node(
@@ -148,7 +150,7 @@ def get_ros2_nodes(*args):
         # node_point_obstacles,
         # node_visual,
         # depth_to_laserscan,
-        # pcl_map_node,
+        pcl_map_node,
         #rviz2_node,
         #lane_follower,
     ] + static_transform_nodes
@@ -168,7 +170,7 @@ def generate_launch_description():
         respawn=True
     )
 
-    
+    os.environ['CONFIG_DIRECTORY'] = CONFIG_DIRECTORY
 
     return LaunchDescription([
         DeclareLaunchArgument(
