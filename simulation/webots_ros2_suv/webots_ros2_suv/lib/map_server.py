@@ -25,6 +25,7 @@ import cv2
 from PIL import Image
 from .config_loader import ConfigLoader
 
+
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
 
@@ -159,7 +160,7 @@ class MapWebServer(object):
         return json.dumps({"detected": True, "sign": self.world_model.found_sign[1]})
 
     @cherrypy.expose
-    def get_image(self, img_type, tm):
+    def get_image(self, img_type, tm, status='nok'):
         if self.world_model is None:
             return None
         if img_type == "obj_detector":
@@ -175,7 +176,20 @@ class MapWebServer(object):
             if self.world_model.found_sign is None:
                 return None
             data = self.world_model.found_sign[2]
+        elif img_type == 'status_icon':
+            status_images = []
+            status_images_relative_path = 'src/webots_ros2_suv/map-server/static'
 
+            for status_image in os.listdir(status_images_relative_path):
+                status_image_numpy = cv2.imread(os.path.join(status_images_relative_path, status_image), cv2.IMREAD_UNCHANGED)
+
+                if status_image_numpy is not None:
+                    status_images.append(status_image_numpy)
+
+            if status == 'nok':
+                data = status_images[1]  # red_cross.png
+            elif status == 'ok':
+                data = status_images[0]  # green_checkmark.png
 
             # use StringIO to stream the image out to the browser direct from RAM
             # output = StringIO.StringIO()
@@ -183,8 +197,10 @@ class MapWebServer(object):
             # data.save(output, format)
             # contents = output.getvalue()
             # output.close()
+
         cherrypy.response.headers['Content-Type'] = "image/png"
         contents = cv2.imencode('.png', data)[1].tostring()
+
         return contents
 
     @cherrypy.expose

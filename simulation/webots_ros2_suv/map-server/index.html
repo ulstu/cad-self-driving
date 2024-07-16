@@ -42,6 +42,35 @@
         width: 100%;
       }
 
+      #diagnosticContainer {
+        display: flex;
+        height: 938px;
+        margin-top: 30px;
+        padding: 10px;
+      }
+
+      #diagnosticContainer h3 { margin-bottom: 10px; }
+
+      .softwareLevelContainer {
+        width: 50%;
+        text-align: center;
+      }
+
+      .hardwareLevelContainer {
+        width: 50%;
+        text-align: center;
+      }
+
+      .statusRow * {
+        display: inline-block;
+        margin: 0;
+        vertical-align: middle;
+      }
+
+      .statusRow img {
+        height: 15px;
+        width: 15px;
+      }
     </style>
   </head>
   <body>
@@ -96,9 +125,57 @@
       <table id="params"></table>
     </div>
   </div>
-
-
   </div>
+
+    <div id="diagnosticContainer">
+      <div class="hardwareLevelContainer">
+        <h3 class="hardwareLevelHeader">Аппаратный уровень</h3>
+        <div class="statusRow">
+          <p class="controlUnitConnectionStatusText">Главный блок управления:</p>
+          <img class="controlUnitConnectionStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="gearBoxUnitConnectionStatusText" style="text-align: left">Блок КПП:</p>
+          <img class="gearBoxUnitConnectionStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="relayUnitConnectionStatusText">Блок реле:</p>
+          <img class="relayUnitConnectionStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="wheelPedalsUnitConnectionStatusText">Блок рулевого и педального узлов:</p>
+          <img class="wheelPedalsUnitConnectionStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="controlPanelUnitConnectionStatusText">Блок пульта оператора:</p>
+          <img class="controlPanelUnitConnectionStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div><br>
+        <div class="statusRow">
+          <p class="gearBoxRemainingAttemptsText">Оставшееся количество попыток включения передачи:</p>
+          <p class="gearBoxRemainingAttemptsNumber">0</p>
+        </div>
+        <div class="statusRow">
+          <p class="wheelDeviationToleranceText">Допуск отклонения текущего положения рулевого колеса от целевого:</p>
+          <img class="wheelDeviationToleranceImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+      </div>
+      <div class="softwareLevelContainer">
+        <h3 class="softwareLevelHeader">Программный уровень</h3>
+        <div class="statusRow">
+          <p class="lidarStatusText">Лидар LS Lidar CB64:</p>
+          <img class="lidarStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="cameraStatusText">3D-камера Stereolabs ZED 2:</p>
+          <img class="cameraStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+        <div class="statusRow">
+          <p class="RTKStatusText">RTK-поправки:</p>
+          <img class="RTKStatusImage" src="static/red_cross.png" alt="Status Icon">
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="main.js"></script>
   </body>
 </html>

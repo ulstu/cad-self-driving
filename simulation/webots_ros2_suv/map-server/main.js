@@ -14,6 +14,9 @@ import Translate from 'ol/interaction/Translate.js';
 let init_point = [48.387626, 54.351436]
 let current_map_file = null;
 
+let lastKnownScrollPosition = window.scrollY;
+let ticking = false;
+
 // AJAX-запрос для получения типов точек и добавления их в выпадающий список
 $.get('/get_point_types', function(data){
   if (data['status'] != 'ok')
@@ -491,7 +494,27 @@ setInterval(
       }
     });
     $.getJSON('/get_params' , function(data) {
-      var tbl_body = document.createElement("tbody");
+      document.addEventListener('scroll', (event) => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            if (window.scrollY > lastKnownScrollPosition) {
+              var diagnostic_container = document.getElementById('diagnosticContainer');
+              diagnostic_container.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});
+            }
+            else if (window.scrollY < lastKnownScrollPosition) {
+              var map_container = document.getElementById('map');
+              map_container.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
+            }
+
+            lastKnownScrollPosition = window.scrollY;
+            ticking = false;
+          });
+
+          ticking = true;
+        }
+      });
+
+      var tbl_body = document.createElement('tbody');
       var odd_even = false;
 
       for (var key in data) {
@@ -499,26 +522,44 @@ setInterval(
           var lidar_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key]; // Секунды
           var alerted = localStorage.getItem('lidar_alert') || '';
           
-          if (lidar_answer_elapsed_time > 3 && alerted != 'true') {
+          if (lidar_answer_elapsed_time >= 3 && alerted != 'true') {
+            $('.lidarStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=nok');
             localStorage.setItem('lidar_alert', 'true');
-            alert('Связь с передним лидаром потеряна!');
+            setTimeout(() => alert('Связь с лидаром LS Lidar CB64 потеряна!'), 1000);
+          }
+          else if (lidar_answer_elapsed_time < 3 && alerted != 'false') {
+            $('.lidarStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=ok');
+            localStorage.setItem('lidar_alert', 'false');
+            setTimeout(() => alert('Связь с лидаром LS Lidar CB64 восстановлена!'), 1000);
           }
         }
         else if (key == 'camera_last_message_time') {
           var camera_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key];
           var alerted = localStorage.getItem('camera_alert') || '';
           
-          if (camera_answer_elapsed_time > 3 && alerted != 'true') {
+          if (camera_answer_elapsed_time >= 3 && alerted != 'true') {
+            $('.cameraStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=nok');
             localStorage.setItem('camera_alert', 'true');
-            alert('Связь с видеокамерой потеряна!');
+            setTimeout(() => alert('Связь с 3D-камерой Stereolabs ZED 2 потеряна!'), 1000);
+          }
+          else if (camera_answer_elapsed_time < 3 && alerted != 'false') {
+            $('.cameraStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=ok');
+            localStorage.setItem('camera_alert', 'false');
+            setTimeout(() => alert('Связь с 3D-камерой Stereolabs ZED 2 восстановлена!'), 1000);
           }
         }
         else if (key == 'rtk_status') {
           var alerted = localStorage.getItem('rtk_alert') || '';
 
           if (data[key].toString() == 'False' && alerted != 'true') {
+            $('.RTKStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=nok');
             localStorage.setItem('rtk_alert', 'true');
-            alert('RTK-поправки перестали приходить!');
+            setTimeout(() => alert('RTK-поправки перестали приходить!'), 1000);
+          }
+          else if (data[key].toString() == 'True' && alerted != 'false') {
+            $('.RTKStatusImage').attr('src', '/get_image?img_type=status_icon&tm=' + unique + '&status=ok');
+            localStorage.setItem('rtk_alert', 'false');
+            setTimeout(() => alert('RTK-поправки снова приходят!'), 1000);
           }
         }
         else {
@@ -532,11 +573,10 @@ setInterval(
           odd_even = !odd_even;
         }
       }
+
       $("#params").empty();
       $("#params").append(tbl_body);
-    });    
+    });
   },
   700,
 );
-
-setInterval(() => localStorage.clear(), 5000);
