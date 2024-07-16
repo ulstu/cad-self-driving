@@ -498,14 +498,14 @@ setInterval(
         if (key == 'lidar_last_message_time') {
           var lidar_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key]; // Секунды
           
-          if (lidar_answer_elapsed_time > 3)
-            alert('Связь с передним лидаром потеряна!');
+          if (lidar_answer_elapsed_time > 3) {}
+            // alert('Связь с передним лидаром потеряна!');
         }
         else if (key == 'camera_last_message_time') {
           var camera_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key];
           
-          if (camera_answer_elapsed_time > 3)
-            alert('Связь с видеокамерой потеряна!');
+          if (camera_answer_elapsed_time > 3) {}
+            // alert('Связь с видеокамерой потеряна!');
         }
         else {
           var tbl_row = tbl_body.insertRow();

@@ -2,7 +2,7 @@ states_dir: "robocross/"
 states:
   start: "StartState.py"
   moving: "MovingState.py"
-  astarmoving: "AStarMovingState.py"
+  parking: "ParkingFollowState.py"
   gpsfollow: "GPSFollowState.py"
   lanefollow: "LaneFollowState.py"
   paused: "PausedState.py"
@@ -22,7 +22,7 @@ workers:
 workerstates:
   start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
   moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] # "pathplanning"
-  astarmoving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
+  parking: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] #, "pathplanning"]
   lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
   gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] #, "pathplanning"]
   stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
@@ -31,19 +31,17 @@ workerstates:
   emergency: []
 transitions:
   start:
-    start_move: ["gpsfollow"] # "gpsfollow"
+    start_move: ["parking"] # "gpsfollow"
     stop: ["stopped"]
     pause: ["paused"]
   gpsfollow:
-    start_astar: ["astarmoving"]
     start_move: ["moving"]
     # start_gps_follow: ["gpsfollow"] 
     # start_lane_follow: ["lanefollow"]
     pause: ["paused"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]
-  astarmoving:
-    start_gps_follow: ["gpsfollow"]
+  parking:
     pause: ["paused"]
     stop: ["stopped", "emergency"]
     turn: ["turn"]

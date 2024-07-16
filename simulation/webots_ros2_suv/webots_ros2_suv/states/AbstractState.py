@@ -26,7 +26,8 @@ class AbstractState:
         angle_points_count = self.turn_angle_num_path_points
         if world_model.path and len(world_model.path) < angle_points_count:
             angle_points_count = len(world_model.path) - 1
-        if world_model.gps_path is not None and len(world_model.gps_path) > 2:
+        # if world_model.gps_path is not None and len(world_model.gps_path) > 2:
+        if world_model.gps_path is not None and len(world_model.gps_path) > 0:
             command_message = AckermannDrive()
             command_message.speed = float(speed)
             command_message.steering_angle = world_model.gps_car_turn_angle

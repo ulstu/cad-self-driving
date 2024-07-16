@@ -2,9 +2,9 @@
 # lon: 54.31585005003535
 # mapfile: mf.geojson
 
-lat: 43.638987354236185
-lon: 56.335206573823854
-mapfile: robocross.geojson
+# lat: 43.638987354236185
+# lon: 56.335206573823854
+# mapfile: robocross.geojson
 
 # lat: 52.000441437135855
 # lon: 55.81957703977085
@@ -34,6 +34,6 @@ mapfile: robocross.geojson
 # lon: 55.81928266212344
 # mapfile: test5.geojson
 
-# lat: 52.00153648853302
-# lon: 55.81928266212344
-# mapfile: test_parking.geojson
+lat: 52.00153648853302
+lon: 55.81928266212344
+mapfile: test_parking.geojson

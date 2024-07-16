@@ -1,7 +1,6 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 from webots_ros2_suv.lib.config_loader import ConfigLoader
-from webots_ros2_suv.lib.coords_transformer import CoordsTransformer
 import math
 import time
 
@@ -184,7 +183,6 @@ class MovingState(AbstractState):
     def on_event(self, event, world_model=None):
         world_model.software_state = 'Auto'
         self.runs = self.runs + 1
-        ct = CoordsTransformer()
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
 
@@ -203,11 +201,6 @@ class MovingState(AbstractState):
         # TODO: add collecting of segment points
         if len(points) > 0 and len(self.road_offsets) == 0:
             self.road_offsets = np.zeros(len(points))
-        for event in pg.event.get():
-            if event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1 and self.config["local_path"]:  #  левая кнопка мыши
-                    x, y = pg.mouse.get_pos()
-                    self.local_path.append(pg.mouse.get_pos(ct.get_global_coordinates(x, y, world_model.get_current_position(), (400, 400))))
         while True:
             world_model.gps_path = points
             path_square_points = []

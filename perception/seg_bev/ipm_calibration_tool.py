@@ -114,7 +114,7 @@ class CalibrationTool(object):
             'width': self.__img_width
         }
         with open(filename, 'w') as file:
-            documents = yaml.dump(config, file, default_flow_style=False)
+            documents = yaml.dump(config, file)
 
     def load_config(self, filename):
         if not os.path.exists(filename):

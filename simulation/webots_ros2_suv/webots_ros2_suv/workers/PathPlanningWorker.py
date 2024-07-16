@@ -191,7 +191,7 @@ class PathPlanningWorker(AbstractWorker):
         print("Emergency State")
         return None
 
-    #@timeit
+    # @timeit
     def on_data(self, world_model):
         # try:
         # thread = Thread(target = self.plan_path, args = (world_model,))

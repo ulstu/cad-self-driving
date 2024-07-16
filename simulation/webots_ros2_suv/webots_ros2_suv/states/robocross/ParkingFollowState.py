@@ -1,6 +1,7 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
 from webots_ros2_suv.lib.coords_transformer import CoordsTransformer
+from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
 import math
 import time
 
@@ -9,7 +10,7 @@ import numpy as np
 
 screen_scale = 15
 
-class TapToMoveGPSFollowState(AbstractState):
+class ParkingFollowState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
         self.runs = 0
@@ -26,6 +27,8 @@ class TapToMoveGPSFollowState(AbstractState):
         self.local_path = []
         self.coords_transformer = CoordsTransformer()
         self.current_direction = 1
+        self.data = {"parking": [0, 0], "points": [], "parallel": True}
+        self.before_points = []
 
     def find_goal_point_x(self, arr, val=100):
         current_length, max_length = 0
@@ -169,16 +172,29 @@ class TapToMoveGPSFollowState(AbstractState):
         for event in pg.event.get():
             if event.type == pg.MOUSEBUTTONDOWN:
                 x, y = pg.mouse.get_pos()
-                self.local_path.append(self.coords_transformer.get_global_coordinates(x, y, (lat, lon, 0), (400, 400)))
-                if event.button != 3:  #  левая кнопка мыши
-                    self.directions.append(1)
-                else:
-                    self.directions.append(-1)
+                if event.button == 1:
+                    self.local_path = []
+                    start_point = (0, 0)
+                    if len(self.data["points"]) > 0:
+                        start_point =  self.rotate_point((0, 0), self.data["points"][-1], orientation + math.pi / 2)
+                    for i in range(len(self.data["points"])):
+                        x_i, y_i, dir = self.data["points"][i]
+                        x_i, y_i = self.rotate_point((0, 0), (x_i, y_i), orientation + math.pi / 2)
+                        self.loge(f"{x_i - start_point[0]}, {y_i - start_point[1]}")
+                        self.local_path.append(self.coords_transformer.get_global_coordinates((x - 400) + (x_i - start_point[0]) * screen_scale, (y - 400) + (y_i - start_point[1]) * screen_scale, (lat, lon, 0), (0, 0)))
+                        self.directions.append(dir)
+                    self.__cur_path_point = 0
+                # if event.button == 3:  #  левая кнопка мыши
+                    # self.before_points.append(self.coords_transformer.get_global_coordinates(x, y, (lat, lon, 0), (400, 400)))
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_z:
-                    self.local_path.pop()
-                    self.directions.pop()
-        points = self.local_path
+            #     if event.key == pg.K_z:
+            #         self.before_points.pop()
+                if event.key == pg.K_x:
+                    self.data = GlobalConfigLoader(self.config["parking_parallel"]).data[0]
+            #     if event.key == pg.K_c:
+            #         self.data = GlobalConfigLoader(self.config["parking_garage"]).data[0]
+        
+        points = self.before_points + self.local_path
 
         
         # while True:
@@ -186,7 +202,6 @@ class TapToMoveGPSFollowState(AbstractState):
         points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
         directions = self.directions[points_offset:]
         world_model.gps_path = points
-        self.logi(str(points))
 
         if len(directions) > 0:
             if self.__cur_path_point == 0:
@@ -194,7 +209,6 @@ class TapToMoveGPSFollowState(AbstractState):
             elif self.current_direction != directions[0]:
                 self.timer = 40
                 self.allow_timer = True
-                self.logi(f"change directrion {self.current_direction} {directions[0]}")
                 self.current_direction = directions[0]
         speed = self.config['default_GPS_speed']
 
@@ -442,6 +456,8 @@ class TapToMoveGPSFollowState(AbstractState):
     def get_directrion(self, idx) -> int:
         return self.directions[idx] if len(self.directions) != 0 or 0 <= idx < len(self.directions) else 1
     
+    def move_relative(self, x, y):
+        return (x - 400) / screen_scale, (y - 400) / screen_scale
     # def has_obstacle(self, world_model):
     #     rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
     #     for obstacle in world_model.obstacles:

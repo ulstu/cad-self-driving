@@ -12,7 +12,7 @@ class GPSFollowState(AbstractState):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
         self.runs = 0
-        self.__cur_path_point = 1
+        self.__cur_path_point = 0
         self.prev_target_angle = 0
         pg.font.init()
         self.sysfont = pg.font.SysFont("Arial", 20)
@@ -164,6 +164,8 @@ class GPSFollowState(AbstractState):
         direction_forward = True
         speed = self.config['default_GPS_speed']
         zones = world_model.get_current_zones()
+        self.params["coords"] = (lat, lon)
+        self.params["orientation"] = orientation
         for zone in zones:
             if zone['name'].startswith("speed"):
                 speed = int(zone['name'].split('speed')[1])  * self.get_directrion(direction_forward)
@@ -298,12 +300,12 @@ class GPSFollowState(AbstractState):
                 if world_model.traffic_light_state == 'red':
                     speed = 0
                     # self.__cur_path_point = 0
-                    event = 'stop'
+                    # event = 'stop'
             elif zone['name'] == 'crosswalk':
                 if world_model.pedestrian_on_crosswalk:
                     speed = 0
                     # self.__cur_path_point = 0
-                    event = 'stop'
+                    # event = 'stop'
             elif zone['name'] == 'stop':
                 self.__cur_path_point = 0
                 event = 'stop'
@@ -345,6 +347,8 @@ class GPSFollowState(AbstractState):
         self.params["traficlight"] = world_model.traffic_light_state
         self.params["segment"] = world_model.cur_path_segment
         self.params["event"] = event
+        self.params["cur_point"] = self.__cur_path_point
+
         y = 10
         for k, v in self.params.items():
             text_reward = self.sysfont.render(f"{k}: {v}", False, (255, 0, 0))
