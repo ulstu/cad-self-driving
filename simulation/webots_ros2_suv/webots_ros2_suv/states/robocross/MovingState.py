@@ -271,8 +271,6 @@ class MovingState(AbstractState):
             self.params["new"] = world_model.gps_car_turn_angle
             self.params["old"] = self.prev_target_angle
             self.params["prevzone"] = world_model.previous_zone
-            self.params["hardware_state"] = world_model.hardware_state
-            self.params["software_state"] = world_model.software_state
             self.params["has_obstacle"] = self.has_obstacle(world_model)
 
             self.prev_target_angle = world_model.gps_car_turn_angle

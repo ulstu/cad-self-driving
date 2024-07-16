@@ -44,10 +44,9 @@ class LaneLineDetectionWorker(AbstractWorker):
 
 
     def on_data(self, world_model):
-        if project_settings_config["use_line_detection"] == True:
-            try:
-                if world_model:
-
+        if world_model:
+            if project_settings_config["use_line_detection"] == True:
+                try:
                     img = np.array(Image.fromarray(world_model.rgb_image))
                     line_batches, mask_batches, results = self.lane_line_model.predict([img])
                     prev_image = np.copy(world_model.img_front_objects_prj)
@@ -139,9 +138,10 @@ class LaneLineDetectionWorker(AbstractWorker):
                     
                     world_model.img_front_objects_prj_lines = image_to_draw
 
-            except  Exception as err:
-                super().error(''.join(traceback.TracebackException.from_exception(err).format()))
-        else:
-            world_model.img_front_objects_prj_lines = np.copy(world_model.img_front_objects_prj)
-            world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+                except  Exception as err:
+                    super().error(''.join(traceback.TracebackException.from_exception(err).format()))
+            else:
+                world_model.img_front_objects_prj_lines = np.copy(world_model.img_front_objects_prj)
+                world_model.ipm_colorized_lines = np.copy(world_model.ipm_colorized)
+                
         return world_model

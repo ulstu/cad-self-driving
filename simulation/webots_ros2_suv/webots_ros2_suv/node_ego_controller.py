@@ -1,3 +1,4 @@
+from std_msgs.msg import Bool, String
 import rclpy
 import numpy as np
 import traceback
@@ -10,7 +11,6 @@ import matplotlib.pyplot as plt
 import sensor_msgs.msg
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
-from std_msgs.msg import Float32, String
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg  import PointStamped, TransformStamped, Quaternion
 from tf2_ros import TransformBroadcaster
@@ -72,12 +72,13 @@ class NodeEgoController(Node):
             # self.__fsm.on_event("stop")
             # self.__fsm.on_event("reset")
 
+            self.create_subscription(Bool, param.get_param('rtk_topicname'), self.__on_rtk_message, qos)
             self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("front_image_topicname"), self.__on_image_message, qos)
             self.create_subscription(sensor_msgs.msg.PointCloud2, param.get_param("lidar_topicname"), self.__on_lidar_message, qos)
             self.create_subscription(sensor_msgs.msg.Image, param.get_param("range_image_topicname"), self.__on_range_image_message, qos)
-            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos) 
-            self.create_subscription(String, 'obstacles_json', self.__on_object_data_message, qos) 
+            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
+            self.create_subscription(String, 'obstacles_json', self.__on_object_data_message, qos)
 
             self.__ackermann_publisher = self.create_publisher(AckermannDrive, 'cmd_ackermann', 1)
             self.__control_unit_publisher = self.create_publisher(String, 'cmd_control_unit', 1)
@@ -176,6 +177,13 @@ class NodeEgoController(Node):
 
         if self.__ws is not None:
             self.__ws.update_model(self.__world_model)
+
+
+    def __on_rtk_message(self, data):
+        if not data.data:
+            self._logger.error(f'The RTK connection was failed!')
+        self.__world_model.params['rtk_status'] = data.data
+
 
     def __on_gps_message(self, data):
         if self.__world_model is not None:

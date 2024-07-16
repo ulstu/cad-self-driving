@@ -62,15 +62,14 @@ class WorldModel(object):
         self.lidar_yolo_boxes: List[LidarYoloBox] = [] # Отфильтрованные с помощью yolo параллепипеды
         self.params = {}                    # Параметры для визуализации в системе управления
         self.gps_car_turn_angle = 0.0
-        self.software_state = 'None'        # Программное состояние автомобиля (данное решение)
-        self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
+        self.software_state = 'None'        # Текущее состояние данного решения для отправки в главный блок управления
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = []                 # Данные о препятствиях с лидара
         self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
         self.previous_zone = None   
-                     
         self.sc = pg.display.set_mode((800, 800))
+
 
     def load_map(self, mapyaml):
         self.global_map = []

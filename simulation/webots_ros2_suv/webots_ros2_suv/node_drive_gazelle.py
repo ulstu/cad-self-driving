@@ -12,7 +12,6 @@ from prometheus_client import start_http_server
 from .log_server import set_location
 from .log_server import set_state
 from .log_server import LogServerStatus
-from .lib.gps_reader import GPSReader
 from .lib.param_loader import ParamLoader
 from .lib.orientation import quaternion_from_euler
 from webots_ros2_driver.utils import controller_url_prefix

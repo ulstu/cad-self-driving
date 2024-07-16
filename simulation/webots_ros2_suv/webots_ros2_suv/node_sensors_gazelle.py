@@ -1,3 +1,4 @@
+from std_msgs.msg import Bool
 import math
 import rclpy
 import traceback
@@ -27,8 +28,11 @@ class NodeSensorsGazelle(Node):
             qos = qos_profile_sensor_data
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             param = ParamLoader()
-            self.__gps_publisher = self.create_publisher(NavSatFix, param.get_param("navsatfix_topicname"), qos)
+
+            self.__rtk_publisher = self.create_publisher(Bool, param.get_param('rtk_topicname'), qos)
+            self.__gps_publisher = self.create_publisher(NavSatFix, param.get_param('navsatfix_topicname'), qos)
             self.__odom_publisher = self.create_publisher(Odometry, param.get_param("odom_topicname"), qos)
+            
             self.__tf_broadcaster = TransformBroadcaster(self)
             
             self.__gps = GPSReader(param.get_param("gnss_port"), int(param.get_param("gnss_baudrate")))
@@ -38,6 +42,11 @@ class NodeSensorsGazelle(Node):
 
     def gps_read(self):
         try:
+            rtk_status = Bool()
+            rtk_status.data = self.__gps.rtk_status
+            
+            self.__rtk_publisher.publish(rtk_status)
+
             #self.get_logger().info('BEFORE GPS READ')
             self.__gps.read_data()
             #self.get_logger().info(f'GPS DATA: lat: {self.__gps.lat_dec}, lon: {self.__gps.lon_dec} yaw: {self.__gps.yaw}')
@@ -51,6 +60,7 @@ class NodeSensorsGazelle(Node):
             msg.altitude = self.__gps.altitude
             msg.status.status = NavSatStatus.STATUS_SBAS_FIX
             msg.status.service = NavSatStatus.SERVICE_GPS | NavSatStatus.SERVICE_GLONASS | NavSatStatus.SERVICE_COMPASS | NavSatStatus.SERVICE_GALILEO
+
             self.__gps_publisher.publish(msg)         
 
             t = TransformStamped()

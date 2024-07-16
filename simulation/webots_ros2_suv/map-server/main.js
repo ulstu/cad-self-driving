@@ -497,15 +497,29 @@ setInterval(
       for (var key in data) {
         if (key == 'lidar_last_message_time') {
           var lidar_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key]; // Секунды
+          var alerted = localStorage.getItem('lidar_alert') || '';
           
-          if (lidar_answer_elapsed_time > 3)
+          if (lidar_answer_elapsed_time > 3 && alerted != 'true') {
+            localStorage.setItem('lidar_alert', 'true');
             alert('Связь с передним лидаром потеряна!');
+          }
         }
         else if (key == 'camera_last_message_time') {
           var camera_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key];
+          var alerted = localStorage.getItem('camera_alert') || '';
           
-          if (camera_answer_elapsed_time > 3)
+          if (camera_answer_elapsed_time > 3 && alerted != 'true') {
+            localStorage.setItem('camera_alert', 'true');
             alert('Связь с видеокамерой потеряна!');
+          }
+        }
+        else if (key == 'rtk_status') {
+          var alerted = localStorage.getItem('rtk_alert') || '';
+
+          if (data[key].toString() == 'False' && alerted != 'true') {
+            localStorage.setItem('rtk_alert', 'true');
+            alert('RTK-поправки перестали приходить!');
+          }
         }
         else {
           var tbl_row = tbl_body.insertRow();
@@ -524,3 +538,5 @@ setInterval(
   },
   700,
 );
+
+setInterval(() => localStorage.clear(), 5000);

@@ -27,6 +27,10 @@ dict = { 'gps_state_status' : 0,
 
 class GPSReader:
     @property
+    def rtk_status(self):
+        return self.__rtk_status
+    
+    @property
     def lat_dec(self):
         return self.__lat_dec
 
@@ -108,7 +112,7 @@ class GPSReader:
         if self.__status == -1:
             print('GPS NMEA data received but not confidential')
         else:
-
+            self.__rtk_status = bool(bytes_to_int(dict['gps_state_status'] + 4, self.__paket) & (2 ** 17))
             self.__lon_dec = bytes_to_int(dict['gps_int_longitude'] + 4, self.__paket) * 360 / 4294967296
             self.__lat_dec = bytes_to_int(dict['gps_int_latitude'] + 4, self.__paket) * 360 / 4294967296
             self.__altitude = self.__paket[dict['gps_altitude'] + 4] + self.__paket[dict['gps_altitude'] + 5] + self.__paket[dict['gps_altitude'] + 6] + self.__paket[dict['gps_altitude'] + 7]
