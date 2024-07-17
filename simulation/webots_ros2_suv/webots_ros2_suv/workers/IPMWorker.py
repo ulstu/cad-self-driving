@@ -44,6 +44,7 @@ class IPMWorker(AbstractWorker):
         # self.zed_pos = np.array([lidardata_config["zed_x"], lidardata_config["zed_y"], lidardata_config["zed_z"]])
         self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
+        self.last_ipm = None
 
     def __save_image_files(self, labels, composited, source):
         range_image = self.__cur_range_image.copy()
@@ -68,6 +69,7 @@ class IPMWorker(AbstractWorker):
 
             image = world_model.rgb_image
             image_seg = world_model.seg_image
+            # image_seg = np.zeros_like(image)
             #image_depth = world_model.range_image
 
             image = self.__map_builder.resize_img(image)
@@ -84,12 +86,18 @@ class IPMWorker(AbstractWorker):
             world_model.yolo_detected_objects = list(zip(resized_boxes, labels))
             
             #depths = self.__map_builder.calc_box_distance(results[0].boxes.data, image_depth)
+            
 
             # image_seg = self.__map_builder.remove_detected_objects(image_seg, cboxes) # if you want to remove objects
-            image_seg[image_seg == 0] = 100 # if you want to left the objects (which should work better for new the yolo model)
+            image_seg[image_seg == 0] = 100 # if you want to left the objects (which should work better for new the yolo model) ///////
             world_model.ipm_image = self.__map_builder.generate_ipm(image_seg, is_mono=False, need_cut=False, log=self.log)
             world_model.ipm_image = self.__map_builder.crop_ipm(world_model.ipm_image, log=self.log)
+            world_model.ipm_image[:] = 100
+            if self.last_ipm is None:
+                self.last_ipm = np.copy(world_model.ipm_image)
             tbs, widths = self.__map_builder.transform_boxes(cboxes)
+
+            # self.logi(f"ipm_img worker {world_model.ipm_image.shape} seg {image_seg.shape}")
 
             world_model.pov_point = (image.shape[0], int(image.shape[1] / 2))
             world_model.pov_point = self.__map_builder.calc_bev_point(world_model.pov_point)
@@ -194,7 +202,7 @@ class IPMWorker(AbstractWorker):
                 # if lidardata_config["visualize_projection"]:
                 #     front_edge  = [p_front[0], p_front[1], p_front[2], p_front[3]]
                 #     right_edge  = [p_front[3], p_front[2], p_front[6], p_front[7]]
-                #     top_edge    = [p_front[1], p_front[5], p_front[6], p_front[2]]
+                #     top_edge    = [p_front[1], p_front[5], p_front[6], p_front[2]]30
                 #     left_edge   = [p_front[0], p_front[1], p_front[5], p_front[4]]
                 #     bottom_edge = [p_front[0], p_front[4], p_front[7], p_front[3]]
                 #     back_edge   = [p_front[4], p_front[5], p_front[6], p_front[7]]
@@ -203,20 +211,40 @@ class IPMWorker(AbstractWorker):
                 #     cv2.drawContours(image_to_draw, [np.array(bottom_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
                 #     cv2.drawContours(image_to_draw, [np.array(left_edge).astype(int)], contourIdx=-1, color=(50, 50, 50), thickness=-1)
                     
-                #     cv2.drawContours(image_to_draw, [np.array(top_edge).astype(int)], contourIdx=-1, color=(170, 170, 170), thickness=-1)
+                #     cv2.drawContours(image_to_draw, [np.array(top_edge).astype(int)], contourgrayIdx=-1, color=(170, 170, 170), thickness=-1)
                 #     cv2.drawContours(image_to_draw, [np.array(right_edge).astype(int)], contourIdx=-1, color=(190, 190, 190), thickness=-1)
                 #     cv2.drawContours(image_to_draw, [np.array(front_edge).astype(int)], contourIdx=-1, color=(220, 220, 220), thickness=-1)
 
                 #     cv2.rectangle(image_to_draw, front_p1, front_p2, color=(255, 0, 0), thickness=2)
             scale = self.lidardata_config["visual_scale"]
-            for box in world_model.obstacles:
+            tmp_img = np.zeros_like(world_model.ipm_image)
+
+
+
+            for box in world_model.get_obstacles():
                 xmin, xmax, ymin, ymax = box[8], box[9], box[10], box[11]
                 xmin, xmax = (xmin  + self.lidardata_config["zed_x"]) * scale + world_model.pov_point[0], (xmax + self.lidardata_config["zed_x"]) * scale + world_model.pov_point[0]
                 ymin, ymax = world_model.pov_point[1] - (ymin  + self.lidardata_config["zed_y"]) * scale, world_model.pov_point[1] - (ymax + self.lidardata_config["zed_y"]) * scale 
-                # self.logi(f"{xmin} {ymin} {xmax} {ymax}")
-                world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
+                a, b = xmax - xmin, ymin - ymax
+                if a * b < 3600:
+                    # self.logi(f"{xmin} {ymin} {xmax} {ymax}")
+                    # world_model.ipm_image = cv2.ellipse(world_model.ipm_image, (int((xmax + xmin) / 2), int((ymax + ymin) / 2)), (40, 100), 0, 0, 360, 0, -1)
+                    tmp_img = cv2.rectangle(tmp_img, (int(xmin) - 20, int(ymin) - 60), (int(xmax) + 20, int(ymax) + 100), 100, -1)
 
-            #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
+
+                    # world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin) - 20, int(ymin) - 60), (int(xmax) + 20, int(ymax) + 100), (255, 255, 0), -1)
+                    # world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
+                    
+                    # world_model.ipm_colorized = cv2.ellipse(world_model.ipm_colorized, (int((xmax + xmin) / 2), int((ymax + ymin) / 2)), (50, 120), 0, 0, 360, (255, 255, 0), -1)
+            self.last_ipm[:] += 30
+            self.last_ipm[self.last_ipm > 100] = 100
+            self.last_ipm -= tmp_img
+            self.last_ipm[self.last_ipm < 0] = 0
+            world_model.ipm_image = np.copy(self.last_ipm)
+            world_model.ipm_colorized = cv2.cvtColor(self.last_ipm, cv2.COLOR_GRAY2BGR)
+
+            self.logi(f"SHAPE: img {world_model.ipm_image.shape} color {world_model.ipm_colorized.shape} {world_model.ipm_colorized[100, 100, :]}")
+                        #colorized, track_ids = self.__map_builder.track_objects(results, colorized, self.__pos)
             world_model.img_front_objects_prj = image_to_draw
             
             # world_model.ipm_colorized

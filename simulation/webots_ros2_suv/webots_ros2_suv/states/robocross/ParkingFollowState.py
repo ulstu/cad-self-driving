@@ -217,7 +217,7 @@ class ParkingFollowState(AbstractState):
         for point in points:
             path_square_points.append(self.gps_to_rect(point[0], point[1]))
 
-        if len(path_square_points) > 0:
+        if not self.allow_timer and len(path_square_points) > 0:
             difference = [path_square_points[0][0] - car_position[0], path_square_points[0][1] - car_position[1]]
             if len(path_square_points) > 1 and directions[1] == directions[0]:
                 nearest_point = self.MedianVector(path_square_points[0], path_square_points[1], 0.75)
@@ -228,7 +228,7 @@ class ParkingFollowState(AbstractState):
             if dist < self.config['change_point_dist']:
                 self.__cur_path_point += 1
                 world_model.cur_path_point = self.__cur_path_point
-        if len(path_square_points) > 0:        
+        if not self.allow_timer and len(path_square_points) > 0:        
             res_car_vector = car_vector
             if self.current_direction != 1:
                 res_car_vector = [-car_vector[0], -car_vector[1]]
@@ -268,7 +268,7 @@ class ParkingFollowState(AbstractState):
         rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
 
         self.has_obstacle = False
-        for obstacle in world_model.obstacles:
+        for obstacle in world_model.get_obstacles():
             obstacle_points = [[-obstacle[8], obstacle[10]],
                                [-obstacle[9], obstacle[10]],
                                [-obstacle[9], obstacle[11]],
@@ -309,9 +309,9 @@ class ParkingFollowState(AbstractState):
                 color =  (0, 255, 0)
             pg.draw.circle(world_model.sc, color, self.move_screen(point[0] - car_position[0], point[1] - car_position[1]), 4)
         self.draw_rect(world_model.sc, pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"]), orientation, (255, 255, 255))
-        rect1 = pg.Rect(-1.5, 0, 3, self.config["obstacle_stop_distance"])
+        # rect1 = pg.Rect(-1.5, 0, 3, self.config["obstacle_stop_distance"])
         
-        self.draw_rect(world_model.sc, (rect1), orientation, (255, 255, 255))
+        # self.draw_rect(world_model.sc, (rect1), orientation, (255, 255, 255))
         self.params["has_obstacle"] = self.has_obstacle
 
         event = None

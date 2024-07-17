@@ -66,11 +66,17 @@ class WorldModel(object):
         self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
-        self.obstacles = []                 # Данные о препятствиях с лидара
+        self.obstacles = {"front": [], "rear": []}                # Данные о препятствиях с лидара
         self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
         self.previous_zone = None   
                      
         self.sc = pg.display.set_mode((800, 800))
+    
+    def get_obstacles(self):
+        res = []
+        for v in self.obstacles.values():
+            res += v
+        return res
 
     def load_map(self, mapyaml):
         self.global_map = []

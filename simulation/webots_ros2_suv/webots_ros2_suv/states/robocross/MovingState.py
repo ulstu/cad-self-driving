@@ -217,7 +217,7 @@ class MovingState(AbstractState):
                     )
                     # difference_vector = [path_source[i][0] - car_position[0], path_source[i][1] - car_position[1]]
                     # difference_vector = self.rotate_point([0, 0], difference_vector, orientation - math.pi / 2)
-                    for obstacle in world_model.obstacles:
+                    for obstacle in world_model.get_obstacles():
                         x_dif = (-obstacle[8] + obstacle[9] + 1) * 15
                         y_dif = (obstacle[11] - obstacle[10] + 40) * 15
                         if x_dif < 1:
@@ -344,7 +344,7 @@ class MovingState(AbstractState):
             if self.road_offsets[i + 1] != 0:
                 color = (0, 255, 0)
             pg.draw.circle(world_model.sc, color, self.move_screen(path_square_points[i][0] - car_position[0], path_square_points[i][1] - car_position[1]), 4)
-        local_obstacles = world_model.obstacles.copy()
+        local_obstacles = world_model.get_obstacles().copy()
         for obstacle in local_obstacles:
             # x_offset = self.lidar_config["gps_shift_x"]
             # y_offset = self.lidar_config["gps_shift_x"]
@@ -410,7 +410,7 @@ class MovingState(AbstractState):
         return event
     
     def has_obstacle(self, world_model):
-        for obstacle in world_model.obstacles:
+        for obstacle in world_model.get_obstacles():
             mean_obstacle_position = [(obstacle[8] + obstacle[9]) / 2, (obstacle[10] + obstacle[11]) / 2]
             obstacle_angle = abs(self.AngleOfReference(mean_obstacle_position))
             if obstacle[1] < self.config["obstacle_stop_distance"] and obstacle_angle < self.config["treshold_angle"]:

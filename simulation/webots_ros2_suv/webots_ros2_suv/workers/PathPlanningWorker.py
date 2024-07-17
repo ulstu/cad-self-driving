@@ -18,40 +18,38 @@ from webots_ros2_suv.lib.a_star import astar, kalman_filter_path, smooth_path_wi
 from threading import Thread
 from geopy.distance import geodesic
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point
+from webots_ros2_suv.lib.config_loader import ConfigLoader
 
 
 class PathPlanningWorker(AbstractWorker):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
-        package_dir = get_package_share_directory('webots_ros2_suv')
-        config_path = os.path.join(package_dir,
-                                    pathlib.Path(os.path.join(package_dir, 'config', 'global_coords.yaml')))
         self.turning_radius = 0.1
         self.process_noise_scale = 0.05 
         self.robot_radius=10
         self.step_size=10
         self.sample_size=5
         self.buffer = None
-        with open(config_path) as file:
-            config = yaml.full_load(file)
-            self.turning_radius = config['dubins_turning_radius']
-            self.process_noise_scale = config['kalman_path_planning_noise_scale']
-            self.robot_radius = config['robot_radius']
-            self.step_size = config['a_star_step_size']
-            self.sample_size = config['dubins_sample_size']
-            self.min_path_points_dist = config['min_path_points_dist']
-            self.bezier_num_points = config['bezier_num_points']
-
+        config = ConfigLoader("global_coords").data
+        self.turning_radius = config['dubins_turning_radius']
+        self.process_noise_scale = config['kalman_path_planning_noise_scale']
+        self.robot_radius = config['robot_radius']
+        self.step_size = config['a_star_step_size']
+        self.sample_size = config['dubins_sample_size']
+        self.min_path_points_dist = config['min_path_points_dist']
+        self.bezier_num_points = config['bezier_num_points']
 
     def plan_a_star(self, world_model):
+        # self.logi(f"pov_point {world_model.pov_point} goal {world_model.goal_point} shape {world_model.ipm_image.shape}")
+        
         world_model.path = astar(world_model.pov_point, 
                                  world_model.goal_point, 
                                  world_model.ipm_image, 
                                  self.robot_radius, 
                                  self.step_size,
-                                 super().log)
-        
+                                 self.logi)
+
         world_model.gps_path = []
         if world_model.path != None and len(world_model.path) > 0:
             for point in world_model.path:
@@ -143,7 +141,8 @@ class PathPlanningWorker(AbstractWorker):
                 x, y = world_model.coords_transformer.get_relative_coordinates(points[self.__cur_path_point][0], points[self.__cur_path_point][1], world_model.get_current_position(), world_model.pov_point)
                 dist = calc_dist_point(points[self.__cur_path_point], world_model.get_current_position())
                 world_model.params["point_dist"] = dist
-                if dist < self.config['change_point_dist']:
+                sub_ipm = world_model.ipm_image[y - 10:y + 10, x - 10:x + 10]
+                if dist < self.config['change_point_dist'] or (sub_ipm.mean(axis=0).mean(axis=0) < 90 and dist < self.config['change_point_dist'] * 2):
                     # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                     self.__cur_path_point = self.__cur_path_point + 1
                     if (world_model.goal_point):
@@ -175,12 +174,10 @@ class PathPlanningWorker(AbstractWorker):
             self.logw("Path is empty")
         elif len(world_model.gps_path) == 0:
             self.plan_a_star(world_model)
-            self.logw("Path is empty")
+            self.logw("Path len is 0")
         elif not self.check_path(world_model):
             self.plan_a_star(world_model)
             self.logw("Path stucked")
-        
-        # self.logi(f"len {len(world_model.path)}")
 
         if len(world_model.gps_path) == 0:
             self.logw(f'Path is empty')

@@ -169,39 +169,36 @@ class GPSFollowState(AbstractState):
         for zone in zones:
             if zone['name'].startswith("speed"):
                 speed = int(zone['name'].split('speed')[1])  * self.get_directrion(direction_forward)
-        while True:
-            points = []
-            for e in world_model.global_map:
-                # if 'seg_num' in e:
-                    # self.logi(f"{e['name']}: {e['seg_num']} cur: {world_model.cur_path_segment}")
-                if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment:
-                    direction_forward = e['name'] == 'moving'
-                    points = e['coordinates']
-                    break
-            points_offset = self.__cur_path_point
-            points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
-            world_model.gps_path = points
+        points = []
+        for e in world_model.global_map:
+            # if 'seg_num' in e:
+                # self.logi(f"{e['name']}: {e['seg_num']} cur: {world_model.cur_path_segment}")
+            if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment:
+                direction_forward = e['name'] == 'moving'
+                points = e['coordinates']
+                break
+        points_offset = self.__cur_path_point
+        points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
+        world_model.gps_path = points
 
-            path_square_points = []
-            for point in points:
-                path_square_points.append(self.gps_to_rect(point[0], point[1]))
+        path_square_points = []
+        for point in points:
+            path_square_points.append(self.gps_to_rect(point[0], point[1]))
 
+        if len(path_square_points) > 0:
+            difference = [path_square_points[0][0] - car_position[0], path_square_points[0][1] - car_position[1]]
             if len(path_square_points) > 1:
-                nearest_point = self.MedianVector(self.gps_to_rect(points[0][0], points[0][1]), self.gps_to_rect(points[1][0], points[1][1]), 0.75)
+                nearest_point = self.MedianVector(path_square_points[0], path_square_points[1], 0.75)
                 difference = [nearest_point[0] - car_position[0], nearest_point[1] - car_position[1]]
 
-                dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
-
-                conf = self.config['change_point_dist']
-            else:
-                break
+            dist = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
+            conf = self.config['change_point_dist']
             if dist < self.config['change_point_dist']:
                 self.__cur_path_point += 1
+                self.logw(f"NEXT POINT {self.__cur_path_point} DIST: {dist} {self.config['change_point_dist']}")
                 world_model.cur_path_point = self.__cur_path_point
-            else:
-                break
 
-        if len(path_square_points) > 1:        
+        if len(path_square_points) > 0:        
             res_car_vector = car_vector
             if not direction_forward:
                 res_car_vector = [-car_vector[0], -car_vector[1]]
@@ -236,15 +233,15 @@ class GPSFollowState(AbstractState):
         rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
 
         self.has_obstacle = False
-        for obstacle in world_model.obstacles:
+        for obstacle in world_model.get_obstacles():
             obstacle_points = [[-obstacle[8], obstacle[10]],
-                               [-obstacle[9], obstacle[10]],
-                               [-obstacle[9], obstacle[11]],
-                               [-obstacle[8], obstacle[11]]]
+                            [-obstacle[9], obstacle[10]],
+                            [-obstacle[9], obstacle[11]],
+                            [-obstacle[8], obstacle[11]]]
             inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
-                                  [-obstacle[9] + 10, obstacle[10]],
-                                  [-obstacle[9] + 10, obstacle[11]],
-                                  [-obstacle[8] - 10, obstacle[11]]]
+                                [-obstacle[9] + 10, obstacle[10]],
+                                [-obstacle[9] + 10, obstacle[11]],
+                                [-obstacle[8] - 10, obstacle[11]]]
             
             x_dif = -obstacle[8] + obstacle[9]
             y_dif = obstacle[11] - obstacle[10]
@@ -284,6 +281,8 @@ class GPSFollowState(AbstractState):
         speed = speed  * self.get_directrion(direction_forward)
         zones_names = []
         for zone in zones:
+            if int(zone["seg_num"]) != world_model.cur_path_segment:
+                continue
             if zone['name'] == 'turn':
                 world_model.cur_turn_polygon = zone['coordinates'][0]
                 self.__cur_path_point = 0
@@ -322,6 +321,7 @@ class GPSFollowState(AbstractState):
                 self.next_seg = True
                 self.timer = 40
                 self.allow_timer = True
+                self.logw(f"To NEXT SEGMENT {self.timer}")
                 speed = 0
             elif zone["name"] == "to_obstacles" and world_model.previous_zone != zone["name"]:
                 world_model.cur_path_segment += 1
@@ -336,6 +336,8 @@ class GPSFollowState(AbstractState):
             if not zone['name'].startswith("speed"):
                 world_model.previous_zone = zone["name"]
                 zones_names.append(zone["name"])
+        if len(zones_names) == 0:
+            world_model.previous_zone = "None"
 
         # if world_model.is_obstacle_before_path_point(filter_num=2, log=self.log):
         #     event = 'start_move'

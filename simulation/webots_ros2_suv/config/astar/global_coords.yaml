@@ -1,4 +1,4 @@
-# lat: 43.63939225773861
+# lat: 43.63939225773861120
 # lon: 56.33517639374398
 # orientation: 1.5
 # scale_x: 30
@@ -12,11 +12,11 @@ scale_x: 15
 scale_y: 6
 
 bev_orientation: -0.33
-change_point_dist: 2
+change_point_dist: 1
 bev_obstacle_ratio: 3
 
 kalman_path_planning_noise_scale: 0.05
-robot_radius: 15
+robot_radius: 1
 a_star_step_size: 20
 dubins_sample_size: 5
 dubins_turning_radius: 10
@@ -34,3 +34,6 @@ obstacle_stop_distance: 10
 treshold_angle: 20
 stop_obstacles: True
 local_path: False
+
+parking_parallel: patterns/parallel
+parking_garage: patterns/garage

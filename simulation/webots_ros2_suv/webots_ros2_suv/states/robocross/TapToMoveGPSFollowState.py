@@ -254,7 +254,7 @@ class TapToMoveGPSFollowState(AbstractState):
         rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
 
         self.has_obstacle = False
-        for obstacle in world_model.obstacles:
+        for obstacle in world_model.get_obstacles():
             obstacle_points = [[-obstacle[8], obstacle[10]],
                                [-obstacle[9], obstacle[10]],
                                [-obstacle[9], obstacle[11]],
