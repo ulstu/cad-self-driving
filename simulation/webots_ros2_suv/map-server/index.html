@@ -42,6 +42,19 @@
         width: 100%;
       }
 
+      #sign_icons {
+        background-color: aqua;
+        display: flex;
+        justify-content: center;
+        /* overflow: hidden; */
+      }
+
+      .img_sign {
+        width: 100px;
+        height: auto;
+        background-color: aqua;
+      }
+
     </style>
   </head>
   <body>
@@ -83,11 +96,18 @@
         </div>
       <div class="row">
         <div class="found_sign_text_container">
-          <label class="input-group-text" for="type">Обнаруженный знак:</label>
+          <label class="input-group-text" for="type">Обнаруженные знаки:</label>
           <b><div id="sign_text" class="">знак не обнаружен</div></b>
         </div>
         <div class="found_sign_countainer">
-          <img id="img_sign" class="img_sign"/>
+          
+          <div id="sign_icons">
+            <!-- <img class="img_sign" src="http://localhost:8008/sign_icons/2_1.jpg"/>
+            <img class="img_sign" src="http://localhost:8008/sign_icons/1_31.jpg"/>
+            <img class="img_sign" src="http://localhost:8008/sign_icons/5_19_1.jpg"/>
+            <img class="img_sign" src="http://localhost:8008/sign_icons/5_19_1.jpg"/>
+            <img class="img_sign" src="http://localhost:8008/sign_icons/5_19_1.jpg"/> -->
+          </div>
         </div>
       </div>
   </div>
