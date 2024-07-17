@@ -12,6 +12,8 @@ from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
 PACKAGE_NAME = 'webots_ros2_suv'
 local_path_to_cnn_model = "resource/weights/model-ep50-signs16/"
 local_path_to_seg_model = "resource/mobilev3large-lraspp-sign.pt"
+local_path_to_tld_model = "resource/TLDm/model.pt"
+local_path_to_sign_model = "resource/TLDm/model.pt"
 local_path_to_icons = "resource/signs_icon/"
 package_dir = get_package_share_directory(PACKAGE_NAME)
 
@@ -20,13 +22,18 @@ class RoadSignDetectorWorker(AbstractWorker):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__( *args, **kwargs)
 
-        path_to_cnn_model = os.path.join(package_dir, local_path_to_cnn_model)
-        path_to_seg_model = os.path.join(package_dir, local_path_to_seg_model)
+        path_to_cnn_model = os.path.join(package_dir,  local_path_to_cnn_model)
+        path_to_seg_model = os.path.join(package_dir,  local_path_to_seg_model)
+        path_to_tld_model = os.path.join(package_dir,  local_path_to_tld_model)
+        path_to_sign_model = os.path.join(package_dir, local_path_to_sign_model)
+
         path_to_icons = os.path.join(package_dir, local_path_to_icons)
         project_settings_config = GlobalConfigLoader("project_settings").data
     
         self.detector = ImageAnalyzer(path_to_cnn_model,
                         path_to_seg_model,
+                        path_to_tld_model,
+                        path_to_sign_model,
                         path_to_icons,
                         is_video=False,
                         is_red=True,
@@ -48,10 +55,14 @@ class RoadSignDetectorWorker(AbstractWorker):
             image_to_draw = np.copy(world_model.img_front_objects_prj_lines)
             self.detector.plot_predictions(img, world_model.yolo_detected_objects, image_to_draw, update_traffic_light_state=True)
 
+            world_model.detected_signs = self.detector.detected_signs
+            world_model.filtered_detected_signs = self.detector.filtered_detected_signs
+
+
+            # print(f"DETECTED SIGNS FROM WORLD MODEL: {world_model.detected_signs}")
+
             world_model.img_front_objects_prj_lines_signs = image_to_draw
 
-            
-            
             #world_model.traffic_light_state = "red" if self.detector.is_red else "green"
             world_model.traffic_light_state = self.detector.traffic_light_state
 

@@ -31,8 +31,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.056328133424849776 -0.9983949525654673 -0.005887280923391253 5.993856218514029
-  position -18.885081100032043 -5.705522767112787 9.954984961542166
+  orientation -0.1578815458928671 -0.9044909768952583 0.3961937533348296 5.944615230328156
+  position -5.586079032796305 -3.2841752694270623 7.280226718511996
   follow "vehicle"
 }
 TexturedBackground {
@@ -1158,4 +1158,31 @@ GenericTrafficLight {
   greenTime 1
   redTime 100
   state "red"
+}
+Solid {
+  translation 36.69 -5.48 0
+  rotation 0 0 1 1.5708
+  children [
+    Transform {
+      scale 0.2 0.2 0.2
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../protos/models/signs/textures/30-Sign.jpg.001.jpg"
+              ]
+            }
+            metalness 0
+          }
+          geometry Mesh {
+            url [
+              "../protos/models/signs/SpeedLimitSign30Finished.dae"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+  name "solid(3)"
 }

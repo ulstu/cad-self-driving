@@ -80,6 +80,9 @@ from PIL import Image
 import time
 from ultralytics import YOLO
 from webots_ros2_suv.lib.config_loader import GlobalConfigLoader
+import easyocr
+import re
+from collections import deque
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -93,6 +96,8 @@ class ImageAnalyzer:
     def __init__(self, 
                  path_to_cnn_model,
                  path_to_seg_model,
+                 path_to_tld_model,
+                 path_to_sign_model,
                  path_to_icons,
                  is_red=False,
                  traffic_light_queue_length=10,
@@ -115,9 +120,17 @@ class ImageAnalyzer:
         self.traffic_light_queue = [self.traffic_light_state] * traffic_light_queue_length
         self.sign_queue = [-1] * sign_queue_length
         self.project_settings_config = GlobalConfigLoader("project_settings").data
+        self.reader = easyocr.Reader(['en'])
+        self.detected_signs = []
+        self.filtered_detected_signs = []
+        self.detected_signs_queue = deque(maxlen=10)
+        self.filtration_threshold = 0.5
 
         tld_model_path = os.path.join(package_dir, "resource/TLDm/model.pt")
         self.tld_model = YOLO(tld_model_path)
+
+        tsd_model_path = os.path.join(package_dir, "resource/TSDm/model.pt")
+        self.tsd_model = YOLO(tsd_model_path)
 
         if self.is_video:
             self.cap = cv2.VideoCapture(video_dir)
@@ -553,7 +566,64 @@ class ImageAnalyzer:
                 max_area = area
                 max_area_idx = idx
         return max_area_idx
-            
+    
+    def get_detected_sings(self, image, result):
+        detected_signs = []
+        if result.boxes is not None:
+            for box in result.boxes:
+                sign_int_label = int(box.cls)
+                sign_label = self.tsd_model.names[sign_int_label]
+                # detected_signs.append(sign_label)
+
+                if sign_label == "3_24" or sign_label == "3_25":
+                    cx = int(box.xywh[0][0])
+                    cy = int(box.xywh[0][1])
+                    width = int(box.xywh[0][2])
+                    height = int(box.xywh[0][3])
+
+                    tlx = min(max(int(cx - width / 2), 0), image.shape[1])
+                    tly = min(max(int(cy - height / 2), 0), image.shape[0])
+                    brx = min(max(int(cx + width / 2), 0), image.shape[1])
+                    bry = min(max(int(cy + height / 2), 0), image.shape[0])
+
+                    sign_image = image[tly:bry, tlx:brx]
+                    if sign_image.shape[0] >= 50 and sign_image.shape[1] >= 50:
+                        sign_image = cv2.cvtColor(sign_image, cv2.COLOR_BGR2RGB)
+                        results = self.reader.readtext(sign_image)
+
+                        if len(results) > 0:
+                            bbox, text, prob = results[0]
+
+                            numbers = re.findall(r'\d+', text)
+                            if len(numbers) < 0:
+                                continue
+
+                            speed_limit = int(numbers[0])
+
+                            sign_label = sign_label + "." + str(int(speed_limit / 10))
+
+                detected_signs.append(sign_label)
+        return detected_signs
+    
+    def get_filtered_signs(self, detected_signs_queue: deque, threshold=0.5):
+        sign_counts = dict()
+
+        for signs in detected_signs_queue:
+            for sign in signs:
+                if sign in sign_counts:
+                    sign_counts[sign] += 1
+                else:
+                    sign_counts[sign] = 1
+        
+        deque_len = len(detected_signs_queue)
+        filtered_signs = []
+
+        for sign_name, sign_count in sign_counts.items():
+            sign_proportion = sign_count / deque_len
+            if sign_proportion >= threshold:
+                filtered_signs.append(sign_name)
+        
+        return filtered_signs
 
     def plot_predictions(self, image, yolo_detected_objects, image_to_plot_on=None, update_traffic_light_state=True, update_sign_state=True):
         analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -564,7 +634,10 @@ class ImageAnalyzer:
             labels = self.seg_model.predict_one(np.array(analyze_image))
 
         # traffic_light_mask, traffic_light_images, light_rects = self.predict_traffic_lights(image, yolo_detected_objects, labels)
-        traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
+        # traffic_sign_mask, traffic_sign_images, sign_rects, found_signs = self.predict_signs(image, labels)
+
+        
+
 
         # if len(traffic_sign_images) > 0:
         #     cv2.imwrite(f"/home/spectre/Pictures/{str(uuid.uuid4())}.png", traffic_sign_images[-1])
@@ -586,24 +659,36 @@ class ImageAnalyzer:
                         traffic_light_state = "red"
                     elif traffic_light_label == "greentrafficlight":
                         traffic_light_state = "green"
+        
 
+        # print()
+        # print("Sign" * 20)
+        result = self.tsd_model.predict([image], verbose=False)[0]
+        self.detected_signs = self.get_detected_sings(image, result)
+        self.found_sign = True # Don't thik this should be always true. But for now, ok. ^0^
+        
+        self.detected_signs_queue.append(self.detected_signs)
+        self.filtered_detected_signs = self.get_filtered_signs(self.detected_signs_queue, self.filtration_threshold)
+        
         
         if update_traffic_light_state:
             self.to_update_traffic_light_state(traffic_light_state)
         
-        if update_sign_state:
-            self.to_update_sign_state(found_signs)
+        # if update_sign_state:
+        #     self.to_update_sign_state(found_signs)
 
         if image_to_plot_on is not None:
             image = image_to_plot_on
 
         # self.draw_mask(image, traffic_light_mask, [255, 0, 0])
         # self.draw_mask(image, traffic_sign_mask, [0, 0, 255])
-        self.draw_signs(image, sign_rects, found_signs)
-        if self.project_settings_config["use_traffic_light_detection"]:
-            self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
-                                            self.traffic_light_state == "green",
-                                            self.traffic_light_state == "none"])
+
+        # self.draw_signs(image, sign_rects, found_signs)
+        # if self.project_settings_config["use_traffic_light_detection"]:
+        #     self.draw_traffic_light(image, 3, [self.traffic_light_state == "red", 
+        #                                     self.traffic_light_state == "green",
+        #                                     self.traffic_light_state == "none"])
+        
         return image
         
 
