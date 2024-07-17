@@ -160,7 +160,8 @@ class MapWebServer(object):
         # test_text = f"What the hell: {str(self.detected_signs)}"
         
         # return json.dumps({"detected": True, "sign": "What the hell!?!?!?!"})
-        return json.dumps({"detected": True, "sign": str(self.world_model.filtered_detected_signs)})
+        # return json.dumps({"detected": True, "sign": str(self.world_model.filtered_detected_signs)})
+        return json.dumps({"detected": True, "sign": self.world_model.filtered_detected_signs})
 
     @cherrypy.expose
     def get_image(self, img_type, tm):
@@ -231,6 +232,10 @@ def start_web_server(map_server):
                                                    'tools.staticdir.on': True,
                                                    'tools.staticdir.dir': LIBS_PATH,
                                                    'tools.staticdir.index': 'index.html'
+                                               },
+                                               '/sign_icons': {
+                                                   "tools.staticdir.on": True,
+                                                   "tools.staticdir.dir": "../../resource/signs_icon"
                                                }
                                                })
     except KeyboardInterrupt:
