@@ -509,15 +509,30 @@ setInterval(
     $.getJSON('/get_params' , function(data) {
       var tbl_body = document.createElement("tbody");
       var odd_even = false;
-      for (var key in data){
-        var tbl_row = tbl_body.insertRow();
-        tbl_row.className = odd_even ? "odd" : "even";
-        var k_cell = tbl_row.insertCell();
-        k_cell.appendChild(document.createTextNode(key.toString()));
-        k_cell.className = "fw-bold";
-        var v_cell = tbl_row.insertCell();
-        v_cell.appendChild(document.createTextNode(data[key].toString()));   
-        odd_even = !odd_even; 
+
+      for (var key in data) {
+        if (key == 'lidar_last_message_time') {
+          var lidar_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key]; // Секунды
+          
+          if (lidar_answer_elapsed_time > 3) {}
+            // alert('Связь с передним лидаром потеряна!');
+        }
+        else if (key == 'camera_last_message_time') {
+          var camera_answer_elapsed_time = Math.floor(Date.now() / 1000) - data[key];
+          
+          if (camera_answer_elapsed_time > 3) {}
+            // alert('Связь с видеокамерой потеряна!');
+        }
+        else {
+          var tbl_row = tbl_body.insertRow();
+          tbl_row.className = odd_even ? "odd" : "even";
+          var k_cell = tbl_row.insertCell();
+          k_cell.appendChild(document.createTextNode(key.toString()));
+          k_cell.className = "fw-bold";
+          var v_cell = tbl_row.insertCell();
+          v_cell.appendChild(document.createTextNode(data[key].toString()));   
+          odd_even = !odd_even;
+        }
       }
       $("#params").empty();
       $("#params").append(tbl_body);

@@ -35,7 +35,7 @@ def main(args=None):
                 rclpy.spin_once(lmp_sender, timeout_sec=0.5)
 
                 if lmp_sender.lmp_data:
-                    print(lmp_sender.lmp_data)
+                    # print(lmp_sender.lmp_data)s
                     lmp_sender.socket_send.sendto(lmp_sender.lmp_data.encode(), (UDP_SEND_IP, UDP_SEND_PORT))
                     lmp_sender.lmp_data = {}
             except KeyboardInterrupt:

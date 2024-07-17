@@ -4,11 +4,11 @@
 
 lat: 43.638987354236185
 lon: 56.335206573823854
-mapfile: final2.geojson
+mapfile: astarrobocross.geojson
 
 # lat: 43.638987354236185
 # lon: 56.335206573823854
-# mapfile: final.geojson
+# mapfile: test_astar.geojson
 
 # lat: 52.000441437135855
 # lon: 55.81957703977085
