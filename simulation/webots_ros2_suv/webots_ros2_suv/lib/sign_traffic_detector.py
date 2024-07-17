@@ -600,7 +600,7 @@ class ImageAnalyzer:
 
                             speed_limit = int(numbers[0])
 
-                            sign_label = sign_label + "." + str(int(speed_limit / 10))
+                            sign_label = sign_label + "_" + str(int(speed_limit / 10))
 
                 detected_signs.append(sign_label)
         return detected_signs

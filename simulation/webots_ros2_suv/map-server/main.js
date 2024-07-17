@@ -474,9 +474,10 @@ setInterval(
 
 setInterval(
   () => {
-    console.log('image seg changed');
+    // console.log('image seg changed');
     var unique = $.now();
     $('#img_sign').attr('src', '/get_image?img_type=sign&tm=' + unique);
+    const sign_icons = document.getElementById('sign_icons');
     $.ajax({
       url: '/get_sign_label',
       method: 'GET',
@@ -484,7 +485,22 @@ setInterval(
       success: function(data) {
           $('#img_sign').attr('hidden', !data['detected'])
           if (data['detected'])
-            $('#sign_text').text(data['sign']);
+            // $('#sign_text').text(data['sign']);
+            var text = "";
+            sign_icons.innerHTML = '';
+            for (let i = 0; i < data['sign'].length; i++) {
+              text += data['sign'][i]
+
+              if (i < (data['sign'].length - 1))
+                text += ", "
+
+              const img = document.createElement('img');
+              img.src = "http://localhost:8008/sign_icons/" + data['sign'][i] + ".jpg"
+              img.className = "img_sign"
+              sign_icons.appendChild(img)
+            }
+            $('#sign_text').text(text);
+            
       },
       error: function() {
         console.error('Не удалось сделать запрос на текст знака.')
