@@ -227,7 +227,7 @@ class GPSFollowState(AbstractState):
         pg.event.get()
         world_model.sc.fill((0, 0, 0))
 
-        pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
+        # pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
         is_obstacle_in_area = True
         rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
@@ -313,10 +313,6 @@ class GPSFollowState(AbstractState):
                 if self.has_obstacle and self.config["stop_obstacles"]:
                     print("stop")
                     speed = 0
-            elif zone["name"] == "traffic_light":
-                if self.has_obstacle and self.config["stop_obstacles"]:
-                    print("stop")
-                    speed = 0
             elif zone["name"] == "next_segment" and world_model.previous_zone != zone["name"]:
                 self.next_seg = True
                 self.timer = 40
@@ -327,9 +323,9 @@ class GPSFollowState(AbstractState):
                 world_model.cur_path_segment += 1
                 world_model.cur_path_point = 0
                 self.__cur_path_point = 0
-                event = 'start_move'
+                event = 'start_astar'
             elif zone['name'].startswith('pause_tick') and world_model.previous_zone != zone["name"]:
-                self.next_seg = True
+                # self.next_seg = True
                 self.timer = int(zone['name'].split('pause_tick_')[1])
                 self.allow_timer = True
                 speed = 0
@@ -350,6 +346,7 @@ class GPSFollowState(AbstractState):
         self.params["segment"] = world_model.cur_path_segment
         self.params["event"] = event
         self.params["cur_point"] = self.__cur_path_point
+        self.params["direction"] = direction_forward
 
         y = 10
         for k, v in self.params.items():

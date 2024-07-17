@@ -124,6 +124,7 @@ class AStarMovingState(AbstractState):
         car_position = self.gps_to_rect(lat, lon)
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
         difference = None
+        zones = world_model.get_current_zones()
 
         if world_model.cur_path_point > self.__cur_path_point:
             self.__cur_gps_point = 1
@@ -178,23 +179,86 @@ class AStarMovingState(AbstractState):
                                                                                    pov_point=world_model.pov_point)
             pg.draw.circle(world_model.sc, (255,255,0, 0.5), bev_position, 10)
         
+        g_points = []
+        for e in world_model.global_map:
+            # if 'seg_num' in e:
+                # self.logi(f"{e['name']}: {e['seg_num']} cur: {world_model.cur_path_segment}")
+            if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment:
+                direction_forward = e['name'] == 'moving'
+                g_points = e['coordinates']
+                break
+        for point in g_points:
+            bev_position = world_model.coords_transformer.get_relative_coordinates(point[0], 
+                                                                                   point[1], 
+                                                                                   pos=world_model.get_current_position(),
+                                                                                   pov_point=world_model.pov_point)
+            pg.draw.circle(world_model.sc, (255,0,0, 0.5), bev_position, 4)
         
 
         event = None
-        zones = world_model.get_current_zones()
         
         # default speed
-        speed = 10
-        for z in zones:
-            if z['name'] == 'turn':
-                world_model.cur_turn_polygon = z['coordinates'][0]
+        speed = 7
+        zones_names = []
+        for zone in zones:
+            if int(zone["seg_num"]) != world_model.cur_path_segment:
+                continue
+            if zone['name'] == 'turn':
+                world_model.cur_turn_polygon = zone['coordinates'][0]
                 self.__cur_path_point = 0
-                event = "turn"
-            elif z['name'] == 'stop':
+                event = 'turn'
+            elif zone['name'] == 'terminal' and self.__cur_path_point > 10:
+                self.logi(f"{world_model.previous_zone}")
+                self.logi(f"Inside terminal")
+                world_model.previous_zone = zone['name']
+                speed = 0
+                world_model.cur_path_point = 0
                 self.__cur_path_point = 0
-                event = "stop"
-            elif z['name'].startswith("speed"):
-                speed = float(z['name'].split('speed')[1])
+                event = 'pause'
+            elif zone['name'] == 'traffic_light':
+                if world_model.traffic_light_state == 'red':
+                    speed = 0
+                    # self.__cur_path_point = 0
+                    # event = 'stop'
+            elif zone['name'] == 'crosswalk':
+                if world_model.pedestrian_on_crosswalk:
+                    speed = 0
+                    # self.__cur_path_point = 0
+                    # event = 'stop'
+            elif zone['name'] == 'stop':
+                self.__cur_path_point = 0
+                event = 'stop'
+            elif zone["name"] == "obstacle_stop":
+                speed = 7
+                if self.has_obstacle and self.config["stop_obstacles"]:
+                    print("stop")
+                    speed = 0
+            elif zone["name"] == "next_segment" and world_model.previous_zone != zone["name"]:
+                self.next_seg = True
+                self.timer = 40
+                self.allow_timer = True
+                self.logw(f"To NEXT SEGMENT {self.timer}")
+                speed = 0
+            elif zone["name"] == "to_obstacles" and world_model.previous_zone != zone["name"]:
+                world_model.cur_path_segment += 1
+                world_model.cur_path_point = 0
+                self.__cur_path_point = 0
+                event = 'start_astar'
+            elif zone["name"] == "to_gpsfollow" and world_model.previous_zone != zone["name"]:
+                world_model.cur_path_segment += 1
+                world_model.cur_path_point = 0
+                self.__cur_path_point = 0
+                event = 'start_gps_follow'
+            elif zone['name'].startswith('pause_tick') and world_model.previous_zone != zone["name"]:
+                self.next_seg = True
+                self.timer = int(zone['name'].split('pause_tick_')[1])
+                self.allow_timer = True
+                speed = 0
+            if not zone['name'].startswith("speed"):
+                world_model.previous_zone = zone["name"]
+                zones_names.append(zone["name"])
+        if len(zones_names) == 0:
+            world_model.previous_zone = "None"
         # if not world_model.is_obstacle_before_path_point(filter_num=10, log=self.log):
         #     event = "start_gps_follow"
         # if world_model.is_lane_road():

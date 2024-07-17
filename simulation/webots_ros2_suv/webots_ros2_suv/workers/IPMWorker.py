@@ -236,7 +236,7 @@ class IPMWorker(AbstractWorker):
                     # world_model.ipm_colorized = cv2.rectangle(world_model.ipm_colorized, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 255), -1)
                     
                     # world_model.ipm_colorized = cv2.ellipse(world_model.ipm_colorized, (int((xmax + xmin) / 2), int((ymax + ymin) / 2)), (50, 120), 0, 0, 360, (255, 255, 0), -1)
-            self.last_ipm[:] += 30
+            self.last_ipm[:] += 50
             self.last_ipm[self.last_ipm > 100] = 100
             self.last_ipm -= tmp_img
             self.last_ipm[self.last_ipm < 0] = 0
