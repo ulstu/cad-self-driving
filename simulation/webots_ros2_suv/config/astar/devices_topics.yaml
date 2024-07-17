@@ -1,0 +1,12 @@
+lidar_topicname: "/ch64w/lslidar_point_cloud"
+lidar_rear: "/points"
+
+front_image_topicname: "/zed/zed_node/rgb/image_rect_color"
+
+range_image_topicname: "/vehicle/range_finder/image"
+navsatfix_topicname: "/vehicle/gps_nav"
+odom_topicname: "/odom"
+fsm_config: "/config/ego_states/roboastar.yaml"
+
+gnss_port: "/dev/serial/by-id/usb-ООО_“ЛМП”_ЛМАП.468351.003_FT6UU2WR-if00-port0"
+gnss_baudrate: 3000000

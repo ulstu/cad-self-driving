@@ -68,11 +68,17 @@ class WorldModel(object):
         self.hardware_state = 'None'        # Аппаратное состояние автомобиля (главный блок управления)
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
-        self.obstacles = []                 # Данные о препятствиях с лидара
+        self.obstacles = {"front": [], "rear": []}                # Данные о препятствиях с лидара
         self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
         self.previous_zone = None   
                      
         self.sc = pg.display.set_mode((800, 800))
+    
+    def get_obstacles(self):
+        res = []
+        for v in self.obstacles.values():
+            res += v
+        return res
 
     def load_map(self, mapyaml):
         self.global_map = []
@@ -94,8 +100,6 @@ class WorldModel(object):
         self.params['lat'] = pos[0]
         self.params['lon'] = pos[1]
         self.params['angle'] = pos[2]
-        self.params['software_state'] = self.software_state
-        self.params['hardware_state'] = self.hardware_state
 
     def draw_scene(self, log=print):
         if self.ipm_colorized_lines is None:

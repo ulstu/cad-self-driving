@@ -25,8 +25,8 @@ def astar(start, goal, obstacles, robot_radius, step_size=1, log=print):
     g_score = {start: 0}
     f_score = {start: heuristic(start, goal)}
 
-    directions = [(-step_size, 0), (0, -step_size), (step_size, 0), (0, step_size)]
-
+    directions = [(-step_size, -step_size), (-step_size, 0), (step_size, -step_size), (0, -step_size), (step_size, 0)]
+    log(f"robot: {robot_radius} step_size: {step_size}")
     while open_set:
         _, current = heapq.heappop(open_set)
 
@@ -39,18 +39,18 @@ def astar(start, goal, obstacles, robot_radius, step_size=1, log=print):
             return path[::-1]
 
         for dx, dy in directions:
-            try:
-                neighbor = (current[0] + dx, current[1] + dy)
-                tentative_g_score = g_score[current] + heuristic(current, neighbor)
+            # try:
+            neighbor = (current[0] + dx, current[1] + dy)
+            tentative_g_score = g_score[current] + heuristic(current, neighbor)
 
-                if 0 <= neighbor[0] < grid_size[0] and 0 <= neighbor[1] < grid_size[1] and is_collision_free(neighbor[0], neighbor[1], robot_radius, obstacles):
-                    if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                        came_from[neighbor] = current
-                        g_score[neighbor] = tentative_g_score
-                        f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-                        heapq.heappush(open_set, (f_score[neighbor], neighbor))
-            except:
-                log('error')
+            if 0 <= neighbor[0] < grid_size[0] and 0 <= neighbor[1] < grid_size[1] and is_collision_free(neighbor[0], neighbor[1], robot_radius, obstacles):
+                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+            # except:
+            #     log('error')
 
     return None
 

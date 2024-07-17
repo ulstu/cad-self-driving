@@ -88,7 +88,7 @@ class NodePointObstacles(Node):
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             param = ParamLoader()
             # Создаём подписчика, который принимает JSON в виде строки и при приёме данных вызывается функция __on_obstacles_message
-            self.create_subscription(String, 'obstacles', self.__on_obstacles_message, qos)
+            self.create_subscription(String, 'obstacles', self.__on_obstacles_message__old, qos)
             self.__obstdict_pubulisher = self.create_publisher(String, 'obstacles_json', qos)
             # Подписка на GPS данные
             self.create_subscription(Odometry, param.get_param("odom_topicname"), self.__on_gps_message, qos)
@@ -301,8 +301,6 @@ class NodePointObstacles(Node):
 
     # Функция вызывается, когда прилетает JSON от pcl_map_node
     def __on_obstacles_message(self, data):
-        
-        
         # в data.data находится наша строка, парсим её
         obstacles_dict = json.loads(data.data);
         # если прилетели данные от переднего лидара

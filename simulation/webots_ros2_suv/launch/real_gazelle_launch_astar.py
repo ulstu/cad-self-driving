@@ -17,7 +17,7 @@ from nav2_common.launch import RewrittenYaml
 
 PACKAGE_NAME = 'webots_ros2_suv'
 USE_SIM_TIME = True
-CONFIG_DIRECTORY = "real"
+CONFIG_DIRECTORY = "astar"
 
 def get_ros2_nodes(*args):
     pkg_share = FindPackageShare(package=PACKAGE_NAME).find(PACKAGE_NAME)
