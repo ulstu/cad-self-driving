@@ -42,7 +42,9 @@ class IPMWorker(AbstractWorker):
         #     lidardata_config = yaml.safe_load(file)
         self.lidardata_config = ConfigLoader("lidardata").data
         # self.zed_pos = np.array([lidardata_config["zed_x"], lidardata_config["zed_y"], lidardata_config["zed_z"]])
-        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
+        # self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/yolov8l_barrels.pt',
+        #                                 ipm_config=f'{package_dir}/config/ipm_config.yaml')
+        self.__map_builder = MapBuilder(model_path=f'{package_dir}/resource/ODm/model.pt',
                                         ipm_config=f'{package_dir}/config/ipm_config.yaml')
         self.last_ipm = None
 
