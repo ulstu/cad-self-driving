@@ -75,7 +75,7 @@ unzip resource.zip
 При этом содержимое папки resource (отдельные файлы и папки) должно быть скопировано в папку resource
 
 ## Запуск
-* Перед первым запуском необходимо скомпилировать web-панель по [инструкции](simulation/webots_ros2_suv/map-server) 
+* Перед первым запуском необходимо скомпилировать web-панель по [инструкции](https://github.com/ulstu/cad-self-driving/tree/main/simulation/webots_ros2_suv/map-server) 
 * Компиляция командой 'colcon build' из папки ~/ros2_ws 
 * Запуск командой 'ros2 launch webots_ros2_suv robot_launch.py'
 * После добавления новых файлов из папки ~/ros2_ws необходимо выполнить команду source install/setup.bash
