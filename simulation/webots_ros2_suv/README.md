@@ -21,6 +21,16 @@ sudo apt-get install libboost${BOOST_VERSION}-dev
 pip install git+https://github.com/rdesc/pydubins.git
 ```
 
+## Установка переменных среды
+* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
+```
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
+export WEBOTS_HOME=/usr/local/webots
+export ROS2_WEBOTS_HOME=/usr/local/webots
+```
+
+
 ## Скачивание репозитория
 ```
 mkdir ~/repositories
@@ -29,7 +39,6 @@ git clone git@github.com:ulstu/cad-self-driving.git
 mkdir ~/ros2_ws
 mkdir ~/ros2_ws/src
 ```
-
 
 ## Установка решения
 * Необходимо установить символические ссылки на папки simulation/pcl_maps, simulation/robot_interfaces и simulation/webots_ros2_suv в папку ~/ros2_ws/src
@@ -56,14 +65,6 @@ ln -s ~/repositories/cad-self-driving/drivers/lslidar_chx1/lslidar_driver/ ~/ros
 ```
 ln -s ~/repositories/cad-self-driving/drivers/zed-ros2-wrapper ~/ros2_ws/src/zed-ros2-wrapper
 rosdep install --from-paths src --ignore-src -r -y
-```
-
-* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
-```
-source /opt/ros/humble/setup.bash
-source /home/user/ros2_ws/install/setup.bash
-export WEBOTS_HOME=/usr/local/webots
-export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 
 Для скачивания и установки весов нейронных сетей скачать в папку ~/ros2_ws/src/webots_ros2_suv/resource файл по ссылке https://disk.yandex.ru/d/SiHdbj_grmqD4A (альтернативная ссылка: https://drive.google.com/drive/folders/1OCcuewvbdDOLtX6npBMKlyta16Tf6_cM), затем:
