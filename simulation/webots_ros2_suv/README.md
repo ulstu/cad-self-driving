@@ -3,7 +3,7 @@
 ## ПО для запуска
 * Linux Ubuntu 22.04
 * ROS2 Humble [Инструкция по установке](https://docs.ros.org/en/humble/Installation.html)
-* Webots 2023b
+* [Webots 2023b](https://github.com/cyberbotics/webots/releases/download/R2023b/webots_2023b_amd64.deb)
 
 ## Минимальные требования к оборудованию
 * процессор Intel не ниже i5
@@ -13,21 +13,14 @@
 
 ## Установка пакетов Linux после установки ROS Humble по стандартной инструкции
 ```
+source /opt/ros/humble/setup.bash
 sudo apt install ros-humble-nav2-common
 sudo apt install ros-humble-webots-ros2
 sudo apt-get install ros-$ROS_DISTRO-pcl-ros ros-$ROS_DISTRO-pluginlib  ros-$ROS_DISTRO-pcl-conversions
 sudo apt-get install libpcap-dev
 sudo apt-get install libboost${BOOST_VERSION}-dev 
+sudo apt install python3-pip
 pip install git+https://github.com/rdesc/pydubins.git
-```
-
-## Установка переменных среды
-* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
-```
-source /opt/ros/humble/setup.bash
-source ~/ros2_ws/install/setup.bash
-export WEBOTS_HOME=/usr/local/webots
-export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 
 
@@ -35,7 +28,7 @@ export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 mkdir ~/repositories
 cd ~/repositories
-git clone git@github.com:ulstu/cad-self-driving.git
+git clone https://github.com/ulstu/cad-self-driving.git
 mkdir ~/ros2_ws
 mkdir ~/ros2_ws/src
 ```
@@ -46,6 +39,15 @@ mkdir ~/ros2_ws/src
 ln -s ~/repositories/cad-self-driving/simulation/pcl_maps ~/ros2_ws/src/pcl_maps
 ln -s ~/repositories/cad-self-driving/simulation/robot_interfaces ~/ros2_ws/src/robot_interfaces
 ln -s ~/repositories/cad-self-driving/simulation/webots_ros2_suv ~/ros2_ws/src/webots_ros2_suv
+```
+
+## Установка переменных среды
+* В ~/.bashrc добавить переменные среды (внимательнее с именем пользователя!):
+```
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
+export WEBOTS_HOME=/usr/local/webots
+export ROS2_WEBOTS_HOME=/usr/local/webots
 ```
 
 ## Установка пакетов python
