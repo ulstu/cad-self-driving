@@ -9,7 +9,7 @@ import pygame as pg
 from ament_index_python.packages import get_package_share_directory
 from .car_model import CarModel
 from .coords_transformer import CoordsTransformer
-from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask
+# from webots_ros2_suv.lib.lane_line_model_utils import get_label_names, draw_lines, draw_segmentation, LaneLine, LaneMask
 from webots_ros2_suv.lib.map_utils import is_path_clear
 from ackermann_msgs.msg import AckermannDrive
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point

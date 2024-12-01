@@ -227,7 +227,7 @@ class GPSFollowState(AbstractState):
         pg.event.get()
         world_model.sc.fill((0, 0, 0))
 
-        pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
+        # pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
         is_obstacle_in_area = True
         rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])

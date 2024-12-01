@@ -10,24 +10,24 @@ states:
   emergency: "EmergencyState.py"
   turn: "TurnState.py"
 workers:
-  lightswitch: "LightSwitchDetectorWorker.py"
-  roadsign: "RoadSignDetectorWorker.py"
-  ipm: "IPMWorker.py"
-  semanticsegmentation: "SemanticSegmentationWorker.py"
-  lanelinedetection: "LaneLineDetectionWorker.py"
+  # lightswitch: "LightSwitchDetectorWorker.py"
+  # roadsign: "RoadSignDetectorWorker.py"
+  # ipm: "IPMWorker.py"
+  # semanticsegmentation: "SemanticSegmentationWorker.py"
+  # lanelinedetection: "LaneLineDetectionWorker.py"
   pathplanning: "PathPlanningWorker.py"
   behavioranalysis: "BehavioralAnalysisWorker.py"
   reedsshepp: "ReedsSheppPlanningWorker.py"
-  roadmarkingdetection: "RoadMarkingDetectionWorker.py"
+  # roadmarkingdetection: "RoadMarkingDetectionWorker.py"
 workerstates:
-  start: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
-  moving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] # "pathplanning"
-  astarmoving: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
-  lanefollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis", "pathplanning"]
-  gpsfollow: ["semanticsegmentation", "ipm", "lanelinedetection", "lightswitch", "roadsign", "roadmarkingdetection", "behavioranalysis"] #, "pathplanning"]
-  stopped: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
-  paused: ["semanticsegmentation", "ipm", "lanelinedetection", "roadsign", "roadmarkingdetection"]
-  turn: ["semanticsegmentation", "ipm", "lanelinedetection", "roadmarkingdetection", "reedsshepp"]
+  start: []
+  moving: [] # "pathplanning"
+  astarmoving: ["pathplanning"]
+  lanefollow: ["pathplanning"]
+  gpsfollow: [] #, "pathplanning"]
+  stopped: []
+  paused: []
+  turn: ["reedsshepp"]
   emergency: []
 transitions:
   start:

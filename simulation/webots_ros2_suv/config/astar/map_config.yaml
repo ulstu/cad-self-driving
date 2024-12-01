@@ -4,7 +4,7 @@
 
 lat: 43.638987354236185
 lon: 56.335206573823854
-mapfile: robocross.geojson
+mapfile: robocross_sim.geojson
 
 # lat: 43.638987354236185
 # lon: 56.335206573823854
