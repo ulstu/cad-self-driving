@@ -1,0 +1,24 @@
+export WEBOTS_HOME=/usr/local/webots
+export WEBOTS_OFFSCREEN=1
+export LIBGL_ALWAYS_INDIRECT=0
+export LIBGL_ALWAYS_SOFTWARE=0
+export USERNAME=default
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+
+
+if uname -v | grep -qi 'ubuntu'; then
+    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+fi
+
+alias cb='colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug'
+alias rr='rm -rf /ulstu/ros2_ws/build /ulstu/ros2_ws/install'
+
+test -f /opt/ros/humble/local_setup.bash && \
+    source /opt/ros/humble/local_setup.bash
+test -f /ulstu/ros2_ws/install/local_setup.bash && \
+    source /ulstu/ros2_ws/install/local_setup.bash
+test -f /ulstu/ros2_ws/install/setup.bash && \
+    source /ulstu/ros2_ws/install/setup.bash
+test -f /ulstu/.host/.Xauthority && \
+    cp -p /ulstu/.host/.Xauthority /ulstu/.Xauthority
