@@ -85,63 +85,79 @@ class NodeEgoController(Node):
             self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     def start_web_server(self):
-        self.__ws = MapWebServer(log=self._logger.info)
-        threading.Thread(target=start_web_server, args=[self.__ws]).start()
+        try:
+            self.__ws = MapWebServer(log=self._logger.info)
+            threading.Thread(target=start_web_server, args=[self.__ws]).start()
+        except  Exception as err:
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     def __on_lidar_message(self, data):
         pass
 
     def __on_range_image_message(self, data):
-        if self.__world_model:
-            image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
-            image[image == np.inf] = SENSOR_DEPTH
-            image[image == -np.inf] = 0
-            self.__world_model.range_image = image / SENSOR_DEPTH
-            #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
+        try:
+            if self.__world_model:
+                image = np.frombuffer(data.data, dtype="float32").reshape((data.height, data.width, 1))
+                image[image == np.inf] = SENSOR_DEPTH
+                image[image == -np.inf] = 0
+                self.__world_model.range_image = image / SENSOR_DEPTH
+                #self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_range_image_message")
+        except  Exception as err:
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     def drive(self):
-        if self.__world_model:
-            # self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
-            self.__ackermann_publisher.publish(self.__world_model.command_message)
+        try:
+            if self.__world_model:
+                # self._logger.info(f'### sent ackerman drive: {self.__world_model.command_message}')
+                self.__ackermann_publisher.publish(self.__world_model.command_message)
+        except  Exception as err:
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
     #@timeit
     def __on_image_message(self, data):
-        image = data.data
-        image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
-        analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
+        try:
+            self._logger.info("image received")
+            image = data.data
+            image = np.frombuffer(image, dtype=np.uint8).reshape((data.height, data.width, 4))
+            analyze_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGBA2RGB))
 
-        # cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
+            # cv2.imwrite(f'/home/hiber/image_{time.strftime("%Y%m%d-%H%M%S")}.png', image)
 
-        self.__world_model.rgb_image = np.asarray(analyze_image)
+            self.__world_model.rgb_image = np.asarray(analyze_image)
 
-        t1 = time.time()
-        # вызов текущих обработчиков данных
-        self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
+            t1 = time.time()
+            # вызов текущих обработчиков данных
+            self.__world_model = self.__fsm.on_data(self.__world_model, source="__on_image_message")
 
-        t2 = time.time()
-        
-        delta = t2 - t1
-        fps = 1 / delta
-        self._logger.info(f"Current FPS: {fps}")
+            t2 = time.time()
+            
+            delta = t2 - t1
+            fps = 1 / delta
+            self._logger.info(f"Current FPS: {fps}")
 
-        # вызов обработки состояний с текущими данными
-        self.__fsm.on_event(None, self.__world_model)
-        self.__world_model.fill_params()
-        self.__world_model.params['states'] = f"{' '.join([s for s in self.__fsm.current_states])}"
-        pos = self.__world_model.get_current_position()
-        self.data_sender.send_data(self.__world_model.params)
-        self.drive()
+            # вызов обработки состояний с текущими данными
+            self.__fsm.on_event(None, self.__world_model)
+            self.__world_model.fill_params()
+            self.__world_model.params['states'] = f"{' '.join([s for s in self.__fsm.current_states])}"
+            pos = self.__world_model.get_current_position()
+            self.data_sender.send_data(self.__world_model.params)
+            self.drive()
 
-        if self.__ws is not None:
-            self.__ws.update_model(self.__world_model)
-
-    def __on_gps_message(self, data):
-        if self.__world_model is not None:
-            roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
-            lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
-            self.__world_model.update_car_pos(lat, lon, orientation)
             if self.__ws is not None:
                 self.__ws.update_model(self.__world_model)
+        except  Exception as err:
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
+
+    def __on_gps_message(self, data):
+        try:
+            if self.__world_model is not None:
+                roll, pitch, yaw = euler_from_quaternion(data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z, data.pose.pose.orientation.w)
+                lat, lon, orientation = self.__world_model.coords_transformer.get_global_coords(data.pose.pose.position.x, data.pose.pose.position.y, yaw)
+                self.__world_model.update_car_pos(lat, lon, orientation)
+                if self.__ws is not None:
+                    self.__ws.update_model(self.__world_model)
+        except  Exception as err:
+            self._logger.error(''.join(traceback.TracebackException.from_exception(err).format()))
 
 def main(args=None):
     try:

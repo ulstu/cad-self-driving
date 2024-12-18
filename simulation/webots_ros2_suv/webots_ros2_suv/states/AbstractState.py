@@ -26,6 +26,10 @@ class AbstractState:
     def drive(self, world_model, angle_points_count=5, speed=None):
         if not speed:
             speed = self.default_speed
+        if (world_model.path):
+            self.log(f"self.turn_angle_num_path_points: {self.turn_angle_num_path_points} len: {len(world_model.path)}" )
+        else:
+            self.log("NO PATH!!!!")
         angle_points_count = self.turn_angle_num_path_points
         if world_model.path and len(world_model.path) < angle_points_count:
             angle_points_count = len(world_model.path) - 1

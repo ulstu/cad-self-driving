@@ -58,7 +58,7 @@ class MovingState(AbstractState):
             if dist < self.config['change_point_dist']:
                 # or (world_model.ipm_image.shape[1] > x and world_model.ipm_image.shape[0] > y and not self.is_obstacle_near(world_model, x, y, 100, 8)):
                 self.__cur_path_point = self.__cur_path_point + 1
-            self.log(f"DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
+            self.log(f"CHDIST: {self.config['change_point_dist']} DIST {dist} CUR POINT: {self.__cur_path_point} SEG: {world_model.cur_path_segment}")
         else:
             self.__cur_path_point = len(points) - 1
         world_model.cur_path_point = self.__cur_path_point
@@ -97,8 +97,9 @@ class MovingState(AbstractState):
         # if world_model.is_lane_road():
         #     event = "start_lane_follow"
 
-        if event:
-            world_model.path = None
+        #if event:
+        #    world_model.path = None
+        #self.log(f"path len: {len(world_model.path)}")
         world_model.set_speed(speed)
         self.drive(world_model, speed=speed)
         return event

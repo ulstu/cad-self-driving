@@ -145,10 +145,10 @@ def get_ros2_nodes(*args):
         #node_localmap,
         #node_globalmap,
         node_ego_controller,
-        node_point_obstacles,
+#        node_point_obstacles,
         # node_visual,
         # depth_to_laserscan,
-        pcl_map_node,
+#        pcl_map_node,
         #rviz2_node,
         #lane_follower,
     ] + static_transform_nodes
