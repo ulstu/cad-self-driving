@@ -1,0 +1,83 @@
+def json_map_string(array_string=''):
+    """
+    Генерация json текста для передачи траектории пути в веб-интерфейс.
+    
+    :param array_string: Строка с массивом путевых точек в глобалных координатах
+    :return: json текст с данными
+    """
+
+    return """
+{
+    "type":"FeatureCollection",
+    "features":[
+        {
+            "type":"Feature",
+            "geometry":{
+                "type":"LineString",
+                "coordinates":""" + array_string + """
+            },
+            "properties":{
+                "seg_num":0,
+                "id":"moving",
+                "geometry_":null,
+                "fill_":{
+                    "color_":"rgba(0,0,255,0.2)"
+                },
+                "image_":{
+                    "opacity_":1,
+                    "rotateWithView_":false,
+                    "rotation_":0,
+                    "scale_":1,
+                    "scaleArray_":[
+                        1,
+                        1
+                    ],
+                    "displacement_":[
+                        0,
+                        0
+                    ],
+                    "canvas_":{
+                        
+                    },
+                    "hitDetectionCanvas_":null,
+                    "fill_":{
+                        "color_":"rgba(0,0,255,0.2)"
+                    },
+                    "origin_":[
+                        0,
+                        0
+                    ],
+                    "points_":null,
+                    "radius_":8,
+                    "angle_":0,
+                    "stroke_":{
+                        "color_":"#0000ff",
+                        "lineDash_":null,
+                        "width_":8
+                    },
+                    "size_":[
+                        24,
+                        24
+                    ],
+                    "renderOptions_":{
+                        "strokeStyle":"#0000ff",
+                        "strokeWidth":8,
+                        "size":24,
+                        "lineDash":null,
+                        "lineJoin":"round",
+                        "miterLimit":10
+                    }
+                },
+                "renderer_":null,
+                "hitDetectionRenderer_":null,
+                "stroke_":{
+                    "color_":"#0000ff",
+                    "lineDash_":null,
+                    "width_":8
+                },
+                "text_":null
+            }
+        }
+    ]
+}
+"""

@@ -13,7 +13,7 @@ bev_orientation: 0.0
 # bev_orientation: -0.35
 
 
-change_point_dist: 0.3
+change_point_dist: 1.6
 bev_obstacle_ratio: 1
 
 kalman_path_planning_noise_scale: 0.05

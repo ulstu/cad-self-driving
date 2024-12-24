@@ -164,7 +164,7 @@ class NodeEgoController(Node):
         
         delta = t2 - t1
         fps = 1 / delta
-        self._logger.info(f"Current FPS: {fps}")
+        # self._logger.info(f"Current FPS: {fps}")
 
         # вызов обработки состояний с текущими данными
         self.__fsm.on_event(None, self.__world_model)

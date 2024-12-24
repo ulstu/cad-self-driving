@@ -24,6 +24,8 @@ import numpy as np
 import cv2
 from PIL import Image
 from .config_loader import ConfigLoader
+from .map_string import json_map_string
+from .field_builder import build_field
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
@@ -145,6 +147,25 @@ class MapWebServer(object):
             with open(f'{MAPS_PATH}/{filename}') as f:
                 j = json.load(f)
                 return {'status': 'ok', 'features' : j} 
+        except Exception as err:        
+            self.log(''.join(traceback.TracebackException.from_exception(err).format()))
+            return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}
+        
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def load_field_map(self, field_data):
+        try:
+            decoded_field_data = json.loads(field_data)
+            features_list = decoded_field_data['features']
+            edges_string = []
+            for feature in features_list:
+                if feature['properties']['id'] == 'terminal':
+                    edges_list = feature['geometry']['coordinates'][0]
+                    field_path = build_field(edges_list, self.log)
+
+            json_string = json_map_string(str(field_path))
+            return {'status': 'ok', 'features' : json_string} 
         except Exception as err:        
             self.log(''.join(traceback.TracebackException.from_exception(err).format()))
             return {'status': 'error', 'message': ''.join(traceback.TracebackException.from_exception(err).format())}

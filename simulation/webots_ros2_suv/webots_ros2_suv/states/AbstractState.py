@@ -51,7 +51,7 @@ class AbstractState:
 
         world_model.command_message = command_message
         if (command_message.speed != self.old_speed or command_message.steering_angle != self.old_angle):
-            self.log(f'command message: {command_message}')
+            # self.log(f'command message: {command_message}')
             self.old_speed = command_message.speed
             self.old_angle = command_message.steering_angle
 

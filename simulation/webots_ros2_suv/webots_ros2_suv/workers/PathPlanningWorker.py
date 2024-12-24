@@ -14,7 +14,7 @@ from webots_ros2_suv.lib.rrt_star_reeds_shepp import RRTStarReedsShepp
 from webots_ros2_suv.lib.rrt_star_direct import rrt_star, RRTTreeNode, visualize_path
 from webots_ros2_suv.lib.rrt_star import RRTStar
 import matplotlib.pyplot as plt
-from webots_ros2_suv.lib.a_star import astar, kalman_filter_path, smooth_path_with_dubins, bezier_curve
+from webots_ros2_suv.lib.a_star import astar, kalman_filter_path, bezier_curve # smooth_path_with_dubins
 from threading import Thread
 from geopy.distance import geodesic
 from webots_ros2_suv.lib.map_utils import is_point_in_polygon, calc_dist_point

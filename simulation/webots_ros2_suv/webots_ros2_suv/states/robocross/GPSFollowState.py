@@ -147,7 +147,6 @@ class GPSFollowState(AbstractState):
     def on_event(self, event, world_model=None):
         world_model.software_state = 'Auto'
         self.runs = self.runs + 1
-        self.log("gps follow state")
         
         # if world_model.traffic_light_state == 'red':
         #     return 'stop'
@@ -214,7 +213,7 @@ class GPSFollowState(AbstractState):
             world_model.gps_car_turn_angle = float(min(1, max(-1, difference_angle / Pk)))
             diff_angle = (self.prev_target_angle - world_model.gps_car_turn_angle) * Ik
             world_model.gps_car_turn_angle = (world_model.gps_car_turn_angle + diff_angle ) * self.get_directrion(direction_forward)
-            self.logi(f"diff = {self.prev_target_angle - world_model.gps_car_turn_angle} new = {world_model.gps_car_turn_angle}, old ={self.prev_target_angle}")
+            # self.logi(f"diff = {self.prev_target_angle - world_model.gps_car_turn_angle} new = {world_model.gps_car_turn_angle}, old ={self.prev_target_angle}")
             
             self.params["diff"] = self.prev_target_angle - world_model.gps_car_turn_angle
             self.params["new"] = world_model.gps_car_turn_angle

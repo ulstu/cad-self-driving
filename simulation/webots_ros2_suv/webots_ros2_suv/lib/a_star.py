@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import heapq
-import dubins
+# import dubins
 from scipy.special import binom
 
 def heuristic(a, b):
@@ -97,24 +97,24 @@ def bezier_curve(control_points, num_points=100):
         curve.append((int(point[0]), int(point[1])))
     return curve
 
-def smooth_path_with_dubins(path, turning_radius, obstacles, sample_size=1, log=print):
-    if not path:
-        return []
+# def smooth_path_with_dubins(path, turning_radius, obstacles, sample_size=1, log=print):
+#     if not path:
+#         return []
 
-    smooth_path = [path[0]]
-    i = 0
-    while i < len(path) - 1:
-        q0 = (path[i][0], path[i][1], 0)
-        for j in range(i + 1, len(path)):
-            q1 = (path[j][0], path[j][1], 0)
-            path_segment = dubins.shortest_path(q0, q1, turning_radius)
-            if is_path_clear(obstacles, path_segment):
-                configurations, _ = path_segment.sample_many(sample_size)
-                smooth_path.extend([(int(config[0]), int(config[1])) for config in configurations])
-                i = j - 1
-                break
-        i += 1
-    return smooth_path
+#     smooth_path = [path[0]]
+#     i = 0
+#     while i < len(path) - 1:
+#         q0 = (path[i][0], path[i][1], 0)
+#         for j in range(i + 1, len(path)):
+#             q1 = (path[j][0], path[j][1], 0)
+#             path_segment = dubins.shortest_path(q0, q1, turning_radius)
+#             if is_path_clear(obstacles, path_segment):
+#                 configurations, _ = path_segment.sample_many(sample_size)
+#                 smooth_path.extend([(int(config[0]), int(config[1])) for config in configurations])
+#                 i = j - 1
+#                 break
+#         i += 1
+#     return smooth_path
 
 def plot_path(dubins_smoothed_path, kalman_smoothed_path, path, start, goal, obstacles):
     img = np.zeros((obstacles.shape[0], obstacles.shape[1], 3), dtype=np.uint8)
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     if path:
         kalman_smoothed_path = kalman_filter_path(path, process_noise_scale)
-        dubins_smoothed_path = smooth_path_with_dubins(kalman_smoothed_path, turning_radius, obstacles)
+        # dubins_smoothed_path = smooth_path_with_dubins(kalman_smoothed_path, turning_radius, obstacles)
         plot_path(dubins_smoothed_path, kalman_smoothed_path, path, start, goal, obstacles)
     else:
         print("Путь не найден")

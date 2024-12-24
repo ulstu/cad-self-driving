@@ -239,6 +239,52 @@ function load_map(filename){
   });
 }
 
+// Функция для загрузки пути fields2cover
+function load_field_map(field_data){
+  var geojson  = new GeoJSON();
+  var features = [];
+  vector.getSource().getFeatures().forEach(function(feature) {
+    feature.setProperties(feature.getStyle()) //add the layer styles to the feature as properties
+    features.push(feature);
+  });
+  var field_data = geojson.writeFeatures(features);
+
+  console.log(field_data)
+
+  $.post('/load_field_map', {'field_data': field_data}, function(data){
+    if (data['status'] == 'ok'){
+      source.clear();
+      source.addFeatures(new GeoJSON().readFeatures(data['features']));
+      current_map_file = "field2cover";
+
+      vector.getSource().forEachFeature(function(feature) {
+        var fill_color = null;
+        var stroke_color = null;
+        var stroke_width = null;
+        var id = null;
+        var v = feature.values_;
+        if (typeof v==='object' && v!==null && !(v instanceof Array) && !(v instanceof Date)) {
+          fill_color = feature.values_.fill_.color_;
+          stroke_color = feature.values_.stroke_.color_;
+          stroke_width = feature.values_.stroke_.width_;
+          id = feature.values_.id;
+        }
+        else {
+          fill_color = feature.values_[0].fill_.color_;
+          stroke_color = feature.values_[0].stroke_.color_;
+          stroke_width = feature.values_[0].stroke_.width_;
+          id = feature.values_[0].id;
+        }
+
+        feature.setStyle(set_style(fill_color, stroke_color, stroke_width));
+        feature.setProperties({"id": id}); 
+      });
+    }
+    else
+      alert(data['message']);
+  });
+}
+
 // Метод загрузки списка ранее сохраненных карт и заполнение списка карт
 function load_maps() {
   $.get('/get_maps', function(data){
@@ -274,6 +320,10 @@ document.getElementById('saveas').addEventListener('click', function () {
 
 document.getElementById('loadmap').addEventListener('click', function () {
   load_map(mapSelect.value);
+});
+
+document.getElementById('loadfield').addEventListener('click', function () {
+  load_field_map();
 });
 
 // document.getElementById('savesegment').addEventListener('click', function () {
@@ -456,7 +506,7 @@ setInterval(
 
 setInterval(
   () => {
-    console.log('image obj changed');
+    // console.log('image obj changed');
     var unique = $.now();
     $('#img_obj').attr('src', '/get_image?img_type=obj_detector&tm=' + unique);
   },
@@ -465,7 +515,7 @@ setInterval(
 
 setInterval(
   () => {
-    console.log('image seg changed');
+    // console.log('image seg changed');
     var unique = $.now();
     $('#img_seg').attr('src', '/get_image?img_type=seg&tm=' + unique);
   },
@@ -474,7 +524,7 @@ setInterval(
 
 setInterval(
   () => {
-    console.log('image seg changed');
+    // console.log('image seg changed');
     var unique = $.now();
     $('#img_sign').attr('src', '/get_image?img_type=sign&tm=' + unique);
     $.ajax({
