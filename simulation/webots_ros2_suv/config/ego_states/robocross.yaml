@@ -18,13 +18,14 @@ workers:
   pathplanning: "PathPlanningWorker.py"
   behavioranalysis: "BehavioralAnalysisWorker.py"
   reedsshepp: "ReedsSheppPlanningWorker.py"
+  agronavigator: "AgronavigatorWorker.py"
   # roadmarkingdetection: "RoadMarkingDetectionWorker.py"
 workerstates:
   start: []
   moving: [] # "pathplanning"
-  astarmoving: ["pathplanning"]
-  lanefollow: ["pathplanning"]
-  gpsfollow: [] #, "pathplanning"]
+  astarmoving: ["pathplanning", "agronavigator"]
+  lanefollow: ["pathplanning", "agronavigator"]
+  gpsfollow: ["agronavigator"] #, "pathplanning"]
   stopped: []
   paused: []
   turn: ["reedsshepp"]

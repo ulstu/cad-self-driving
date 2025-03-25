@@ -4,12 +4,14 @@ import {Point} from 'ol/geom.js';
 import {Circle, Fill, Stroke, Style, Icon} from 'ol/style.js';
 import {OSM, Vector as VectorSource} from 'ol/source.js';
 import GeoJSON from "ol/format/GeoJSON";
-import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
+import {Image as ImageLayer, Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
+import {Raster as RasterSource} from 'ol/source.js';
 import LineString from 'ol/geom/LineString.js';
 import * as ol_color from 'ol/color';
 import {useGeographic, fromLonLat} from 'ol/proj.js';
 import {getCenter} from 'ol/extent.js';
 import Translate from 'ol/interaction/Translate.js';
+import ImageTile from 'ol/ImageTile.js';
 
 let init_point = [48.387626, 54.351436]
 let current_map_file = null;
@@ -67,7 +69,35 @@ let polylineLayer = new VectorLayer({
     })
 });
 
+// // Расчет глубины воды
+// function flood(pixels) {
+//   const pixel = pixels[0];
+//   if (pixel[3]) {
+//     pixel[0] = 134;
+//     pixel[1] = 203;
+//     pixel[2] = 249;
+//     pixel[3] = 250;
+//   }
+//   return pixel;
+// }
 
+// const key = 'LoJGNSWOJhMQek8xozdy';
+
+// const elevation = new ImageTile({
+//   // The RGB values in the source collectively represent elevation.
+//   // Interpolation of individual colors would produce incorrect elevations and is disabled.
+//   url:
+//     'https://api.maptiler.com/tiles/terrain-rgb-v2/{z}/{x}/{y}.webp?key=' + key,
+//   tileSize: 512,
+//   maxZoom: 14,
+//   crossOrigin: '',
+//   interpolate: false,
+// });
+
+// let raster_source = new RasterSource({
+//   sources: [elevation],
+//   operation: flood,
+// });
 
 // Создание объекта (feature) для отображения на карте
 let ego_feature = new Feature({
@@ -93,6 +123,12 @@ const ego_vehicle_layer = new VectorLayer({
   }),
   style: ego_marker_style
 });
+
+// // Создание слоя для растровой отрисовки
+// const raster_layer = new ImageLayer({
+//   opacity: 0.6,
+//   source: raster_source,
+// });
 
 // Инициализация карты с добавлением созданных слоёв
 const map = new Map({
@@ -255,7 +291,7 @@ function load_field_map(field_data){
     if (data['status'] == 'ok'){
       source.clear();
       source.addFeatures(new GeoJSON().readFeatures(data['features']));
-      current_map_file = "field2cover";
+      current_map_file = "field_driving";
 
       vector.getSource().forEachFeature(function(feature) {
         var fill_color = null;

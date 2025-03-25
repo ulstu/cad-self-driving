@@ -3,10 +3,68 @@
 
 import math
 import fields2cover as f2c
+import numpy as np
+
+from webots_ros2_suv.lib.linalg import VECTOR2, POINT, vector_angle
+from webots_ros2_suv.lib.ReedsShepp import calc_optimal_path
 
 
 # Константа: радиус Земли в метрах
 R = 6378137  # WGS84
+
+
+def gps_to_rect(dLon, dLat):
+    """
+    Перевод географических координат (широта, долгота) в прямоугольные (x, y) методом Гаусса-Крюгера.
+    
+    :param dLon: Долгота (в градусах)
+    :param dLat: Широта (в градусах)
+    :return: Координаты x, y в метрах
+    """
+
+    # Номер зоны Гаусса-Крюгера
+    zone = int(dLon / 6.0 + 1)
+
+    # Параметры эллипсоида Красовского
+    a = 6378245.0  # Большая (экваториальная) полуось
+    b = 6356863.019  # Малая (полярная) полуось
+    e2 = (a ** 2 - b ** 2) / a ** 2  # Эксцентриситет
+    n = (a - b) / (a + b)  # Приплюснутость
+
+    # Параметры зоны Гаусса-Крюгера
+    F = 1.0  # Масштабный коэффициент
+    Lat0 = 0.0  # Начальная параллель (в радианах)
+    Lon0 = (zone * 6 - 3) * math.pi / 180  # Центральный меридиан (в радианах)
+    N0 = 0.0  # Условное северное смещение для начальной параллели
+    E0 = zone * 1e6 + 500000.0  # Условное восточное смещение для центрального меридиана
+
+    # Перевод широты и долготы в радианы
+    Lat = dLat * math.pi / 180.0
+    Lon = dLon * math.pi / 180.0
+
+    # Вычисление переменных для преобразования
+    v = a * F * (1 - e2 * (math.sin(Lat) ** 2)) ** -0.5
+    p = a * F * (1 - e2) * (1 - e2 * (math.sin(Lat) ** 2)) ** -1.5
+    n2 = v / p - 1
+    M1 = (1 + n + 5.0 / 4.0 * n ** 2 + 5.0 / 4.0 * n ** 3) * (Lat - Lat0)
+    M2 = (3 * n + 3 * n ** 2 + 21.0 / 8.0 * n ** 3) * math.sin(Lat - Lat0) * math.cos(Lat + Lat0)
+    M3 = (15.0 / 8.0 * n ** 2 + 15.0 / 8.0 * n ** 3) * math.sin(2 * (Lat - Lat0)) * math.cos(2 * (Lat + Lat0))
+    M4 = 35.0 / 24.0 * n ** 3 * math.sin(3 * (Lat - Lat0)) * math.cos(3 * (Lat + Lat0))
+    M = b * F * (M1 - M2 + M3 - M4)
+    I = M + N0
+    II = v / 2 * math.sin(Lat) * math.cos(Lat)
+    III = v / 24 * math.sin(Lat) * (math.cos(Lat)) ** 3 * (5 - (math.tan(Lat) ** 2) + 9 * n2)
+    IIIA = v / 720 * math.sin(Lat) * (math.cos(Lat) ** 5) * (61 - 58 * (math.tan(Lat) ** 2) + (math.tan(Lat) ** 4))
+    IV = v * math.cos(Lat)
+    V = v / 6 * (math.cos(Lat) ** 3) * (v / p - (math.tan(Lat) ** 2))
+    VI = v / 120 * (math.cos(Lat) ** 5) * (5 - 18 * (math.tan(Lat) ** 2) + (math.tan(Lat) ** 4) + 14 * n2 - 58 * (math.tan(Lat) ** 2) * n2)
+
+    # Вычисление северного и восточного смещения (в метрах)
+    N = I + II * (Lon - Lon0) ** 2 + III * (Lon - Lon0) ** 4 + IIIA * (Lon - Lon0) ** 6
+    E = E0 + IV * (Lon - Lon0) + V * (Lon - Lon0) ** 3 + VI * (Lon - Lon0) ** 5
+
+    return [E, -N]
+
 
 def geo_to_cartesian(lat, lon):
     """
@@ -45,16 +103,17 @@ def cartesian_to_geo(x, y):
     return lat, lon
 
 
-def build_field(edges, logger=print):
+def build_field(edges, position, logger=print):
     """
     Построение пути объезда поля из координат углов полигона.
     
     :param edges: Массив углов полигона
+    :param position: Положение автомобиля (x, y, angle)
     :param logger: Указатель на логгер
-    :return: Набор путевых точек в глобальных координатах
+    :return: (Набор путевых точек в глобальных координатах, в прямоугольных) 
     """
     
-    robot = f2c.Robot(2.0, 6.0)
+    robot = f2c.Robot(2.5, 20.0)
     const_hl = f2c.HG_Const_gen()
 
     square_edges = []
@@ -85,4 +144,36 @@ def build_field(edges, logger=print):
         current_geo = cartesian_to_geo(current_point.getX(), current_point.getY())
         square_edges.append([current_geo[1],current_geo[0]])
 
-    return square_edges
+
+    destinations = []
+    for i in range(swaths.size()):
+        first_point = swaths.at(i).getPoint(0)
+        second_point = swaths.at(i).getPoint(1)
+        angle = vector_angle(VECTOR2(first_point.getX() - second_point.getX(), first_point.getY() - second_point.getY()))
+        destinations.append(POINT(first_point.getX(), first_point.getY(), angle))
+        destinations.append(POINT(second_point.getX(), second_point.getY(), angle))
+
+    tmp_low_destintaions = destinations.copy()
+
+    geo_edges = []
+    for i in range(len(tmp_low_destintaions) - 1):
+        s_x = tmp_low_destintaions[i].x
+        s_y = tmp_low_destintaions[i].y
+        s_yaw = tmp_low_destintaions[i].angle
+        g_x = tmp_low_destintaions[i + 1].x
+        g_y = tmp_low_destintaions[i + 1].y
+        g_yaw = tmp_low_destintaions[i + 1].angle
+
+        try:
+            path_i = calc_optimal_path(s_x, s_y, s_yaw,
+                                   g_x, g_y, g_yaw, 0.1, 4)
+        except:
+            logger("no reedsshepp!")
+            return square_edges, []
+
+        for j in range(len(path_i.x)):
+            current_geo = cartesian_to_geo(path_i.x[j], path_i.y[j])
+            geo_edges.append([current_geo[1],current_geo[0]])
+            pass
+
+    return geo_edges

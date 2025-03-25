@@ -67,8 +67,11 @@ class WorldModel(object):
         self.__obstacles_lookup_num = 0
         self.pedestrian_on_crosswalk = False # Пешеход на пешеходном переходе
         self.obstacles = {"front": [], "rear": []}                # Данные о препятствиях с лидара
-        self.lmp_data = {}  # Словарь данных о БПТС для отправки ЛМП
-        self.previous_zone = None   
+        self.lmp_data = {}                  # Словарь данных о БПТС для отправки ЛМП
+        self.previous_zone = None
+        self.is_spray = False               # Состояние опрыскивания
+        self.field_chanks = []              # Список частей поля
+        self.surround_chanks = []           # Закешированные чанки
                      
         self.sc = pg.display.set_mode((800, 800))
     

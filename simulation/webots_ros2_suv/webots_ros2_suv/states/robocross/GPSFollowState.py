@@ -1,5 +1,6 @@
 from webots_ros2_suv.states.AbstractState import AbstractState
 from webots_ros2_suv.lib.map_utils import calc_dist_point
+from webots_ros2_suv.lib.field_builder import gps_to_rect
 import math
 import time
 
@@ -73,50 +74,6 @@ class GPSFollowState(AbstractState):
         )
 
         return (x, y)
-
-    def gps_to_rect(self, dLon, dLat):
-        # Номер зоны Гаусса-Крюгера
-        zone = int(dLon / 6.0 + 1)
-
-        # Параметры эллипсоида Красовского
-        a = 6378245.0  # Большая (экваториальная) полуось
-        b = 6356863.019  # Малая (полярная) полуось
-        e2 = (a ** 2 - b ** 2) / a ** 2  # Эксцентриситет
-        n = (a - b) / (a + b)  # Приплюснутость
-
-        # Параметры зоны Гаусса-Крюгера
-        F = 1.0  # Масштабный коэффициент
-        Lat0 = 0.0  # Начальная параллель (в радианах)
-        Lon0 = (zone * 6 - 3) * math.pi / 180  # Центральный меридиан (в радианах)
-        N0 = 0.0  # Условное северное смещение для начальной параллели
-        E0 = zone * 1e6 + 500000.0  # Условное восточное смещение для центрального меридиана
-
-        # Перевод широты и долготы в радианы
-        Lat = dLat * math.pi / 180.0
-        Lon = dLon * math.pi / 180.0
-
-        # Вычисление переменных для преобразования
-        v = a * F * (1 - e2 * (math.sin(Lat) ** 2)) ** -0.5
-        p = a * F * (1 - e2) * (1 - e2 * (math.sin(Lat) ** 2)) ** -1.5
-        n2 = v / p - 1
-        M1 = (1 + n + 5.0 / 4.0 * n ** 2 + 5.0 / 4.0 * n ** 3) * (Lat - Lat0)
-        M2 = (3 * n + 3 * n ** 2 + 21.0 / 8.0 * n ** 3) * math.sin(Lat - Lat0) * math.cos(Lat + Lat0)
-        M3 = (15.0 / 8.0 * n ** 2 + 15.0 / 8.0 * n ** 3) * math.sin(2 * (Lat - Lat0)) * math.cos(2 * (Lat + Lat0))
-        M4 = 35.0 / 24.0 * n ** 3 * math.sin(3 * (Lat - Lat0)) * math.cos(3 * (Lat + Lat0))
-        M = b * F * (M1 - M2 + M3 - M4)
-        I = M + N0
-        II = v / 2 * math.sin(Lat) * math.cos(Lat)
-        III = v / 24 * math.sin(Lat) * (math.cos(Lat)) ** 3 * (5 - (math.tan(Lat) ** 2) + 9 * n2)
-        IIIA = v / 720 * math.sin(Lat) * (math.cos(Lat) ** 5) * (61 - 58 * (math.tan(Lat) ** 2) + (math.tan(Lat) ** 4))
-        IV = v * math.cos(Lat)
-        V = v / 6 * (math.cos(Lat) ** 3) * (v / p - (math.tan(Lat) ** 2))
-        VI = v / 120 * (math.cos(Lat) ** 5) * (5 - 18 * (math.tan(Lat) ** 2) + (math.tan(Lat) ** 4) + 14 * n2 - 58 * (math.tan(Lat) ** 2) * n2)
-
-        # Вычисление северного и восточного смещения (в метрах)
-        N = I + II * (Lon - Lon0) ** 2 + III * (Lon - Lon0) ** 4 + IIIA * (Lon - Lon0) ** 6
-        E = E0 + IV * (Lon - Lon0) + V * (Lon - Lon0) ** 3 + VI * (Lon - Lon0) ** 5
-
-        return [E, -N]
     
     def rotate_point(self, center, target, angle):
         return [math.cos(angle) * (target[0] - center[0]) - math.sin(angle) * (target[1] - center[1]) + center[0],
@@ -156,7 +113,10 @@ class GPSFollowState(AbstractState):
         
         lat, lon, orientation = world_model.get_current_position() # Текущее месторасположение автомобиля
         orientation -= 1.5
-        car_position = self.gps_to_rect(lat, lon)
+        car_position = gps_to_rect(lat, lon)
+        
+        self.params["rect_position"] = car_position
+
         car_vector = [math.cos(orientation) * 2, math.sin(orientation) * 2]
         difference = None
         # self.logi(f"{world_model.global_map}")
@@ -168,21 +128,26 @@ class GPSFollowState(AbstractState):
         for zone in zones:
             if zone['name'].startswith("speed"):
                 speed = int(zone['name'].split('speed')[1])  * self.get_directrion(direction_forward)
-        points = []
+        points_all = []
         for e in world_model.global_map:
             # if 'seg_num' in e:
                 # self.logi(f"{e['name']}: {e['seg_num']} cur: {world_model.cur_path_segment}")
             if 'moving' in e['name'] and 'seg_num' in e and int(e['seg_num']) == world_model.cur_path_segment:
                 direction_forward = e['name'] == 'moving'
-                points = e['coordinates']
+                points_all = e['coordinates']
                 break
         points_offset = self.__cur_path_point
-        points = points[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
+        points = points_all[points_offset:] # Удаляем из него те точки, которые были достигнуты автомобилем
         world_model.gps_path = points
+
+        if points_offset > 0 and points_offset < len(points_all) - 2:
+            world_model.is_spray = True
+        else:
+            world_model.is_spray = False
 
         path_square_points = []
         for point in points:
-            path_square_points.append(self.gps_to_rect(point[0], point[1]))
+            path_square_points.append(gps_to_rect(point[0], point[1]))
 
         if len(path_square_points) > 0:
             difference = [path_square_points[0][0] - car_position[0], path_square_points[0][1] - car_position[1]]
@@ -225,43 +190,49 @@ class GPSFollowState(AbstractState):
             world_model.gps_car_turn_angle = 0.0
         pg.event.get()
         world_model.sc.fill((0, 0, 0))
+        
+        # Отрисовка частей полей
+        for chank in world_model.surround_chanks.all():
+            green_color = math.sin(chank.irrigation_degree / 100 * math.pi) * 255
+            red_color = 0
+            if (chank.irrigation_degree > 50):
+                red_color = math.sin((chank.irrigation_degree - 50) / 100 * math.pi) * 255
+            pg.draw.rect(world_model.sc, pg.Color(int(red_color), int(green_color), 100), ((chank.position_x - car_position[0]) * 15 + 400, (chank.position_y - car_position[1]) * 15 + 400, 15, 15))
 
         # pg.image.frombuffer(world_model.ipm_colorized.tostring(), world_model.ipm_colorized.shape[1::-1], "BGR")
 
-        is_obstacle_in_area = True
-        rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
-
         self.has_obstacle = False
-        for obstacle in world_model.get_obstacles():
-            obstacle_points = [[-obstacle[8], obstacle[10]],
-                            [-obstacle[9], obstacle[10]],
-                            [-obstacle[9], obstacle[11]],
-                            [-obstacle[8], obstacle[11]]]
-            inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
-                                [-obstacle[9] + 10, obstacle[10]],
-                                [-obstacle[9] + 10, obstacle[11]],
-                                [-obstacle[8] - 10, obstacle[11]]]
+        # rect1 = pg.Rect(-1, 0, 2, self.config["obstacle_stop_distance"])
+        # for obstacle in world_model.get_obstacles():
+        #     obstacle_points = [[-obstacle[8], obstacle[10]],
+        #                     [-obstacle[9], obstacle[10]],
+        #                     [-obstacle[9], obstacle[11]],
+        #                     [-obstacle[8], obstacle[11]]]
+        #     inflated_obstacles = [[-obstacle[8] - 10, obstacle[10]],
+        #                         [-obstacle[9] + 10, obstacle[10]],
+        #                         [-obstacle[9] + 10, obstacle[11]],
+        #                         [-obstacle[8] - 10, obstacle[11]]]
             
-            x_dif = -obstacle[8] + obstacle[9]
-            y_dif = obstacle[11] - obstacle[10]
-            if x_dif < 1:
-                x_dif = 1
-            if y_dif < 1:
-                y_dif = 1
-            rect2 = pg.Rect(-obstacle[9], obstacle[10], x_dif, y_dif)
-            # self.draw_rect(world_model.sc, (rect2), orientation, (255, 255, 255))
-            color = (255, 255, 0)
-            if rect1.colliderect(rect2):
-                color = (255, 0, 0)
-                self.has_obstacle = True
+        #     x_dif = -obstacle[8] + obstacle[9]
+        #     y_dif = obstacle[11] - obstacle[10]
+        #     if x_dif < 1:
+        #         x_dif = 1
+        #     if y_dif < 1:
+        #         y_dif = 1
+        #     rect2 = pg.Rect(-obstacle[9], obstacle[10], x_dif, y_dif)
+        #     # self.draw_rect(world_model.sc, (rect2), orientation, (255, 255, 255))
+        #     color = (255, 255, 0)
+        #     if rect1.colliderect(rect2):
+        #         color = (255, 0, 0)
+        #         self.has_obstacle = True
 
-            rotated_obstacle = []
-            rotated_inflated_obstacle = []
-            for i in range(4):
-                rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
-                rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
-            self.draw_box(world_model.sc, rotated_obstacle, color)
-            # self.draw_box(world_model.sc, rotated_inflated_obstacle, (255, 0, 0))
+        #     rotated_obstacle = []
+        #     rotated_inflated_obstacle = []
+        #     for i in range(4):
+        #         rotated_obstacle.append(self.rotate_point(center=[0, 0], target=[obstacle_points[i][0], obstacle_points[i][1]], angle=(orientation - (math.pi / 2))))
+        #         rotated_inflated_obstacle.append(self.rotate_point(center=[0, 0], target=[inflated_obstacles[i][0], inflated_obstacles[i][1]], angle=(orientation - (math.pi / 2))))
+        #     self.draw_box(world_model.sc, rotated_obstacle, color)
+        #     # self.draw_box(world_model.sc, rotated_inflated_obstacle, (255, 0, 0))
 
         pg.draw.line(world_model.sc, (255,0,0), self.move_screen(0, 0), self.move_screen(car_vector[0], car_vector[1]))
         if difference != None:

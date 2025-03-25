@@ -26,6 +26,9 @@ from PIL import Image
 from .config_loader import ConfigLoader
 from .map_string import json_map_string
 from .field_builder import build_field
+from webots_ros2_suv.lib.field_builder import gps_to_rect
+from webots_ros2_suv.lib.gis import session, FieldChank
+from webots_ros2_suv.lib.linalg import POINT
 
 BASE_RESOURCE_PATH = get_package_share_directory('webots_ros2_suv') + '/'
 # для отладки в режиме редактирования fronend части прописать абсолютный путь, например:
@@ -162,7 +165,29 @@ class MapWebServer(object):
             for feature in features_list:
                 if feature['properties']['id'] == 'terminal':
                     edges_list = feature['geometry']['coordinates'][0]
-                    field_path = build_field(edges_list, self.log)
+                    self.log("world_model")
+                    lat, lon, orientation = self.world_model.get_current_position() # Текущее месторасположение автомобиля
+                    orientation -= 1.5
+                    car_position = gps_to_rect(lat, lon)
+                    self.log("world_model" + str(car_position))
+                    field_path = build_field(edges_list, (car_position[0], car_position[1], orientation), self.log)
+                    
+                    field_chanks = session.query(FieldChank)
+                    # Генерация пустых частей поля вдоль траектроии
+                    counter = 0
+                    for edge in field_path:
+                        square_edge = gps_to_rect(edge[0], edge[1])
+                        for i in range(int(square_edge[1]) - 10, int(square_edge[1]) + 10):
+                            for j in range(int(square_edge[0]) - 10, int(square_edge[0]) + 10):
+                                chunks = field_chanks.filter(FieldChank.position_x == j).filter(FieldChank.position_y == i).all()
+                                if len(chunks) == 0:
+                                    polygon_left_top = POINT(j, i)
+                                    new_polygon = f'({polygon_left_top.x} {polygon_left_top.y},{polygon_left_top.x + 1} {polygon_left_top.y},{polygon_left_top.x + 1} {polygon_left_top.y + 1},{polygon_left_top.x} {polygon_left_top.y + 1},{polygon_left_top.x} {polygon_left_top.y})'
+                                    new_chank = FieldChank(crop_name='garlic', polygon=f'POLYGON({new_polygon})', position_x=polygon_left_top.x, position_y=polygon_left_top.y, irrigation_degree=0)
+                                    session.add(new_chank)
+                        counter += 1
+                        self.log(f'edge {counter}/{len(field_path)}')
+                    session.commit()
 
             json_string = json_map_string(str(field_path))
             return {'status': 'ok', 'features' : json_string} 
