@@ -1,0 +1,79 @@
+#VRML_SIM R2023a utf8
+
+PROTO PlasticBarrel [
+  field SFVec3f    translation       0 0 0
+  field SFRotation rotation          0 0 1 0
+  field SFString   name              "PlasticBarrel"
+  field SFBool     castShadows       TRUE
+  field SFBool     isPickable        TRUE
+  field SFString   contactMaterial   "default"
+  field MFString   modelPath            ["models/plastic_barrel/plastic_barrel.dae"]
+  field MFString   baseColorTexturePath ["models/plastic_barrel/textures/base_map.jpg"]
+  field MFString   roughnessTexturePath ["models/plastic_barrel/textures/roughness_map.jpg"]
+  field MFString   metallicTexturePath  ["models/plastic_barrel/textures/metallic_map.jpg"]
+  field MFString   normalTexturePath    ["models/plastic_barrel/textures/normal_map.png"]
+  field SFFloat    translationStep   0.01
+  field SFFloat    rotationStep      0.262
+  field SFFloat    bodyMass          10.0        # Масса объекта в кг
+] {
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColorMap ImageTexture {
+            url IS baseColorTexturePath
+          }
+      
+          roughnessMap ImageTexture {
+            url IS roughnessTexturePath
+          }
+      
+          metalnessMap ImageTexture {
+            url IS metallicTexturePath
+          }
+      
+          normalMap ImageTexture {
+            url IS normalTexturePath
+          }
+        }
+        geometry Mesh {
+          url IS modelPath
+        }
+        castShadows IS castShadows
+        isPickable IS isPickable
+      }
+    ]
+    name IS name
+    contactMaterial IS contactMaterial
+    boundingObject Transform {
+      translation -0.05 -0.05 0.75  # Смещение цилиндра вверх, чтобы центр совпадал с нижней частью бочки
+      children [
+#        Box {
+#          size 0.8 0.8 1.4
+#        }
+        Cylinder {
+          height 1.4
+          radius 0.45
+          side TRUE
+          top TRUE
+        }
+      ]
+    }
+    physics Physics {
+      density -1
+      mass IS bodyMass
+#      inertiaMatrix [ 3.958 0 0  0 3.958 0  0 0 1.25 ]
+      centerOfMass [ 0 0 0.5 ] 
+    }
+    locked FALSE
+    radarCrossSection 0
+    recognitionColors [
+      # Добавить цвета распознавания при необходимости
+    ]
+    immersionProperties NULL
+    translationStep IS translationStep
+    rotationStep IS rotationStep
+  }
+}

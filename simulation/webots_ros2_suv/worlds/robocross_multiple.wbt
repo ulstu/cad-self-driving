@@ -1,0 +1,1256 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/Road.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/trees/protos/SimpleTree.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/GenericTrafficLight.proto"
+EXTERNPROTO "protos/MainRoadSign.proto"
+EXTERNPROTO "protos/GiveWaySign.proto"
+EXTERNPROTO "protos/PlasticBarrel.proto"
+EXTERNPROTO "protos/GazelleNext/GazelleNext.proto"
+
+WorldInfo {
+  ERP 0.6
+  basicTimeStep 60
+  FPS 30
+  optimalThreadCount 4
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.1498165484242444 0.609655485625986 -0.7783798498576316 0.4956451869721657
+  position -30.03370629355541 8.788887149068678 15.379149056221157
+  follow "vehicle"
+}
+TexturedBackground {
+}
+Solid {
+  children [
+    GenericTrafficLight {
+      translation 18.96 -11.73 0
+      rotation 0 0 1 3.14159
+      state "green"
+    }
+  ]
+  name "solid(2)"
+}
+TexturedBackgroundLight {
+  castShadows FALSE
+}
+Solid {
+  translation 126.593 -30.2546 0.530002
+  rotation -3.2024999999909137e-07 2.3605099999933025e-06 -0.9999999999971627 -0.9799953071795864
+  children [
+    Solid {
+      translation 1.74844e-05 -4.76 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(1)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 3.94133e-05 -10.73 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 6.08279e-05 -16.56 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(3)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 8.19857e-05 -22.32 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(4)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 0.000102006 -27.77 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(5)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 0.000126361 -34.4 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(6)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 0.000149807 -40.78 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(7)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 0.000171992 -46.82 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(8)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 0.000195503 -53.22 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(9)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 2.70736 -54.05 0
+      rotation 2.64655e-06 -0.9999999997933533 2.01507e-05 0.07
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(20)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 8.19393 -54.05 0
+      rotation 2.64655e-06 -0.9999999997933533 2.01507e-05 0.07
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(21)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 12.7628 -54.05 0
+      rotation 2.64655e-06 -0.9999999997933533 2.01507e-05 0.07
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(22)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 17.7909 -54.05 0
+      rotation 2.64655e-06 -0.9999999997933533 2.01507e-05 0.07
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(23)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -53.22 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(10)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -46.26 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(11)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -40.72 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(12)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -34.36 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(13)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -27.21 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(14)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -21.95 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(15)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -15.93 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(16)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -10.06 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(17)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 -4.43 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(18)"
+      boundingObject USE brick
+    }
+    Solid {
+      translation 21.0902 0.39 0
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      name "solid(19)"
+      boundingObject USE brick
+    }
+    Solid {
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry DEF brick Box {
+            size 2.5 1 1
+          }
+        }
+      ]
+      boundingObject USE brick
+    }
+  ]
+  name "solid(5)"
+}
+Solid {
+  translation 3.33 13.05 0
+  children [
+    SimpleTree {
+      translation 8.81 0 0
+      name "tree(1)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 8.81 -29.31 0
+      name "tree(21)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 17.04 0 0
+      name "tree(2)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 17.04 -29.56 0
+      name "tree(22)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 26.54 0 0
+      name "tree(3)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 26.54 -28.69 0
+      name "tree(23)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 35.9 0 0
+      name "tree(4)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 35.9 -31.64 0
+      name "tree(24)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 44.69 -1.74 0
+      name "tree(5)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 44.69 -30.81 0
+      name "tree(25)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 53.55 -2.62 0
+      name "tree(6)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 53.55 -31.66 0
+      name "tree(26)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 62.05 -1.82 0
+      name "tree(7)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 62.05 -32.01 0
+      name "tree(27)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 71.49 -1.43 0
+      name "tree(8)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 71.49 -31.78 0
+      name "tree(28)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 86.5 -2.47 0
+      name "tree(10)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 89.48 -34.86 0
+      name "tree(30)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 93.58 -2.66 0
+      name "tree(11)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 99.54 -4.09 0
+      name "tree(12)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 109.52 -4.65 0
+      name "tree(13)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 117.84 -8.82 0
+      name "tree(14)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 127.03 -13.53 0
+      name "tree(15)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 137.44 -20.6 0
+      name "tree(16)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 101.35 -37.86 0
+      name "tree(31)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 112.77 -44.76 0
+      name "tree(32)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 121.83 -50.63 0
+      name "tree(33)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 132.24 -57.85 0
+      name "tree(35)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 144.49 -27.08 0
+      name "tree(17)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 153.13 -33.1 0
+      name "tree(18)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 161.53 -40.02 0
+      name "tree(19)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 169.96 -47.62 0
+      name "tree(36)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 178.67 -50.22 0
+      name "tree(37)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 162.29 -77.53 0
+      name "tree(38)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 150.79 -70.93 0
+      name "tree(39)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 139.54 -63.64 0
+      name "tree(43)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 79.82 -2.25 0
+      name "tree(9)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 80.77 -32.77 0
+      name "tree(29)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+    SimpleTree {
+      translation 0 -28.83 0
+      name "tree(20)"
+      height 10
+      radius 4
+      enableBoundingObject FALSE
+      locked FALSE
+    }
+  ]
+}
+Solid {
+  translation 0.0478663 -0.137844 0.1
+  children [
+    DEF road Road {
+      name "road(1)"
+      width 20
+      lines [
+        RoadLine {
+          type "continuous"
+        }
+      ]
+      rightBarrier TRUE
+      leftBarrier TRUE
+      wayPoints [
+        0 0 0
+        100 0 0
+        115 -10 0
+        130 -20 0
+      ]
+      roadTilt [
+        0, 0, 0, 0
+      ]
+      startingAngle [
+        0
+      ]
+      appearance Appearance {
+        texture ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/vehicles/worlds/textures/ground.jpg"
+          ]
+        }
+      }
+      roadBoundingObject TRUE
+    }
+    DEF road Road {
+      name "road(2)"
+      width 20
+      lines [
+        RoadLine {
+          type "continuous"
+        }
+      ]
+      roadBorderHeight 0
+      wayPoints [
+        130 -20 0
+        190 -60 0
+      ]
+      appearance Appearance {
+        texture ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/vehicles/worlds/textures/ground.jpg"
+          ]
+        }
+      }
+      roadBoundingObject TRUE
+    }
+    Solid {
+      translation 10 0 0.005
+      children [
+        Pose {
+          rotation 1 0 0 0
+          children [
+            Pose {
+              rotation 0 0 1 1.5708
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 20 0.5 0.01
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "stop_line"
+      rotationStep 0.261799
+    }
+    Solid {
+      translation 150 -33 0.03
+      children [
+        Pose {
+          rotation 1 0 0 0
+          children [
+            Pose {
+              rotation 0 0 1 0.99
+              children [
+                Pose {
+                  children [
+                    Shape {
+                      appearance PBRAppearance {
+                        roughness 1
+                        metalness 0
+                      }
+                      geometry Box {
+                        size 20 0.5 0.01
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "stop_line_end_adjusted"
+    }
+  ]
+  name "solid(1)"
+}
+Solid {
+  translation 107.72 -84.49 -1.29
+  rotation 0 0 1 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/rock.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+      }
+      geometry DEF brick Box {
+        size 2.5 1 1
+      }
+    }
+  ]
+  name "solid(4)"
+  boundingObject USE brick
+}
+RectangleArena {
+  floorSize 2000 2000
+  floorAppearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/default/worlds/textures/grass.jpg"
+      ]
+      repeatS FALSE
+      repeatT FALSE
+    }
+    roughness 1
+    metalness 0
+  }
+}
+MainRoadSign {
+  translation 14.5917 -11.5529 0
+  rotation 0 0 1 -3.139185307179586
+}
+GiveWaySign {
+  translation 22.9994 -11.6633 0
+  rotation 0 0 1 -3.134375307179586
+}
+PlasticBarrel {
+  translation 112.888 -12.3338 0.1
+  name "PlasticBarrel(3)"
+}
+DEF Gazelle1 GazelleNext {
+  translation 2.43536 -4.76087 0.5
+  controller "<extern>"
+  supervisor TRUE
+  sensorsSlotFront [
+    Lidar {
+      translation -0.95 0 1.52
+      name "lidar_base"
+      horizontalResolution 1024
+      fieldOfView 6.28318
+      verticalFieldOfView 0.6
+      numberOfLayers 64
+      minRange 1.5
+      maxRange 100
+    }
+    RangeFinder {
+      translation 0 0 0.2
+      name "range_finder"
+      fieldOfView 1
+      width 840
+      height 480
+      minRange 0.5
+      maxRange 40
+    }
+    Camera {
+      translation -0.25 0 1.15
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 840
+      height 480
+    }
+  ]
+  sensorsSlotTop [
+    Compass {
+      translation 0.4 0 0.3
+    }
+    InertialUnit {
+      translation 0.4 0 0.3
+      name "inertial_unit"
+    }
+    Accelerometer {
+      translation 0.4 0 0
+    }
+    Gyro {
+    }
+    GPS {
+      translation 0.4 0 0.3
+    }
+  ]
+  sensorsSlotCenter [
+    Radar {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+}
+DEF Gazelle2 GazelleNext {
+  translation 4.14269 2.48842 0.5
+  name "vehicle1"
+  controller "<extern>"
+  supervisor TRUE
+  sensorsSlotFront [
+    Lidar {
+      translation -0.95 0 1.52
+      name "lidar_base"
+      horizontalResolution 1024
+      fieldOfView 6.28318
+      verticalFieldOfView 0.6
+      numberOfLayers 64
+      minRange 1.5
+      maxRange 100
+    }
+    RangeFinder {
+      translation 0 0 0.2
+      name "range_finder"
+      fieldOfView 1
+      width 840
+      height 480
+      minRange 0.5
+      maxRange 40
+    }
+    Camera {
+      translation -0.25 0 1.15
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 840
+      height 480
+    }
+  ]
+  sensorsSlotTop [
+    Compass {
+      translation 0.4 0 0.3
+    }
+    InertialUnit {
+      translation 0.4 0 0.3
+      name "inertial_unit"
+    }
+    Accelerometer {
+      translation 0.4 0 0
+    }
+    Gyro {
+    }
+    GPS {
+      translation 0.4 0 0.3
+    }
+  ]
+  sensorsSlotCenter [
+    Radar {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+}
+PlasticBarrel {
+  translation 19.9235 -4.10833 0.1
+  name "PlasticBarrel(2)"
+}
+PlasticBarrel {
+  translation 31.5432 -0.512183 0.1
+  name "PlasticBarrel(1)"
+}
+PlasticBarrel {
+  translation 55.3437 -0.387974 0.1
+  name "PlasticBarrel(6)"
+}
+PlasticBarrel {
+  translation 103.37 -2.41209 0.1
+  name "PlasticBarrel(8)"
+}
+PlasticBarrel {
+  translation 103.092 -3.14603 0.1
+  name "PlasticBarrel(10)"
+}
+PlasticBarrel {
+  translation 75.7109 5.10587 0.1
+  name "PlasticBarrel(9)"
+}
+PlasticBarrel {
+  translation 55.5218 -8.42203 0.1
+  name "PlasticBarrel(7)"
+}
+PlasticBarrel {
+  translation 31.507 0.309897 0.1
+  name "PlasticBarrel(5)"
+}
+PlasticBarrel {
+  translation 19.7383 -4.98268 0.1
+  name "PlasticBarrel(4)"
+}
