@@ -69,97 +69,27 @@ transitions:
     stop: ["stopped", "emergency"]
 map-elements:
   - element:
-    id: "start"
-    name: !!str Точка старта
-    ol-type: !!str Point
-    color: !!str 00ff00
-  - element:
-    id: "turn"
-    name: !!str Зона разворота
+    id: "field"
+    name: !!str Поле для обработки 
     ol-type: !!str Polygon
-    color: !!str ffff00
+    color: !!str aaaa11
   - element:
-    id: "finish"
-    name: !!str Зона  финиша
+    id: "parking"
+    name: !!str Зона парковки
     ol-type: !!str Polygon
-    color: !!str ff0000
+    color: !!str ff1111
   - element:
-    id: "nolanes"
-    name: !!str Зона движения без линий разметки 
+    id: "loading"
+    name: !!str Зона погрузки расходников 
     ol-type: !!str Polygon
-    color: !!str 0000ff
+    color: !!str 11ff11
+  - element:
+    id: "refueling"
+    name: !!str Зона заправки топлива 
+    ol-type: !!str Polygon
+    color: !!str 111111
   - element:
     id: "moving"
-    name: !!str Путь следования
+    name: !!str Дорога для движения
     ol-type: !!str LineString
-    color: !!str 0000ff
-  - element:
-    id: "moving_back"
-    name: !!str Путь следования задом
-    ol-type: !!str LineString
-    color: !!str 00ff00
-  - element:
-    id: "terminal"
-    name: !!str Зона терминала
-    ol-type: !!str Polygon
-    color: !!str ffa500
-  - element:
-    id: "traffic_light"
-    name: !!str Зона светофора
-    ol-type: !!str Polygon
-    color: !!str 000000
-  - element:
-    id: "crosswalk"
-    name: !!str Зона пешеходного перехода
-    ol-type: !!str Polygon
-    color: !!str ffffff
-  - element:
-    id: "stop"
-    name: !!str Зона остановки
-    ol-type: !!str Polygon
-    color: !!str 800080
-  - element:
-    id: "speed7"
-    name: !!str Зона скорости 7
-    ol-type: !!str Polygon
-    color: !!str fe00f0
-  - element:
-    id: "speed20"
-    name: !!str Зона скорости 20
-    ol-type: !!str Polygon
-    color: !!str fefcba
-  - element:
-    id: "speed30"
-    name: !!str Зона скорости 30
-    ol-type: !!str Polygon
-    color: !!str aef0b0
-  - element:
-    id: "speed40"
-    name: !!str Зона скорости 40
-    ol-type: !!str Polygon
-    color: !!str fe00cf
-  - element:
-    id: "obstacle_stop"
-    name: !!str Зона остановки перед препядствием
-    ol-type: !!str Polygon
-    color: !!str 804030
-  - element:
-    id: "next_segment"
-    name: !!str Зона следующего сегмента
-    ol-type: !!str Polygon
-    color: !!str ff00ff
-  - element:
-    id: "to_gpsfollow"
-    name: !!str Зона пеерхода следования по GPS
-    ol-type: !!str Polygon
-    color: !!str 40a8f7
-  - element:
-    id: "to_obstacles"
-    name: !!str Зона пеерхода на объезд пряпядствий 
-    ol-type: !!str Polygon
-    color: !!str 83eb34
-  - element:
-    id: "pause_tick_50"
-    name: !!str Зона паузы на 50 тиков 
-    ol-type: !!str Polygon
-    color: !!str 40524e
+    color: !!str 1111ff

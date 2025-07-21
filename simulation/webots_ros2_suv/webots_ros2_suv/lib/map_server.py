@@ -163,7 +163,7 @@ class MapWebServer(object):
             features_list = decoded_field_data['features']
             edges_string = []
             for feature in features_list:
-                if feature['properties']['id'] == 'terminal':
+                if feature['properties']['id'] == 'field':
                     edges_list = feature['geometry']['coordinates'][0]
                     self.log("world_model")
                     lat, lon, orientation = self.world_model.get_current_position() # Текущее месторасположение автомобиля
@@ -176,6 +176,9 @@ class MapWebServer(object):
                     # Генерация пустых частей поля вдоль траектроии
                     counter = 0
                     for edge in field_path:
+                        counter += 1
+                        if counter % 10 != 0:
+                            continue
                         square_edge = gps_to_rect(edge[0], edge[1])
                         for i in range(int(square_edge[1]) - 10, int(square_edge[1]) + 10):
                             for j in range(int(square_edge[0]) - 10, int(square_edge[0]) + 10):
@@ -185,7 +188,6 @@ class MapWebServer(object):
                                     new_polygon = f'({polygon_left_top.x} {polygon_left_top.y},{polygon_left_top.x + 1} {polygon_left_top.y},{polygon_left_top.x + 1} {polygon_left_top.y + 1},{polygon_left_top.x} {polygon_left_top.y + 1},{polygon_left_top.x} {polygon_left_top.y})'
                                     new_chank = FieldChank(crop_name='garlic', polygon=f'POLYGON({new_polygon})', position_x=polygon_left_top.x, position_y=polygon_left_top.y, irrigation_degree=0)
                                     session.add(new_chank)
-                        counter += 1
                         self.log(f'edge {counter}/{len(field_path)}')
                     session.commit()
 
