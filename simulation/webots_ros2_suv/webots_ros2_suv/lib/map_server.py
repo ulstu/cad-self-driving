@@ -85,7 +85,7 @@ class MapWebServer(object):
         if self.world_model is None:
             return None
         try:
-            pos = self.world_model.get_current_position()
+            pos = self.world_model.get_current_position('vehicle')
             self.driving_points.append([pos[0], pos[1]])
         except Exception as e:
             return {'status' : 'error', 'message': ''.join(traceback.TracebackException.from_exception(e).format())}
@@ -166,7 +166,7 @@ class MapWebServer(object):
                 if feature['properties']['id'] == 'field':
                     edges_list = feature['geometry']['coordinates'][0]
                     self.log("world_model")
-                    lat, lon, orientation = self.world_model.get_current_position() # Текущее месторасположение автомобиля
+                    lat, lon, orientation = self.world_model.get_current_position('vehicle') # Текущее месторасположение автомобиля
                     orientation -= 1.5
                     car_position = gps_to_rect(lat, lon)
                     self.log("world_model" + str(car_position))

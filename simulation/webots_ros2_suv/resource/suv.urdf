@@ -4,7 +4,7 @@
     <plugin type="webots_ros2_suv.suv_driver.SUVDriver"/>
     <plugin type="webots_ros2_driver::Ros2IMU">
             <frameName>imu_link</frameName>
-            <topicName>/imu</topicName>
+            <topicName>/vehicle/imu</topicName>
             <inertialUnitName>inertial_unit</inertialUnitName>
             <gyroName>gyro</gyroName>
             <accelerometerName>accelerometer</accelerometerName>

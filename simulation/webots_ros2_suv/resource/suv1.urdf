@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
-<robot name="/home/hiber/Downloads/suv.urdf" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="SUV" xmlns:xacro="http://ros.org/wiki/xacro">
   <webots>
     <plugin type="webots_ros2_suv.suv_driver.SUVDriver"/>
+    <plugin type="webots_ros2_driver::Ros2IMU">
+            <frameName>imu_link</frameName>
+            <topicName>/vehicle1/imu</topicName>
+            <inertialUnitName>inertial_unit</inertialUnitName>
+            <gyroName>gyro</gyroName>
+            <accelerometerName>accelerometer</accelerometerName>
+    </plugin>
+    <device reference="camera" type="Camera">
+      <ros>
+          <topicName>/vehicle1/camera</topicName>
+      </ros>
+    </device>
+    <device reference="left_wing_camera" type="Camera">
+      <ros>
+          <topicName>/vehicle1/left_wing_camera</topicName>
+      </ros>
+    </device>
+
   </webots>
   <link name="base_link">
     <visual>
@@ -187,24 +205,8 @@
   <joint name="base_link_Velodyne HDL-64E_joint" type="fixed">
     <parent link="base_link"/>
     <child link="Velodyne HDL-64E"/>
-    <origin xyz="1 0 1.61" rpy="-0.000007 -0.000007 3.14159"/>
+    <origin xyz="1 0 1.63" rpy="0 0 0"/>
   </joint>
-  <!--
-    <link name="solid_0">
-    <visual>
-      <origin xyz="0 0.08 0" rpy="-1.57 0 0"/>
-      <geometry>
-        <cylinder radius="0.115" length="0.17"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0.08 0" rpy="-1.57 0 0"/>
-      <geometry>
-        <cylinder radius="0.115" length="0.17"/>
-      </geometry>
-    </collision>
-  </link>
-  -->
   <joint name="Velodyne HDL-64E_solid_0_joint" type="fixed">
     <parent link="Velodyne HDL-64E"/>
     <child link="solid_0"/>
@@ -224,11 +226,35 @@
       </geometry>
     </collision>
   </link>
-  <!-- <joint name="Velodyne HDL-64E_solid_0_joint" type="fixed">
-    <parent link="Velodyne HDL-64E"/>
-    <child link="solid_0"/>
-    <origin xyz="0 0 -0.08" rpy="1.570807 0 0"/>
-  </joint> -->
+  <link name="gps">
+  </link>
+  <joint name="base_link_gps_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="gps"/>
+    <origin xyz="1 0 1.45" rpy="0 0 0"/>
+  </joint>
+  <link name="lidar">
+  </link>
+  <joint name="base_link_lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar"/>
+    <origin xyz="1 0 1.45" rpy="0 0 0"/>
+  </joint>
+  <link name="inertial unit">
+  </link>
+  <joint name="base_link_inertial unit_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="inertial unit"/>
+    <origin xyz="1 0 1.45" rpy="0 0 0"/>
+  </joint>
+  <link name="compass">
+  </link>
+  <joint name="base_link_compass_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="compass"/>
+    <origin xyz="1 0 1.45" rpy="0 0 0"/>
+  </joint>
+
   <link name="Sms UMRR 0a30">
     <visual>
       <origin xyz="-0.015 0 0" rpy="1.570741 0.000118 -1.570741"/>
@@ -248,12 +274,29 @@
     <child link="Sms UMRR 0a30"/>
     <origin xyz="3.85 0 0.45" rpy="0 0 0"/>
   </joint>
+  
   <link name="camera">
   </link>
   <joint name="base_link_camera_joint" type="fixed">
     <parent link="base_link"/>
     <child link="camera"/>
-    <origin xyz="3.85 0 0.45" rpy="-1.570796 0 -1.570796"/>
+    <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
+  </joint>
+  
+  <link name="left_wing_camera">
+  </link>
+  <joint name="base_link_camera_left_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_wing_camera"/>
+    <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
+  </joint>
+  
+  <link name="range_finder">
+  </link>
+  <joint name="base_link_range_finder_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="range_finder"/>
+    <origin xyz="1.73 0 1.38" rpy="-1.570796 0 -1.570796"/>
   </joint>
   <link name="engine_speaker">
   </link>
@@ -266,17 +309,17 @@
     <parent link="base_link"/>
     <child link="rear right wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz="0.001434 -0.812566 0" rpy="-1.532408 0 1.5708"/>
+    <origin xyz="0 -0.814 0" rpy="0 0 1.5708"/>
   </joint>
   <link name="rear right wheel">
     <visual>
-      <origin xyz="-0.001434 -0.111671 0.004289" rpy="0 1.570796 0"/>
+      <origin xyz="0 0 0" rpy="0 1.570796 0"/>
       <geometry>
         <cylinder radius="0.374" length="0.25"/>
       </geometry>
     </visual>
     <collision>
-      <origin xyz="-0.001434 -0.111671 0.004289" rpy="0 1.570796 0"/>
+      <origin xyz="0 0 0" rpy="0 1.570796 0"/>
       <geometry>
         <cylinder radius="0.374" length="0.25"/>
       </geometry>
@@ -285,23 +328,23 @@
   <joint name="slot_rear right wheel_joint" type="fixed">
     <parent link="base_link"/>
     <child link="rear right wheel"/>
-    <origin xyz="-0.001434 -0.111671 0.004289" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
   <joint name="left_rear_sensor" type="continuous">
     <parent link="base_link"/>
     <child link="rear left wheel"/>
     <axis xyz="-1 0 0"/>
-    <origin xyz="0.001434 0.812566 0" rpy="2.095027 0 -1.5708"/>
+    <origin xyz="0 0.814 0" rpy="0 0 -1.5708"/>
   </joint>
   <link name="rear left wheel">
     <visual>
-      <origin xyz="-0.001434 0.096746 -0.055938" rpy="0 1.570796 0"/>
+      <origin xyz="0 0 0" rpy="0 1.570796 0"/>
       <geometry>
         <cylinder radius="0.374" length="0.25"/>
       </geometry>
     </visual>
     <collision>
-      <origin xyz="-0.001434 0.096746 -0.055938" rpy="0 1.570796 0"/>
+      <origin xyz="0 0 0" rpy="0 1.570796 0"/>
       <geometry>
         <cylinder radius="0.374" length="0.25"/>
       </geometry>
@@ -310,6 +353,6 @@
   <joint name="slot_1_rear left wheel_joint" type="fixed">
     <parent link="base_link"/>
     <child link="rear left wheel"/>
-    <origin xyz="-0.001434 0.096746 -0.055938" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 </robot>
