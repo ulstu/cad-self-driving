@@ -52,24 +52,24 @@ class AgronavigatorWorker(AbstractWorker):
             sprayers_positions.append(sprayer_position)
 
         # Симуляция опрыскивания
-        if world_model.is_spray:
-            self.logi("spray")
-            for sprayer_position in sprayers_positions:
-                new_polygon = f'({sprayer_position.x - self.spray_radius} {sprayer_position.y - self.spray_radius},{sprayer_position.x + self.spray_radius} {sprayer_position.y - self.spray_radius},{sprayer_position.x + self.spray_radius} {sprayer_position.y + self.spray_radius},{sprayer_position.x - self.spray_radius} {sprayer_position.y + self.spray_radius},{sprayer_position.x - self.spray_radius} {sprayer_position.y - self.spray_radius})'
-                chanks = world_model.surround_chanks.filter(FieldChank.polygon.ST_Intersects(f'POLYGON({new_polygon})')).all()
-                # print(len(chanks), new_polygon)
-                average_irrigation = 0
-                for chank in chanks:
-                    average_irrigation += chank.irrigation_degree
-                if len(chanks) > 0:
-                    average_irrigation /= len(chanks)
-                irrigation_coefficient = min(math.sqrt(max(0, 30 - average_irrigation)) * 1.3, 10)
-                for chank in chanks:
-                    if irrigation_coefficient > 0:
-                        chank.irrigation_degree = min(100, chank.irrigation_degree + 10 / irrigation_coefficient)
-            if time() - self.chank_update_time > 5:
-                session.commit()
-                self.chank_update_time = time()
+        # if world_model.is_spray:
+        #     self.logi("spray")
+        #     for sprayer_position in sprayers_positions:
+        #         new_polygon = f'({sprayer_position.x - self.spray_radius} {sprayer_position.y - self.spray_radius},{sprayer_position.x + self.spray_radius} {sprayer_position.y - self.spray_radius},{sprayer_position.x + self.spray_radius} {sprayer_position.y + self.spray_radius},{sprayer_position.x - self.spray_radius} {sprayer_position.y + self.spray_radius},{sprayer_position.x - self.spray_radius} {sprayer_position.y - self.spray_radius})'
+        #         chanks = world_model.surround_chanks.filter(FieldChank.polygon.ST_Intersects(f'POLYGON({new_polygon})')).all()
+        #         # print(len(chanks), new_polygon)
+        #         average_irrigation = 0
+        #         for chank in chanks:
+        #             average_irrigation += chank.irrigation_degree
+        #         if len(chanks) > 0:
+        #             average_irrigation /= len(chanks)
+        #         irrigation_coefficient = min(math.sqrt(max(0, 30 - average_irrigation)) * 1.3, 10)
+        #         for chank in chanks:
+        #             if irrigation_coefficient > 0:
+        #                 chank.irrigation_degree = min(100, chank.irrigation_degree + 10 / irrigation_coefficient)
+        #     if time() - self.chank_update_time > 5:
+        #         session.commit()
+        #         self.chank_update_time = time()
 
         return world_model
 

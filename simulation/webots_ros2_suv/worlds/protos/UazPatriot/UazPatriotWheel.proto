@@ -6,8 +6,8 @@
 # Model of the BMW X5 wheels using the generic VehicleWheel PROTO including physic properties and baseColorMaps.
 # This model was sponsored by the [CTI project RO2IVSim](http://transport.epfl.ch/simulator-for-mobile-robots-and-intelligent-vehicles).
 
-EXTERNPROTO "webots://projects/vehicles/protos/abstract/VehicleWheel.proto"
-EXTERNPROTO "webots://projects/vehicles/protos/abstract/GenericTireAppearance.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/VehicleWheel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/GenericTireAppearance.proto"
 
 PROTO UazPatriotWheel [
   field       SFString name           "Uaz Patriot wheel"  # Is `VehicleWheel.name`.

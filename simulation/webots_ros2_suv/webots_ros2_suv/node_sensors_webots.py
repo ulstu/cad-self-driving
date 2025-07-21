@@ -33,7 +33,7 @@ class NodeSensorsWebots(Node):
             qos.reliability = QoSReliabilityPolicy.RELIABLE
             self.__gps_publisher = self.create_publisher(NavSatFix, "/vehicle/gps_nav", qos)
             self.__odom_publisher = self.create_publisher(Odometry, "/odom", qos)
-            self.__pc_publisher = self.create_publisher(PointCloud2, '/lidar', qos)
+            self.__pc_publisher = self.create_publisher(PointCloud2, '/cloud_in', qos)
             self.__pc_publisher_rear = self.create_publisher(PointCloud2, '/lidar_rear', qos)
             self.create_subscription(PointStamped, '/vehicle/gps', self.__on_gps_message, qos)
             self.create_subscription(Image, '/vehicle/range_finder', self.__on_range_message, qos)

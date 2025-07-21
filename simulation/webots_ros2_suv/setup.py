@@ -56,7 +56,9 @@ setup(
             'node_sensors_gazelle = webots_ros2_suv.node_sensors_gazelle:main',
             'node_visual = webots_ros2_suv.node_visual:main',
             'node_drive_gazelle = webots_ros2_suv.node_drive_gazelle:main',
-            "node_lmp_sender = webots_ros2_suv.node_lmp_sender:main"
+            "node_lmp_sender = webots_ros2_suv.node_lmp_sender:main",
+            "ackermann_keyboard_teleop_node = webots_ros2_suv.ackermann_keyboard_teleop_node:main",
+            "pointcloud_to_laserscan_bridge_node = webots_ros2_suv.pointcloud_to_laserscan_bridge_node:main"
         ],
         'launch.frontend.launch_extension': ['launch_ros = launch_ros']
     }

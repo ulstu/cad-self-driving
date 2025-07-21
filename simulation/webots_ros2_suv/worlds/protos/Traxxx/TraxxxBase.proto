@@ -1,0 +1,104 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# tags: hidden
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GlossyPaint.proto"
+
+PROTO TraxxxBase [
+  field     SFColor  color                    0.43 0.11 0.1
+]
+{
+  Group {
+    children [
+      DEF METALLICPARTS Pose {
+        translation 0.0 0.0 0.15
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              metalness 0.5
+              baseColor 0.5 0.5 0.5
+            }
+            geometry Mesh {
+              url [
+                "models/GlossyShafts.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF ACRILICPARTS Pose {
+        translation 0.0 0.0 0.15
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              metalness 0.1
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Mesh {
+              url [
+                "models/AcrylicPlate.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF PLASTICPARTS Pose {
+        translation 0.0 0.0 0.15
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.196078 0.196078 0.196078
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/BlackPlasticBase.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF JETSONPARTS Pose {
+        translation 0.0 0.0 0.15
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+              roughness 0.4
+              metalness 0.01
+            }
+            geometry Mesh {
+              url [
+                "models/Jetson.dae"
+              ]
+            }
+          }
+        ]
+      }
+      DEF WHITEPARTS Pose {
+        translation 0.0 0.0 0.15
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 1 1
+              roughness 0.4
+              metalness 0
+            }
+            geometry Mesh {
+              url [
+                "models/WhiteSprings.dae"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

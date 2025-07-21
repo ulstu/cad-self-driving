@@ -1,0 +1,180 @@
+#VRML_SIM R2022b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# documentation url: https://www.cyberbotics.com/doc/automobile/car
+# Model of an BMW X5 car using the Car proto as a base.
+# The vehicle is modelled with realistic physics properties: motor torques, body mass, friction forces, suspensions, etc.
+# This model was sponsored by the CTI project RO2IVSim (http://transport.epfl.ch/simulator-for-mobile-robots-and-intelligent-vehicles).
+# For the last 6 fields to have any effect, the 'interior' has to be enabled.
+# template language: javascript
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/Car.proto"
+EXTERNPROTO "TraxxxWheel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/VehicleLights.proto"
+EXTERNPROTO "TraxxxBase.proto"
+
+PROTO Traxxx [
+  field SFVec3f      translation              0 0 0.4
+  field SFRotation   rotation                 0 0 1 0
+  field SFColor      color                    0.43 0.11 0.1
+  field SFString     engineSound              "sounds/engine.wav"
+  field SFString     name                     "vehicle"
+  field SFString     controller               "<generic>"
+  field MFString     controllerArgs           []
+  field SFBool       supervisor               FALSE
+  field SFBool       synchronization          TRUE
+  field SFBool       windshieldWipers         TRUE
+  field SFBool       frontSpotLights          FALSE
+  field SFBool       rearMirror               FALSE
+  field SFBool       leftWingMirror           FALSE
+  field SFBool       rightWingMirror          FALSE
+  field SFFloat      mirrorFar                200.0
+  field MFNode       sensorsSlotFront         []
+  field MFNode       sensorsSlotRear          []
+  field MFNode       sensorsSlotTop           []
+  field MFNode       sensorsSlotCenter        []
+  field SFBool       interior                 TRUE
+  field SFBool       dynamicSpeedDisplay      TRUE
+  field SFBool       completeInterior         TRUE
+  field SFBool       shifter                  TRUE
+  field SFFloat      innerWindowTransparency  0.7
+  field SFBool       innerWindowDust          FALSE
+  field SFString     window                   "automobile"
+]
+{
+  %<
+    let interior = fields.interior.value;
+    let innerWindowTransparency = fields.innerWindowTransparency.value;
+    const frontSpotLights = fields.frontSpotLights.value;
+    const rearMirror = fields.rearMirror.value;
+    const dynamicSpeedDisplay = fields.dynamicSpeedDisplay.value;
+    const completeInterior = fields.completeInterior.value;
+    const innerWindowDust = fields.innerWindowDust.value;
+    if (!interior && rearMirror)
+      console.error('The rear mirror can only enabled if \'interior\' is set to TRUE.');
+
+    if (!interior && (dynamicSpeedDisplay || completeInterior || innerWindowDust))
+      console.error('In order to see the effect of the last 6 fields, the \'interior\' has to be enabled.');
+  >%
+  Car {
+    translation IS translation
+    rotation IS rotation
+    engineSound IS engineSound
+    trackFront 0.25
+    trackRear 0.25
+    wheelbase 0.31
+    time0To100 30
+    maxVelocity 5
+    engineType "electric"
+    engineMaxTorque 15
+    engineMaxPower 11
+    engineMaxRPM 500
+    brakeCoefficient 10  # calibrated for braking from 100 to 0km/h in 36.5m
+    wheelsDampingConstant 0.3
+    suspensionFrontSpringConstant  30000
+    suspensionFrontDampingConstant 300
+    suspensionRearSpringConstant   30000
+    suspensionRearDampingConstant  300
+    gearRatio   [-2 2]
+    wheelFrontLeft TraxxxWheel {
+      name "front left wheel"
+      wheelSide TRUE
+      physics DEF WHEEL_PHYSICS Physics {
+        density -1
+        mass 30
+      }
+    }
+    wheelFrontRight TraxxxWheel {
+      name "front right wheel"
+      physics USE WHEEL_PHYSICS
+    }
+    wheelRearRight TraxxxWheel {
+      name "rear right wheel"
+      physics USE WHEEL_PHYSICS
+    }
+    wheelRearLeft TraxxxWheel {
+      name "rear left wheel"
+      wheelSide TRUE
+      physics USE WHEEL_PHYSICS
+    }
+    extensionSlot [
+      # Sensors slotsSenso
+      Transform {
+        translation 0 0 0.03
+        rotation 0 0 1 3.14159
+        children IS sensorsSlotRear
+      }
+      Transform {
+        translation 0.36 0 0.1
+        children IS sensorsSlotFront
+      }
+      Transform {
+        translation 0.15 0 0.19
+        children IS sensorsSlotTop
+      }
+      %< if (interior) { >%
+      %< } >%
+      Transform{
+          rotation 0.57735 0.57735 0.57735 2.094395
+          children [
+            TraxxxBase {
+            }
+          ]
+      }
+      # vehicle interior
+    ]
+    name IS name
+    model "Traxxx"
+    controller IS controller
+    controllerArgs IS controllerArgs
+    supervisor IS supervisor
+    synchronization IS synchronization
+    boundingObject Group {
+      children [
+        Transform {
+          translation 0.16 0 0.06
+          rotation 0.57735 0.57735 0.57735 2.094395
+          children [
+            Box {
+              size 0.18 0.08 0.54
+            }
+          ]
+        }
+        Transform {
+          translation 0.32 0 0.01
+          rotation 0.57735 0.57735 0.57735 2.094395
+          children [
+            Box {
+              size 0.18 0.04 0.08
+            }
+          ]
+        }
+        Transform {
+          translation 0 0 0.01
+          rotation 0.57735 0.57735 0.57735 2.094395
+          children [
+            Box {
+              size 0.18 0.04 0.08
+            }
+          ]
+        }
+      ]
+    }
+    radarCrossSection 100
+    recognitionColors [
+      %<= fields.color.value.r >% %<= fields.color.value.g >% %<= fields.color.value.b >%
+    ]
+    physics Physics {
+      density -1
+      mass 40
+      centerOfMass [
+        0.18 0 0
+      ]
+      # inertiaMatrix [
+      #   1125.07 4473.54 4346.1
+      #   0 846.89 0
+      # ]
+    }
+    window IS window
+  }
+}

@@ -1,0 +1,301 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "/home/vladosok/ros2_ws/src/webots_ros2_suv/worlds/protos/Traxxx/Traxxx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/velodyne/protos/VelodyneVLP-16.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/chairs/protos/OfficeChair.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/cabinet/protos/Cabinet.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/PaintedWood.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Door.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/tables/protos/Desk.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/ParkingLines.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/computers/protos/DesktopComputer.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/computers/protos/Monitor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/CardboardBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/PlasticCrate.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/television/protos/Television.proto"
+
+WorldInfo {
+  ERP 0.6
+  basicTimeStep 10
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.4167508055418214 -0.21194424592105382 -0.8839674217419999 3.9364188091313066
+  position 3.9557914445007616 -5.1789575241674 8.931066923025803
+  follow "vehicle"
+}
+TexturedBackground {
+  texture "factory"
+  skyColor [
+    1 1 1
+  ]
+}
+Traxxx {
+  translation -0.4748 0.054 0.761868
+  rotation 0 -1 0 3.67802e-06
+  controller "<extern>"
+  supervisor TRUE
+  sensorsSlotFront [
+    RangeFinder {
+      name "range_finder"
+      fieldOfView 1
+      width 840
+      height 480
+      minRange 0.5
+      maxRange 40
+    }
+    VelodyneVLP-16 {
+    }
+  ]
+  sensorsSlotTop [
+    Camera {
+      translation 0 0 0.03
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 840
+      height 480
+    }
+    Compass {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    GPS {
+    }
+    Accelerometer {
+    }
+    Radar {
+    }
+    Gyro {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+  interior FALSE
+}
+RectangleArena {
+  translation 0 0 0.699464
+  name "rectangle arena(1)"
+  floorSize 5 5
+  floorTileSize 1 1
+  floorAppearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/parquetry/mosaic_parquetry_base_color.jpg?raw=true"
+      ]
+      filtering 2
+    }
+    roughness 1
+    roughnessMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/parquetry/mosaic_parquetry_roughness.jpg?raw=true"
+      ]
+    }
+    metalness 0.01
+    IBLStrength 0
+    normalMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/parquetry/mosaic_parquetry_normal.jpg?raw=true"
+      ]
+    }
+    occlusionMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/parquetry/mosaic_parquetry_occlusion.jpg?raw=true"
+      ]
+    }
+    occlusionMapStrength 0.1
+  }
+  wallHeight 0.5
+}
+DirectionalLight {
+  ambientIntensity 1
+  direction 0 0.5 -1
+  intensity 2
+  castShadows TRUE
+}
+DirectionalLight {
+  ambientIntensity 1
+  direction 0 -0.5 -1
+  intensity 2
+}
+OfficeChair {
+  translation 1.28816 -1.80784 0.73
+  rotation 0 0 1 3.14159
+}
+OfficeChair {
+  translation 2.10816 -0.29784 0.73
+  rotation 0 0 1 -2.6179953071795863
+  name "office chair(2)"
+}
+OfficeChair {
+  translation -1.88397 -2.10707 0.73
+  rotation 0 0 1 0.261794
+  name "office chair(1)"
+}
+Cabinet {
+  translation 2.49 1.28999 0.7
+  rotation 0 0 1 3.14159
+  name "cabinet(1)"
+}
+Cabinet {
+  translation 2.49 2.08999 0.7
+  rotation 0 0 1 3.14159
+  name "cabinet(3)"
+  primaryAppearance PaintedWood {
+    colorOverride 0.596078 0.415686 0.266667
+  }
+  secondaryAppearance PaintedWood {
+    colorOverride 0.596078 0.415686 0.266667
+  }
+}
+Cabinet {
+  translation 2.49 0.48999 0.7
+  rotation 0 0 1 3.14159
+  name "cabinet(2)"
+}
+Door {
+  translation 1.39 2.63 0.66
+  rotation 0 0 1 -1.5707953071795862
+  canBeOpen FALSE
+  jointAtLeft FALSE
+}
+Desk {
+  translation -1.25 -1.88 0.67
+}
+Desk {
+  translation -1.85 -0.18 0.67
+  rotation 0 0 1 1.5708
+  name "desk(3)"
+}
+Desk {
+  translation -1.85 0.52 0.67
+  rotation 0 0 1 1.5708
+  name "desk(4)"
+}
+Desk {
+  translation -1.85 2.13 0.67
+  rotation 0 0 1 1.5708
+  name "desk(5)"
+}
+Desk {
+  translation -0.65 2.13 0.67
+  rotation 0 0 1 1.5708
+  name "desk(6)"
+}
+Desk {
+  translation 0.66 -1.87 0.67
+  name "desk(1)"
+}
+Desk {
+  translation 2.13 -1.88 0.67
+  name "desk(2)"
+}
+ParkingLines {
+  translation -0.66 -0.65 0.7
+  numberOfCarParks 2
+  carParkLength 2
+  carParkWidth 1
+}
+DesktopComputer {
+  translation -1.31598 -2.33036 0.7
+  rotation 0 0 1 2.61799
+}
+DesktopComputer {
+  translation 0.595161 -2.27709 0.7
+  rotation 0 0 -1 -0.261795307179586
+  name "desktop computer(1)"
+}
+DesktopComputer {
+  translation -2.25549 2.13518 0.7
+  rotation 0 0 1 -1.5708053071795867
+  name "desktop computer(2)"
+}
+Monitor {
+  translation -1.07 -1.8 1.38
+  rotation 0 0 1 3.14159
+}
+Monitor {
+  translation 0.55 -1.8 1.38
+  rotation 0 0 1 -5.307179586466759e-06
+  name "monitor(2)"
+}
+Monitor {
+  translation -1.88 2.29 1.38
+  rotation 0 0 1 -1.5708053071795867
+  name "monitor(3)"
+}
+Monitor {
+  translation -1.1766 -2.25464 1.38
+  rotation 0 0 -1 -2.6179953071795863
+  name "monitor(1)"
+}
+CardboardBox {
+  translation -0.82 2.16 0.99
+}
+CardboardBox {
+  translation -2.25 0.52 0.9
+  name "cardboard box(4)"
+  size 0.5 0.4 0.4
+}
+CardboardBox {
+  translation -2.17 0.2 0.85
+  name "cardboard box(5)"
+  size 0.5 0.2 0.3
+}
+CardboardBox {
+  translation -0.58 -2.39 0.85
+  name "cardboard box(6)"
+  size 0.5 0.2 0.3
+}
+CardboardBox {
+  translation 2.18 -2.06 0.99
+  name "cardboard box(2)"
+}
+CardboardBox {
+  translation 2.26 -1.63 0.95
+  name "cardboard box(3)"
+  size 0.4 0.2 0.5
+}
+CardboardBox {
+  translation -0.36 2.25 0.9
+  rotation 0 0 1 -1.5707953071795862
+  name "cardboard box(1)"
+  size 0.4 0.3 0.4
+}
+PlasticCrate {
+  translation -2.26 -0.09 0.71
+  size 0.4 0.3 0.2
+}
+Television {
+  translation -2.39 0.18 1.69
+}

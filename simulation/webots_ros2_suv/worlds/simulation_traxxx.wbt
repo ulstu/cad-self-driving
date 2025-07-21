@@ -1,0 +1,533 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "/home/vladosok/ros2_ws/src/webots_ros2_suv/worlds/protos/Traxxx/Traxxx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/devices/velodyne/protos/VelodyneVLP-16.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/UnevenTerrain.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/buildings/protos/Windmill.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/buildings/protos/Barn.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/obstacles/protos/OilBarrel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/trees/protos/Cypress.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/garden/protos/Wheelbarrow.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/rocks/protos/Rock.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/WorkBarrier.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/traffic/protos/TrafficCone.proto"
+
+WorldInfo {
+  ERP 0.6
+  basicTimeStep 10
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.10017268438098266 -0.2801392138519343 -0.9547185209088218 5.3942342120984135
+  position -11.273780710633439 -0.1006601964799182 2.038562255129056
+  follow "vehicle"
+}
+TexturedBackground {
+  texture "mars"
+  skyColor [
+    1 1 1
+  ]
+}
+Traxxx {
+  translation -9.9248 2.384 0.90185
+  rotation 0 -1 0 3.67802e-06
+  controller "<extern>"
+  supervisor TRUE
+  sensorsSlotFront [
+    RangeFinder {
+      name "range_finder"
+      fieldOfView 1
+      width 840
+      height 480
+      minRange 0.5
+      maxRange 40
+    }
+    VelodyneVLP-16 {
+    }
+  ]
+  sensorsSlotTop [
+    Camera {
+      translation 0 0 0.03
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 840
+      height 480
+    }
+    Compass {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    GPS {
+    }
+    Accelerometer {
+    }
+    Radar {
+    }
+    Gyro {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+  interior FALSE
+}
+TexturedBackgroundLight {
+}
+TexturedBackgroundLight {
+  texture "mars"
+  castShadows FALSE
+}
+RectangleArena {
+  translation 0 0 0.699464
+  name "rectangle arena(1)"
+  floorSize 2000 2000
+  floorTileSize 1 1
+  floorAppearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/dry_mud/dry_mud_base_color.jpg?raw=true"
+      ]
+      filtering 2
+    }
+    roughness 1
+    metalness 0.2
+    IBLStrength 0
+    normalMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/dry_mud/dry_mud_normal.jpg?raw=true"
+      ]
+    }
+    occlusionMap ImageTexture {
+      url [
+        "https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/textures/dry_mud/dry_mud_occlusion.jpg?raw=true"
+      ]
+    }
+    occlusionMapStrength 0.1
+  }
+}
+Rock {
+  translation 7.63 26.35 2.21
+  type "flat"
+  scale 14
+}
+Rock {
+  translation 15.95 6.67 1.1
+  rotation 0 0 1 1.5708
+  name "rock(1)"
+  type "flat"
+  scale 10
+}
+Rock {
+  translation 33.35 -13.32 3.27
+  rotation 0 0 -1 -5.307179586466759e-06
+  name "rock(2)"
+  type "flat"
+  scale 10
+}
+Rock {
+  translation 32.65 25.53 3.13
+  rotation 0 0 -1 -5.307179586466759e-06
+  name "rock(5)"
+  scale 25
+}
+Rock {
+  translation 32.65 42.69 2.83
+  rotation 0 0 1 -1.3089953071795861
+  name "rock(7)"
+  scale 35
+}
+Rock {
+  translation 52.14 25.53 3.13
+  rotation -2.6535899999626298e-06 0.999999999985917 -4.596149999935272e-06 -1.047195307179586
+  name "rock(6)"
+  scale 25
+}
+Rock {
+  translation 7.64 -27.87 2.49
+  rotation 0 0 -1 -5.307179586466759e-06
+  name "rock(3)"
+  type "flat"
+  scale 10
+}
+Rock {
+  translation -13.96 -36.47 1.73
+  rotation 0 0 1 1.5708
+  name "rock(8)"
+  type "flat"
+  scale 10
+}
+WorkBarrier {
+  translation -17.3512 10.4327 0.68
+  rotation 0 0 1 1.309
+}
+WorkBarrier {
+  translation -20.4227 11.8881 0.68
+  rotation 0 0 -1 -1.0472053071795866
+  name "work barrier(1)"
+}
+WorkBarrier {
+  translation -24.0083 12.5655 0.68
+  rotation 0 0 1 -1.3089953071795861
+  name "work barrier(2)"
+}
+WorkBarrier {
+  translation -27.5808 10.6575 0.68
+  rotation 0 0 1 -0.785395307179586
+  name "work barrier(3)"
+}
+WorkBarrier {
+  translation -17.9247 4.2225 0.68
+  rotation 0 0 1 1.5708
+  name "work barrier(4)"
+}
+WorkBarrier {
+  translation -15.2166 2.04676 0.68
+  rotation 0 0 -1 -0.5236053071795865
+  name "work barrier(5)"
+}
+WorkBarrier {
+  translation -21.2702 2.89294 0.68
+  rotation 0 0 1 2.3562
+  name "work barrier(6)"
+}
+WorkBarrier {
+  translation -21.9704 -0.649677 0.68
+  rotation 0 0 1 -3.1415853071795863
+  name "work barrier(7)"
+}
+Rock {
+  translation 33.88 -34.47 3.35
+  rotation 0 0 1 1.309
+  name "rock(4)"
+  type "flat"
+  scale 13
+}
+UnevenTerrain {
+  translation 12.83 0 -7.54
+  size 100 100 20
+  xDimension 44
+  yDimension 44
+  randomSeed 6
+  perlinNOctaves 4
+}
+Windmill {
+  translation -24.1279 -36.3877 1.28
+  rotation 0 0 1 0.785398
+}
+Barn {
+  translation 49.54 -1.82208e-08 3.27
+  rotation 1.27237e-14 9.58979e-09 -1 -3.1415853071795863
+}
+OilBarrel {
+  translation -11.23 0 1.2
+}
+OilBarrel {
+  translation -11.23 0 1.14
+  name "oil barrel(3)"
+}
+OilBarrel {
+  translation -11.23 5.02 1.14
+  rotation 0 0 1 1.5708
+  name "oil barrel(1)"
+}
+OilBarrel {
+  translation -8.1 0 1.14
+  rotation 0 0 1 1.5708
+  name "oil barrel(2)"
+}
+OilBarrel {
+  translation 12.63 -4.43992 2.65
+  rotation 0 0 -1 -1.3090053071795866
+  name "oil barrel(5)"
+}
+OilBarrel {
+  translation 24.38 -4.43992 3.02
+  rotation 0 0 1 -2.617985307179586
+  name "oil barrel(9)"
+}
+OilBarrel {
+  translation 24.38 15.5901 2.09
+  rotation 0 0 1 1.5708
+  name "oil barrel(13)"
+}
+OilBarrel {
+  translation 24.38 -7.43992 3.07
+  rotation 0 0 1 -1.3089953071795861
+  name "oil barrel(12)"
+}
+OilBarrel {
+  translation 24.38 -5.16992 3.02
+  rotation 0 0 1 2.3562
+  name "oil barrel(11)"
+}
+OilBarrel {
+  translation 25 -4.43992 3.13
+  rotation 0 0 1 -1.047195307179586
+  name "oil barrel(10)"
+}
+OilBarrel {
+  translation 11.9 -4.43992 2.65
+  rotation 0 0 1 -2.8797853071795863
+  name "oil barrel(7)"
+}
+OilBarrel {
+  translation 12.63 -5.11992 2.65
+  rotation 0 0 1 -2.3561953071795863
+  name "oil barrel(6)"
+}
+OilBarrel {
+  translation 12.63 -7.45992 2.65
+  rotation 0 0 1 -1.8325953071795862
+  name "oil barrel(8)"
+}
+OilBarrel {
+  translation -8.1 5.04 1.14
+  rotation 0 0 1 0.523599
+  name "oil barrel(4)"
+}
+Cypress {
+  translation -6.56 -8.73 0.6
+}
+Cypress {
+  translation -8.67 -9.6 0.6
+  name "cypress tree(1)"
+}
+Cypress {
+  translation -13.84 -6.78 0.6
+  name "cypress tree(3)"
+}
+Cypress {
+  translation -14.88 -0.78 0.6
+  name "cypress tree(4)"
+}
+Cypress {
+  translation -17.49 2.71 0.6
+  name "cypress tree(5)"
+}
+Cypress {
+  translation -17.49 12.27 0.6
+  name "cypress tree(9)"
+}
+Cypress {
+  translation -12.93 13.07 0.6
+  name "cypress tree(12)"
+}
+Cypress {
+  translation -8.04 15.89 0.6
+  name "cypress tree(13)"
+}
+Cypress {
+  translation -3.78 11.67 0.6
+  name "cypress tree(14)"
+}
+Cypress {
+  translation -1.54 4.3 0.6
+  name "cypress tree(15)"
+}
+Cypress {
+  translation -1.54 -1.93 0.6
+  name "cypress tree(16)"
+}
+Cypress {
+  translation -3.54 -6.14 0.6
+  name "cypress tree(17)"
+}
+Cypress {
+  translation -21.02 13.99 0.6
+  name "cypress tree(10)"
+}
+Cypress {
+  translation -25.91 13.99 0.6
+  name "cypress tree(11)"
+}
+Cypress {
+  translation -28.79 11.79 0.6
+  name "cypress tree(18)"
+}
+Cypress {
+  translation -32.35 7.21 0.6
+  name "cypress tree(19)"
+}
+Cypress {
+  translation -35.47 1.25 0.6
+  name "cypress tree(20)"
+}
+Cypress {
+  translation -35.85 -4.89 0.6
+  name "cypress tree(21)"
+}
+Cypress {
+  translation -36.3 -11.65 0.6
+  name "cypress tree(22)"
+}
+Cypress {
+  translation -35.51 -18.13 0.6
+  name "cypress tree(23)"
+}
+Cypress {
+  translation -30.77 -19.69 0.6
+  name "cypress tree(24)"
+}
+Cypress {
+  translation -25.5 -17.76 0.6
+  name "cypress tree(25)"
+}
+Cypress {
+  translation -21.5 -14.44 0.6
+  name "cypress tree(26)"
+}
+Cypress {
+  translation -20.77 -8.73 0.6
+  name "cypress tree(6)"
+}
+Cypress {
+  translation -21.16 -3.68 0.6
+  name "cypress tree(7)"
+}
+Cypress {
+  translation -20.69 0.9 0.6
+  name "cypress tree(8)"
+}
+Cypress {
+  translation -11.44 -8.73 0.58
+  name "cypress tree(2)"
+}
+Wheelbarrow {
+  translation 44.6162 -4.0316 3.26
+  rotation -9.58979e-09 7.35847e-09 -1 -1.8325953071795862
+}
+Pedestrian {
+  translation -6.27 0 1.97
+  rotation 0 0 1 2.618
+}
+Pedestrian {
+  translation -5.395 -0.216509 1.96
+  rotation 0 0 -1 -2.094405307179586
+  name "pedestrian(1)"
+}
+Pedestrian {
+  translation -7.43 5.04015 1.96
+  rotation 0 0 1 -2.356185307179586
+  name "pedestrian(2)"
+}
+TrafficCone {
+  translation -0.0207054 3.83 1.27728
+  rotation 0 -1 0 0.261795
+}
+TrafficCone {
+  translation -0.0207054 -1.61 1.27728
+  rotation 0 -1 0 0.261795
+  name "traffic cone(9)"
+}
+TrafficCone {
+  translation 3.30099 2.96 1.81899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(1)"
+}
+TrafficCone {
+  translation 3.44099 -2.56 2.12899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(10)"
+}
+TrafficCone {
+  translation 6.25099 2.64 2.15899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(2)"
+}
+TrafficCone {
+  translation 6.93099 -3.62 2.48899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(11)"
+}
+TrafficCone {
+  translation 10.571 -4.48 2.33899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(12)"
+}
+TrafficCone {
+  translation 26.061 -4.48 2.84899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(13)"
+}
+TrafficCone {
+  translation 21.911 -7.49 2.33899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(15)"
+}
+TrafficCone {
+  translation 18.751 -7.49 2.15899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(16)"
+}
+TrafficCone {
+  translation 15.801 -7.49 2.20899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(17)"
+}
+TrafficCone {
+  translation 28.551 -4.33 3.51899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(14)"
+}
+TrafficCone {
+  translation 10.001 2.73 2.15899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(3)"
+}
+TrafficCone {
+  translation 12.671 3.32 2.02899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(4)"
+}
+TrafficCone {
+  translation 16.831 3.32 1.97899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(5)"
+}
+TrafficCone {
+  translation 19.601 3.72 1.88899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(6)"
+}
+TrafficCone {
+  translation 22.991 3.72 1.98899
+  rotation 0 1 0 4.38702e-06
+  name "traffic cone(7)"
+}
+TrafficCone {
+  translation 26.531 3.51 2.60899
+  rotation 0.004371851938539861 -0.9999904434096494 -9.589704252208037e-09 -5.307179586466759e-06
+  name "traffic cone(8)"
+}

@@ -8,10 +8,10 @@
 # For the last 6 fields to have any effect, the 'interior' has to be enabled.
 # template language: javascript
 
-EXTERNPROTO "webots://projects/vehicles/protos/abstract/CarSteeringWheel.proto"
-EXTERNPROTO "webots://projects/vehicles/protos/abstract/Car.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/CarSteeringWheel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/Car.proto"
 EXTERNPROTO "UazPatriotWheel.proto"
-EXTERNPROTO "webots://projects/vehicles/protos/abstract/VehicleLights.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/abstract/VehicleLights.proto"
 EXTERNPROTO "UazPatriotMesh.proto"
 EXTERNPROTO "UazPatriotInterior.proto"
 
