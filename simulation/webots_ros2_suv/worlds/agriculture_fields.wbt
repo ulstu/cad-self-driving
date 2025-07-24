@@ -1,14 +1,16 @@
-#VRML_SIM R2023a utf8
+#VRML_SIM R2023b utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/vehicles/protos/bmw/BmwX5.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/Road.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/Crossroad.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/SimpleBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/geometries/protos/Extrusion.proto"
+EXTERNPROTO "/home/vladosok/ros2_ws/src/webots_ros2_suv/worlds/protos/UazAvionAmazon/UazAvionAmazon.proto"
+EXTERNPROTO "/home/vladosok/ros2_ws/src/webots_ros2_suv/worlds/protos/UazAvionSprayer/UazAvionSprayer.proto"
+EXTERNPROTO "/home/vladosok/ros2_ws/src/webots_ros2_suv/worlds/protos/GazelleNext/GazelleNext.proto"
 
 WorldInfo {
   info [
@@ -19,9 +21,9 @@ WorldInfo {
   gpsReference 54.581649999999996 48.9638 0
   lineScale 23
 }
-BmwX5 {
-  translation 3.0579153604693654 -7.343241089265075 0.5290680682345432
-  rotation 0.9929554089719524 -0.11836327798953662 0.005448872994841482 0.07212438106245643
+GazelleNext {
+  translation 3.06052 -11.0833 0.370741
+  rotation 1 0 0 0
   controller "<extern>"
   sensorsSlotFront [
     RangeFinder {
@@ -33,12 +35,10 @@ BmwX5 {
       minRange 0.5
       maxRange 40
     }
-    VelodyneVLP-16 {
-    }
     Camera {
       translation -2.12 0 0.93
       children [
-        Transform {
+        Pose {
           translation -0.05 0 0
           rotation 0 -1 0 1.5708
           children [
@@ -83,10 +83,133 @@ BmwX5 {
     }
   ]
 }
-
+UazAvionAmazon {
+  translation 3.05792 -7.34324 0.589068
+  rotation 1 0 0 0
+  controller "<extern>"
+  sensorsSlotFront [
+    RangeFinder {
+      translation 0 0 0.2
+      name "range_finder"
+      fieldOfView 1
+      width 360
+      height 240
+      minRange 0.5
+      maxRange 40
+    }
+    Camera {
+      translation -2.12 0 0.93
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 360
+      height 240
+    }
+  ]
+  sensorsSlotTop [
+    Compass {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    GPS {
+    }
+  ]
+  sensorsSlotCenter [
+    Accelerometer {
+    }
+    Radar {
+    }
+    Gyro {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+}
+UazAvionSprayer {
+  translation 3.05535 -3.00371 0.611729
+  rotation 1 0 0 0
+  controller "<extern>"
+  sensorsSlotFront [
+    RangeFinder {
+      translation 0 0 0.2
+      name "range_finder"
+      fieldOfView 1
+      width 360
+      height 240
+      minRange 0.5
+      maxRange 40
+    }
+    Camera {
+      translation -2.12 0 0.93
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 360
+      height 240
+    }
+  ]
+  sensorsSlotTop [
+    Compass {
+    }
+    InertialUnit {
+      name "inertial_unit"
+    }
+    GPS {
+    }
+  ]
+  sensorsSlotCenter [
+    Accelerometer {
+    }
+    Radar {
+    }
+    Gyro {
+    }
+    Display {
+      width 200
+      height 160
+    }
+  ]
+}
 Viewpoint {
-  orientation -0.44881304729505295 0.12180308265192329 0.8852857491421724 2.6694509350281437
-  position 669.6713380835764 -1502.1482934739627 35.635416093311605
+  orientation 0.09811683742426938 0.011625732728929373 -0.9951069935199808 2.5936382699380984
+  position 21.840198376747782 3.9642821935201322 5.105620910505186
   near 3
 }
 TexturedBackground {
@@ -2120,12 +2243,6 @@ Road {
   ]
   splineSubdivision 0
 }
-PedestrianCrossing {
-  translation -1912.067031 -1144.494826 -0.07
-  rotation 0 0 1 1.445018
-  name "pedestrian crossing(1)"
-  size 7 2.8
-}
 Road {
   translation -2205.968387 -1776.465825 0.01
   name "Волжская улица"
@@ -3891,12 +4008,6 @@ Road {
   ]
   splineSubdivision 0
 }
-PedestrianCrossing {
-  translation -2369.380904 -1081.069198 -0.07
-  rotation 0 0 1 2.573651
-  name "pedestrian crossing(2)"
-  size 7 2.8
-}
 Road {
   translation -2573.812012 -1871.389946 0.01
   name "улица Калинина"
@@ -4540,18 +4651,6 @@ Road {
     "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_triangle.png"
   ]
   splineSubdivision 0
-}
-PedestrianCrossing {
-  translation 4821.929958 -1974.188846 -0.07
-  rotation 0 0 1 1.517187
-  name "pedestrian crossing(3)"
-  size 7 2.8
-}
-PedestrianCrossing {
-  translation 4891.780059 -1978.577043 -0.07
-  rotation 0 0 1 1.505289
-  name "pedestrian crossing(4)"
-  size 7 2.8
 }
 Road {
   translation 649.258027 -1495.024188 0.01
@@ -6866,12 +6965,6 @@ Road {
   ]
   splineSubdivision 0
 }
-PedestrianCrossing {
-  translation -1934.729681 -1069.617425 -0.07
-  rotation 0 0 1 2.633002
-  name "pedestrian crossing(5)"
-  size 7 2.8
-}
 Road {
   translation -1866.93552 -1307.594563 0.01
   name "улица Карла Маркса(2)"
@@ -7180,18 +7273,6 @@ Road {
     "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/road/protos/textures/road_line_triangle.png"
   ]
   splineSubdivision 0
-}
-PedestrianCrossing {
-  translation -2657.957702 -1529.963881 -0.07
-  rotation 0 0 1 2.56015
-  name "pedestrian crossing(6)"
-  size 7 2.8
-}
-PedestrianCrossing {
-  translation -2774.965251 -1709.611267 -0.07
-  rotation 0 0 1 2.572213
-  name "pedestrian crossing(7)"
-  size 7 2.8
 }
 Road {
   translation -2081.443431 -1251.086213 0.01
@@ -13596,7 +13677,7 @@ Solid {
   name "wall(6)"
   boundingObject USE SHAPE
 }
-Transform {
+Pose {
   translation 237.93 2890.58 0
   children [
     Shape {
@@ -13622,7 +13703,7 @@ Transform {
     }
   ]
 }
-Transform {
+Pose {
   translation -1356.55 -54.91 0
   children [
     Shape {
@@ -13665,7 +13746,7 @@ Transform {
     }
   ]
 }
-Transform {
+Pose {
   translation -566.92 1305.41 0
   children [
     Shape {
@@ -13691,7 +13772,7 @@ Transform {
     }
   ]
 }
-Transform {
+Pose {
   translation -1105.16 -100.53 0
   children [
     Shape {
@@ -13720,7 +13801,7 @@ Transform {
     }
   ]
 }
-Transform {
+Pose {
   translation -495.84 1225.49 0
   children [
     Shape {
@@ -13751,7 +13832,7 @@ Transform {
     }
   ]
 }
-Transform {
+Pose {
   translation -870.33 -189.2 0
   children [
     Shape {
@@ -13784,7 +13865,7 @@ Transform {
     }
   ]
 }
-DEF water Transform {
+DEF water Pose {
   translation -2314.462889 -307.835097 0
   children [
     Shape {
@@ -13808,7 +13889,7 @@ DEF water Transform {
     }
   ]
 }
-DEF water Transform {
+DEF water Pose {
   translation -2441.525514 848.797751 0
   children [
     Shape {
@@ -13832,7 +13913,7 @@ DEF water Transform {
     }
   ]
 }
-DEF _3-_ Transform {
+DEF _3-_ Pose {
   translation -2203.986966 -113.389696 0
   children [
     Shape {
@@ -13855,7 +13936,7 @@ DEF _3-_ Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 1362.797559 -3410.062203 0
   children [
     Shape {
@@ -13886,7 +13967,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -999.956673 -1208.515571 0
   children [
     Shape {
@@ -13916,7 +13997,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 1064.293491 -3424.643924 0
   children [
     Shape {
@@ -13947,7 +14028,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -2396.114186 2058.832233 0
   children [
     Shape {
@@ -13988,7 +14069,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -171.477595 1987.496485 0
   children [
     Shape {
@@ -14018,7 +14099,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 3286.40005 -1434.489774 0
   children [
     Shape {
@@ -14049,7 +14130,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 2216.438586 207.514055 0
   children [
     Shape {
@@ -14080,7 +14161,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -2437.800024 -1791.687193 0
   children [
     Shape {
@@ -14127,7 +14208,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF water Transform {
+DEF water Pose {
   translation -1325.796136 -83.374409 0
   children [
     Shape {
@@ -14167,7 +14248,7 @@ DEF water Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -1828.825729 -44.514886 0
   children [
     Shape {
@@ -14198,7 +14279,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 599.840958 -1298.002591 0
   children [
     Shape {
@@ -14228,7 +14309,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 2203.831625 2028.741869 0
   children [
     Shape {
@@ -14277,7 +14358,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF parking Transform {
+DEF parking Pose {
   translation -1135.116693 -1309.748437 0
   children [
     Shape {
@@ -14311,7 +14392,7 @@ DEF parking Transform {
     }
   ]
 }
-DEF _ Transform {
+DEF _ Pose {
   translation -3280.407254 -764.430599 0
   children [
     Shape {
@@ -14335,7 +14416,7 @@ DEF _ Transform {
     }
   ]
 }
-DEF water Transform {
+DEF water Pose {
   translation -1564.645325 2043.795435 0
   children [
     Shape {
@@ -14359,7 +14440,7 @@ DEF water Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -2007.413016 -1636.708564 0
   children [
     Shape {
@@ -14407,7 +14488,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation 2143.208499 2782.408163 0
   children [
     Shape {
@@ -14438,7 +14519,7 @@ DEF farmland Transform {
     }
   ]
 }
-DEF farmland Transform {
+DEF farmland Pose {
   translation -711.783595 961.476623 0
   children [
     Shape {
